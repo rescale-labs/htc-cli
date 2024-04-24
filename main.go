@@ -15,10 +15,6 @@ import (
 )
 
 func main() {
-	parseArgs()
-}
-
-func parseArgs() {
 	validateArgs()
 
 	ctx := context.Background()
@@ -42,6 +38,33 @@ func parseArgs() {
 	} else {
 		download(client)
 	}
+}
+
+func getGoogleCredentials() string {
+	credentials, ok := os.LookupEnv("GCP_APPLICATION_CREDENTIALS")
+	if !ok {
+		log.Fatal("Error GCP_APPLICATION_CREDENTIALS not set")
+		os.Exit(1)
+	}
+
+	return credentials
+}
+
+func uploadDirectory(client *storage.Client, ctx context.Context, bucket string, remotePath string, localDir string) {
+	entries, err := os.ReadDir(localDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	files := make([]string, 0)
+	for _, e := range entries {
+		remoteObject := fmt.Sprintf("%s/%s", remotePath, e.Name())
+		localPath := fmt.Sprintf("%s/%s", localDir, e.Name())
+
+		uploadFile(client, ctx, bucket, remoteObject, localPath)
+	}
+
+	log.Print(files)
 }
 
 func uploadFile(client *storage.Client, ctx context.Context, bucket string, object string, localFile string) {
@@ -70,28 +93,14 @@ func uploadFile(client *storage.Client, ctx context.Context, bucket string, obje
 	log.Printf("Blob %s uploaded.\n", object)
 }
 
-func getGoogleCredentials() string {
-	credentials, ok := os.LookupEnv("GCP_APPLICATION_CREDENTIALS")
-	if !ok {
-		log.Fatal("Error GCP_APPLICATION_CREDENTIALS not set")
-		os.Exit(1)
-	}
-
-	return credentials
-}
-
 func upload(client *storage.Client, ctx context.Context) {
 	uploadCmd := flag.NewFlagSet("upload", flag.ExitOnError)
 	src := uploadCmd.String("src", "", "the source path to upload from")
 	dest := uploadCmd.String("dest", "", "the destination bucket to upload to")
-	region := uploadCmd.String("region", "", "the region to upload to")
 	uploadCmd.Parse(os.Args[2:])
 
 	bucket, path := parseBucket(*dest)
-
-	object := fmt.Sprintf("%s/%s", path, "env")
-
-	uploadFile(client, ctx, bucket, object, "env")
+	uploadDirectory(client, ctx, bucket, path, *src)
 
 	//it := client.Bucket(bucket).Objects(ctx, &storage.Query{Prefix: path})
 	//
@@ -109,7 +118,6 @@ func upload(client *storage.Client, ctx context.Context) {
 	log.Printf("Upload command: %s\n", uploadCmd.Args())
 	log.Printf("src: %s\n", *src)
 	log.Printf("dest: %s\n", *dest)
-	log.Printf("region: %s\n", *region)
 }
 
 func parseBucket(bucketPath string) (string, string) {
@@ -128,7 +136,7 @@ func download(client *storage.Client) {
 	downloadCmd := flag.NewFlagSet("download", flag.ExitOnError)
 	src := downloadCmd.String("src", "", "the source bucket to download from")
 	dest := downloadCmd.String("dest", "", "the destination path to download to")
-	region := downloadCmd.String("region", "", "the region to download from")
+
 	downloadCmd.Parse(os.Args[2:])
 
 	log.Printf("Download command: %s\n", downloadCmd.Args())
