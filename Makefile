@@ -10,5 +10,8 @@ build-container: format
 build-binary: format
 	go build -o ./htccli
 
+test:
+	go test
+
 clean:
 	rm -f htccli

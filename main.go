@@ -22,7 +22,7 @@ func main() {
 	credentials, err := google.CredentialsFromJSON(ctx, []byte(credentialsString), "https://www.googleapis.com/auth/cloud-platform")
 
 	if err != nil {
-		log.Fatal("Error GCP_APPLICATION_CREDENTIALS not set")
+		log.Fatal("Error loading credentials")
 		os.Exit(1)
 	}
 
@@ -50,43 +50,41 @@ func getGoogleCredentials() string {
 	return credentials
 }
 
-func uploadDirectory(client *storage.Client, ctx context.Context, bucket string, remotePath string, localDir string) {
-	entries, err := os.ReadDir(localDir)
+func uploadDirectory(client *storage.Client, ctx context.Context, bucket string, remotePath string, localPath string) {
+
+	entries, err := os.ReadDir(localPath)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error opening path %s", localPath)
+		os.Exit(1)
 	}
 
-	files := make([]string, 0)
 	for _, e := range entries {
 		remoteObject := fmt.Sprintf("%s/%s", remotePath, e.Name())
-		localPath := fmt.Sprintf("%s/%s", localDir, e.Name())
+		localFile := fmt.Sprintf("%s/%s", localPath, e.Name())
 
-		uploadFile(client, ctx, bucket, remoteObject, localPath)
+		uploadFile(client, ctx, bucket, remoteObject, localFile)
 	}
-
-	log.Print(files)
 }
 
 func uploadFile(client *storage.Client, ctx context.Context, bucket string, object string, localFile string) {
 	f, err := os.Open(localFile)
 	if err != nil {
-		log.Fatalf("os.Open: %w", err)
+		log.Fatalf("os.Open: %s", err)
 		os.Exit(1)
 	}
 	defer f.Close()
 
 	o := client.Bucket(bucket).Object(object)
-	o = o.If(storage.Conditions{DoesNotExist: true})
 
 	writer := o.NewWriter(ctx)
 
 	if _, err = io.Copy(writer, f); err != nil {
-		log.Fatalf("io.Copy error: %w", err)
+		log.Fatalf("io.Copy error: %s", err)
 		return
 	}
 
 	if err := writer.Close(); err != nil {
-		log.Fatalf("Writer.Close: %w", err)
+		log.Fatalf("Writer.Close: %s", err)
 		return
 	}
 
@@ -102,22 +100,6 @@ func upload(client *storage.Client, ctx context.Context) {
 	bucket, path := parseBucket(*dest)
 	uploadDirectory(client, ctx, bucket, path, *src)
 
-	//it := client.Bucket(bucket).Objects(ctx, &storage.Query{Prefix: path})
-	//
-	//for {
-	//	attrs, err := it.Next()
-	//	if err == iterator.Done {
-	//		break
-	//	}
-	//	if err != nil {
-	//		log.Fatal(err)
-	//	}
-	//	log.Printf("Name is %s", attrs.Name)
-	//}
-
-	log.Printf("Upload command: %s\n", uploadCmd.Args())
-	log.Printf("src: %s\n", *src)
-	log.Printf("dest: %s\n", *dest)
 }
 
 func parseBucket(bucketPath string) (string, string) {
@@ -142,7 +124,6 @@ func download(client *storage.Client) {
 	log.Printf("Download command: %s\n", downloadCmd.Args())
 	log.Printf("src: %s\n", *src)
 	log.Printf("dest: %s\n", *dest)
-	log.Printf("region: %s\n", *region)
 }
 
 func validateArgs() {
