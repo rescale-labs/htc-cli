@@ -14,6 +14,17 @@ import (
 	"strings"
 )
 
+type FileUpload struct {
+	localPath  string
+	remotePath string
+}
+
+type UploadResponse struct {
+	remoteObject string
+	success      bool
+	error        error
+}
+
 func main() {
 	validateArgs()
 
@@ -58,19 +69,56 @@ func uploadDirectory(client *storage.Client, ctx context.Context, bucket string,
 		os.Exit(1)
 	}
 
+	numJobs := 5
+	filesToProcess := make(chan FileUpload, numJobs)
+	uploadedResponses := make(chan UploadResponse, len(entries))
+	responses := make([]UploadResponse, len(entries))
+
+	// adding 5 workers for processing the queue
+	for worker := 0; worker < 5; worker++ {
+		go uploadWorker(client, ctx, bucket, filesToProcess, uploadedResponses)
+	}
+
+	// puts the files into the queue to process
 	for _, e := range entries {
 		remoteObject := fmt.Sprintf("%s/%s", remotePath, e.Name())
 		localFile := fmt.Sprintf("%s/%s", localPath, e.Name())
 
-		uploadFile(client, ctx, bucket, remoteObject, localFile)
+		filesToProcess <- FileUpload{localFile, remoteObject}
+	}
+
+	// no more work to add to the queue
+	close(filesToProcess)
+
+	// reads from the results if file was uploaded properly
+	for w := 0; w < len(entries); w++ {
+		responses = append(responses, <-uploadedResponses)
+	}
+
+	failedUploads := strings.Builder{}
+	failedUploads.WriteString("Failed to upload files [")
+	for _, response := range responses {
+		if response.success == false {
+			failedUploads.WriteString(fmt.Sprintf("%s ", response.remoteObject))
+		}
+	}
+	failedUploads.WriteString("]")
+
+	log.Print(failedUploads.String())
+}
+
+func uploadWorker(client *storage.Client, ctx context.Context, bucket string, filesToProcess <-chan FileUpload, uploaded chan<- UploadResponse) {
+	// processing the elements in the queue
+	for localFile := range filesToProcess {
+		uploaded <- uploadFile(client, ctx, bucket, localFile.remotePath, localFile.localPath)
 	}
 }
 
-func uploadFile(client *storage.Client, ctx context.Context, bucket string, object string, localFile string) {
+func uploadFile(client *storage.Client, ctx context.Context, bucket string, object string, localFile string) UploadResponse {
 	f, err := os.Open(localFile)
 	if err != nil {
-		log.Fatalf("os.Open: %s", err)
-		os.Exit(1)
+		log.Fatal("Failed to open local file")
+		return UploadResponse{object, false, err}
 	}
 	defer f.Close()
 
@@ -80,15 +128,16 @@ func uploadFile(client *storage.Client, ctx context.Context, bucket string, obje
 
 	if _, err = io.Copy(writer, f); err != nil {
 		log.Fatalf("io.Copy error: %s", err)
-		return
+		return UploadResponse{object, false, err}
 	}
 
 	if err := writer.Close(); err != nil {
 		log.Fatalf("Writer.Close: %s", err)
-		return
+		return UploadResponse{object, false, err}
 	}
 
 	log.Printf("Blob %s uploaded.\n", object)
+	return UploadResponse{o.ObjectName(), true, nil}
 }
 
 func upload(client *storage.Client, ctx context.Context) {
