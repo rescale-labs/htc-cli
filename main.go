@@ -98,7 +98,20 @@ func upload(client *storage.Client, ctx context.Context) {
 	uploadCmd.Parse(os.Args[2:])
 
 	bucket, path := parseBucket(*dest)
-	uploadDirectory(client, ctx, bucket, path, *src)
+
+	filePtr, err := os.Stat(*src)
+	if err != nil {
+		log.Fatal("Unable to check if path is file or directory")
+		os.Exit(1)
+	}
+
+	if filePtr.IsDir() {
+		uploadDirectory(client, ctx, bucket, path, *src)
+	}
+
+	if filePtr.Mode().IsRegular() {
+		uploadFile(client, ctx, bucket, fmt.Sprintf("%s/%s", path, filePtr.Name()), *src)
+	}
 
 }
 
