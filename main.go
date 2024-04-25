@@ -26,11 +26,6 @@ type UploadResponse struct {
 	error        error
 }
 
-func (m UploadResponse) String() string {
-	//code
-	return m.remoteObject
-}
-
 func main() {
 	validateArgs()
 
@@ -77,12 +72,11 @@ func uploadDirectory(client *storage.Client, ctx context.Context, bucket string,
 
 	numJobs := 5
 	filesToProcess := make(chan FileUpload, numJobs)
-	uploadedResponses := make(chan UploadResponse, numJobs)
-	responses := make([]UploadResponse, len(entries))
+	processedFiles := make(chan UploadResponse)
 
 	// adding 5 workers for processing the queue
 	for worker := 0; worker < 5; worker++ {
-		go uploadWorker(client, ctx, bucket, filesToProcess, uploadedResponses)
+		go uploadWorker(client, ctx, bucket, filesToProcess, processedFiles)
 	}
 
 	// puts the files into the queue to process
@@ -96,16 +90,15 @@ func uploadDirectory(client *storage.Client, ctx context.Context, bucket string,
 	// no more work to add to the queue
 	close(filesToProcess)
 
-	// reads from the results if file was uploaded properly
-	for w := 0; w < len(entries); w++ {
-		responses = append(responses, <-uploadedResponses)
-	}
-
 	failedUploads := strings.Builder{}
 	failedUploads.WriteString("Failed to upload files [")
-	for _, response := range responses {
-		if response.success == false {
-			failedUploads.WriteString(fmt.Sprintf("%s ", response.remoteObject))
+
+	// reads from the results if file was uploaded properly
+	for file := 0; file < len(entries); file++ {
+		result := <-processedFiles
+		if result.success == false {
+			log.Printf(result.remoteObject)
+			failedUploads.WriteString(fmt.Sprintf("%s ", result.remoteObject))
 		}
 	}
 	failedUploads.WriteString("]")
@@ -113,10 +106,10 @@ func uploadDirectory(client *storage.Client, ctx context.Context, bucket string,
 	log.Print(failedUploads.String())
 }
 
-func uploadWorker(client *storage.Client, ctx context.Context, bucket string, filesToProcess <-chan FileUpload, uploaded chan<- UploadResponse) {
+func uploadWorker(client *storage.Client, ctx context.Context, bucket string, filesToProcess <-chan FileUpload, processedFiles chan<- UploadResponse) {
 	// processing the elements in the queue
 	for localFile := range filesToProcess {
-		uploaded <- uploadFile(client, ctx, bucket, localFile.remotePath, localFile.localPath)
+		processedFiles <- uploadFile(client, ctx, bucket, localFile.remotePath, localFile.localPath)
 	}
 }
 
