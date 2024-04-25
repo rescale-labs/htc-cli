@@ -12,6 +12,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 )
 
 type FileUpload struct {
@@ -23,6 +24,11 @@ type UploadResponse struct {
 	remoteObject string
 	success      bool
 	error        error
+}
+
+func (m UploadResponse) String() string {
+	//code
+	return m.remoteObject
 }
 
 func main() {
@@ -71,7 +77,7 @@ func uploadDirectory(client *storage.Client, ctx context.Context, bucket string,
 
 	numJobs := 5
 	filesToProcess := make(chan FileUpload, numJobs)
-	uploadedResponses := make(chan UploadResponse, len(entries))
+	uploadedResponses := make(chan UploadResponse, numJobs)
 	responses := make([]UploadResponse, len(entries))
 
 	// adding 5 workers for processing the queue
@@ -124,7 +130,10 @@ func uploadFile(client *storage.Client, ctx context.Context, bucket string, obje
 
 	o := client.Bucket(bucket).Object(object)
 
-	writer := o.NewWriter(ctx)
+	workerCtx, cancel := context.WithTimeout(ctx, time.Hour*1)
+	defer cancel()
+
+	writer := o.NewWriter(workerCtx)
 
 	if _, err = io.Copy(writer, f); err != nil {
 		log.Fatalf("io.Copy error: %s", err)
