@@ -11,6 +11,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -19,6 +20,11 @@ import (
 type FileUpload struct {
 	localPath  string
 	remotePath string
+}
+
+type FileDownload struct {
+	destinationFile string
+	remoteObject    string
 }
 
 type UploadResponse struct {
@@ -82,7 +88,7 @@ func uploadDirectory(client *storage.Client, ctx context.Context, bucket string,
 	processedFiles := make(chan UploadResponse)
 
 	// adding 5 workers for processing the queue
-	for worker := 0; worker < 5; worker++ {
+	for worker := 0; worker < 10; worker++ {
 		go uploadWorker(client, ctx, bucket, filesToProcess, processedFiles)
 	}
 
@@ -185,7 +191,17 @@ func parseBucket(bucketPath string) (string, string) {
 	return match[1], match[2]
 }
 
+func downloadWorker(client *storage.Client, ctx context.Context, bucket string, filesToProcess <-chan FileDownload, processedFiles chan<- DownloadResponse) {
+	// processing the elements in the queue
+	for object := range filesToProcess {
+		processedFiles <- downloadFile(client, ctx, bucket, object.remoteObject, object.destinationFile)
+	}
+}
+
 func downloadFile(client *storage.Client, ctx context.Context, bucket string, object string, localFile string) DownloadResponse {
+
+	destinationDirectory := filepath.Dir(localFile)
+	ensureDirectoryExists(destinationDirectory)
 
 	workerCtx, cancel := context.WithTimeout(ctx, time.Hour*1)
 	defer cancel()
@@ -226,9 +242,25 @@ func download(client *storage.Client, ctx context.Context) {
 
 	bucket, path := parseBucket(*src)
 
+	ensureDirectoryExists(*dest)
+	listAndDownloadObjects(client, ctx, bucket, path, *dest)
+}
+
+func listAndDownloadObjects(client *storage.Client, ctx context.Context, bucket string, path string, destinationDir string) {
+
+	numJobs := 5
+	filesToProcess := make(chan FileDownload, numJobs)
+	processedFiles := make(chan DownloadResponse)
+
+	//adding 5 workers for processing the queue
+	for worker := 0; worker < 10; worker++ {
+		go downloadWorker(client, ctx, bucket, filesToProcess, processedFiles)
+	}
+
 	listCtx, cancel := context.WithTimeout(ctx, time.Second*60)
 	defer cancel()
 
+	numDownloads := 0
 	it := client.Bucket(bucket).Objects(listCtx, &storage.Query{Prefix: path})
 	page := iterator.NewPager(it, 50, "")
 	for {
@@ -240,12 +272,50 @@ func download(client *storage.Client, ctx context.Context) {
 		}
 
 		for _, object := range remoteObjects {
-			downloadFile(client, ctx, bucket, object.Name, *dest)
+			objectPath, _ := strings.CutPrefix(object.Name, path)
+			if strings.HasPrefix(objectPath, "/") {
+				objectPath = strings.TrimLeft(objectPath, "/")
+			}
+			destinationFilePath := fmt.Sprintf("%s/%s", strings.TrimRight(destinationDir, "/"), objectPath)
+			numDownloads += 1
+			log.Printf("Downloading %s to %s", object.Name, destinationFilePath)
+			downloadFile(client, ctx, bucket, object.Name, destinationFilePath)
+			//filesToProcess <- FileDownload{destinationFilePath, object.Name}
 		}
 
 		if nextPageToken == "" {
 			break
 		}
+	}
+
+	// no more work to add to the queue
+	close(filesToProcess)
+	//
+	//log.Printf("Downloaded %d files", numDownloads)
+	//failedDownloads := strings.Builder{}
+	//failedDownloads.WriteString("Failed to download files [")
+	//for i := 0; i < numDownloads; i++ {
+	//	result := <-processedFiles
+	//	if result.success == false {
+	//		failedDownloads.WriteString(fmt.Sprintf("%s ", result.localFile))
+	//	}
+	//}
+	//failedDownloads.WriteString("]")
+
+	//log.Print(failedDownloads.String())
+}
+
+func ensureDirectoryExists(dirName string) {
+
+	info, err := os.Stat(dirName)
+	if err == nil && info.IsDir() {
+		return
+	}
+
+	// owner has all permissions and the rest have read and execute permissions
+	err = os.MkdirAll(dirName, 0755)
+	if err != nil {
+		log.Fatalf("Error Making directory %w", err)
 	}
 }
 
