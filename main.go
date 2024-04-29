@@ -85,9 +85,14 @@ func uploadDirectory(client *storage.Client, ctx context.Context, bucket string,
 			if strings.HasPrefix(objectPath, "/") {
 				objectPath = strings.TrimLeft(objectPath, "/")
 			}
+			if strings.HasPrefix(remotePath, "/") {
+				remotePath = strings.TrimLeft(remotePath, "/")
+			}
 			sourceFilePath := fmt.Sprintf("%s/%s", strings.TrimRight(localPath, "/"), objectPath)
-			log.Printf("Uploading %s to %s", sourceFilePath, objectPath)
-			result := uploadFile(client, ctx, bucket, objectPath, sourceFilePath)
+			remoteFilePath := fmt.Sprintf("%s/%s", remotePath, objectPath)
+
+			log.Printf("Uploading %s to %s", sourceFilePath, remoteFilePath)
+			result := uploadFile(client, ctx, bucket, remoteFilePath, sourceFilePath)
 			if !result.success {
 				failedUploads.WriteString(fmt.Sprintf("%s ", result.remoteObject))
 			}
