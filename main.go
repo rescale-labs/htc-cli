@@ -3,6 +3,7 @@ package main
 import (
 	"cloud.google.com/go/storage"
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"golang.org/x/oauth2/google"
@@ -43,19 +44,10 @@ func main() {
 	validateArgs()
 
 	ctx := context.Background()
-	credentialsString := getGoogleCredentials()
-	credentials, err := google.CredentialsFromJSON(ctx, []byte(credentialsString), "https://www.googleapis.com/auth/cloud-platform")
-
-	if err != nil {
-		log.Fatal("Error loading credentials")
-		os.Exit(1)
-	}
-
-	client, err := storage.NewClient(ctx, option.WithCredentials(credentials))
+	client, err := getGoogleClient(ctx)
 
 	if err != nil {
 		log.Fatalf("Error creating client %s", err)
-		os.Exit(1)
 	}
 
 	if os.Args[1] == "upload" {
@@ -65,14 +57,27 @@ func main() {
 	}
 }
 
-func getGoogleCredentials() string {
-	credentials, ok := os.LookupEnv("GCP_APPLICATION_CREDENTIALS")
-	if !ok {
-		log.Fatal("Error GCP_APPLICATION_CREDENTIALS not set")
-		os.Exit(1)
+func getGoogleClient(ctx context.Context) (*storage.Client, error) {
+	credentialsString, err := getGoogleCredentials()
+	if err != nil {
+		return nil, err
 	}
 
-	return credentials
+	credentials, err := google.CredentialsFromJSON(ctx, []byte(credentialsString), "https://www.googleapis.com/auth/cloud-platform")
+	if err != nil {
+		return nil, err
+	}
+
+	return storage.NewClient(ctx, option.WithCredentials(credentials))
+}
+
+func getGoogleCredentials() (string, error) {
+	credentials, ok := os.LookupEnv("GCP_APPLICATION_CREDENTIALS")
+	if !ok {
+		return "", errors.New("Error GCP_APPLICATION_CREDENTIALS not set")
+	}
+
+	return credentials, nil
 }
 
 func uploadDirectory(client *storage.Client, ctx context.Context, bucket string, remotePath string, localPath string) {
