@@ -6,10 +6,12 @@ import (
 	"flag"
 	"fmt"
 	"golang.org/x/oauth2/google"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -20,10 +22,21 @@ type FileUpload struct {
 	remotePath string
 }
 
+type FileDownload struct {
+	destinationFile string
+	remoteObject    string
+}
+
 type UploadResponse struct {
 	remoteObject string
 	success      bool
 	error        error
+}
+
+type DownloadResponse struct {
+	localFile string
+	success   bool
+	error     error
 }
 
 func main() {
@@ -48,7 +61,7 @@ func main() {
 	if os.Args[1] == "upload" {
 		upload(client, ctx)
 	} else {
-		download(client)
+		download(client, ctx)
 	}
 }
 
@@ -63,54 +76,27 @@ func getGoogleCredentials() string {
 }
 
 func uploadDirectory(client *storage.Client, ctx context.Context, bucket string, remotePath string, localPath string) {
-
-	entries, err := os.ReadDir(localPath)
-	if err != nil {
-		log.Fatalf("Error opening path %s", localPath)
-		os.Exit(1)
-	}
-
-	numJobs := 5
-	filesToProcess := make(chan FileUpload, numJobs)
-	processedFiles := make(chan UploadResponse)
-
-	// adding 5 workers for processing the queue
-	for worker := 0; worker < 5; worker++ {
-		go uploadWorker(client, ctx, bucket, filesToProcess, processedFiles)
-	}
-
-	// puts the files into the queue to process
-	for _, e := range entries {
-		remoteObject := fmt.Sprintf("%s/%s", remotePath, e.Name())
-		localFile := fmt.Sprintf("%s/%s", localPath, e.Name())
-
-		filesToProcess <- FileUpload{localFile, remoteObject}
-	}
-
-	// no more work to add to the queue
-	close(filesToProcess)
-
 	failedUploads := strings.Builder{}
 	failedUploads.WriteString("Failed to upload files [")
 
-	// reads from the results if file was uploaded properly
-	for file := 0; file < len(entries); file++ {
-		result := <-processedFiles
-		if result.success == false {
-			log.Printf(result.remoteObject)
-			failedUploads.WriteString(fmt.Sprintf("%s ", result.remoteObject))
+	filepath.Walk(localPath, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			objectPath, _ := strings.CutPrefix(path, localPath)
+			if strings.HasPrefix(objectPath, "/") {
+				objectPath = strings.TrimLeft(objectPath, "/")
+			}
+			sourceFilePath := fmt.Sprintf("%s/%s", strings.TrimRight(localPath, "/"), objectPath)
+			log.Printf("Uploading %s to %s", sourceFilePath, objectPath)
+			result := uploadFile(client, ctx, bucket, objectPath, sourceFilePath)
+			if !result.success {
+				failedUploads.WriteString(fmt.Sprintf("%s ", result.remoteObject))
+			}
 		}
-	}
+		return nil
+	})
 	failedUploads.WriteString("]")
 
 	log.Print(failedUploads.String())
-}
-
-func uploadWorker(client *storage.Client, ctx context.Context, bucket string, filesToProcess <-chan FileUpload, processedFiles chan<- UploadResponse) {
-	// processing the elements in the queue
-	for localFile := range filesToProcess {
-		processedFiles <- uploadFile(client, ctx, bucket, localFile.remotePath, localFile.localPath)
-	}
 }
 
 func uploadFile(client *storage.Client, ctx context.Context, bucket string, object string, localFile string) UploadResponse {
@@ -178,16 +164,106 @@ func parseBucket(bucketPath string) (string, string) {
 	return match[1], match[2]
 }
 
-func download(client *storage.Client) {
+func downloadFile(client *storage.Client, ctx context.Context, bucket string, object string, localFile string) DownloadResponse {
+
+	destinationDirectory := filepath.Dir(localFile)
+	ensureDirectoryExists(destinationDirectory)
+
+	workerCtx, cancel := context.WithTimeout(ctx, time.Hour*1)
+	defer cancel()
+
+	filePtr, err := os.Create(localFile)
+	if err != nil {
+		log.Fatal("Failed to open local file")
+		return DownloadResponse{localFile, false, err}
+	}
+
+	rc, err := client.Bucket(bucket).Object(object).NewReader(workerCtx)
+	if err != nil {
+		log.Fatalf("Object(%q).NewReader: %w", object, err)
+		return DownloadResponse{localFile, false, err}
+	}
+	defer rc.Close()
+
+	if _, err := io.Copy(filePtr, rc); err != nil {
+		log.Fatalf("io.Copy error: %s", err)
+		return DownloadResponse{localFile, false, err}
+	}
+
+	if err = filePtr.Close(); err != nil {
+		log.Fatalf("f.Close: %w", err)
+		return DownloadResponse{localFile, false, err}
+	}
+
+	log.Printf("Blob %v downloaded to local file %v\n", object, localFile)
+	return DownloadResponse{localFile, true, nil}
+}
+
+func download(client *storage.Client, ctx context.Context) {
 	downloadCmd := flag.NewFlagSet("download", flag.ExitOnError)
 	src := downloadCmd.String("src", "", "the source bucket to download from")
 	dest := downloadCmd.String("dest", "", "the destination path to download to")
 
 	downloadCmd.Parse(os.Args[2:])
 
-	log.Printf("Download command: %s\n", downloadCmd.Args())
-	log.Printf("src: %s\n", *src)
-	log.Printf("dest: %s\n", *dest)
+	bucket, path := parseBucket(*src)
+
+	ensureDirectoryExists(*dest)
+	listAndDownloadObjects(client, ctx, bucket, path, *dest)
+}
+
+func listAndDownloadObjects(client *storage.Client, ctx context.Context, bucket string, path string, destinationDir string) {
+
+	listCtx, cancel := context.WithTimeout(ctx, time.Second*60)
+	defer cancel()
+
+	failedDownloads := strings.Builder{}
+	failedDownloads.WriteString("Failed to download files [")
+
+	it := client.Bucket(bucket).Objects(listCtx, &storage.Query{Prefix: path})
+	page := iterator.NewPager(it, 50, "")
+	for {
+		var remoteObjects []*storage.ObjectAttrs
+		nextPageToken, err := page.NextPage(&remoteObjects)
+
+		if err != nil {
+			log.Fatalf("Error getting next page of objects %w", err)
+		}
+
+		for _, object := range remoteObjects {
+			objectPath, _ := strings.CutPrefix(object.Name, path)
+			if strings.HasPrefix(objectPath, "/") {
+				objectPath = strings.TrimLeft(objectPath, "/")
+			}
+			destinationFilePath := fmt.Sprintf("%s/%s", strings.TrimRight(destinationDir, "/"), objectPath)
+			log.Printf("Downloading %s to %s", object.Name, destinationFilePath)
+			response := downloadFile(client, ctx, bucket, object.Name, destinationFilePath)
+			if !response.success {
+				failedDownloads.WriteString(fmt.Sprintf("%s ", response.localFile))
+			}
+		}
+
+		if nextPageToken == "" {
+			break
+		}
+	}
+	failedDownloads.WriteString("]")
+
+	log.Print(failedDownloads.String())
+}
+
+func ensureDirectoryExists(dirName string) {
+
+	info, err := os.Stat(dirName)
+	if err == nil && info.IsDir() {
+		return
+	}
+
+	// owner has all permissions and the rest have read and execute permissions
+	err = os.MkdirAll(dirName, 0755)
+	if err != nil {
+		log.Fatalf("Error Making directory %w", err)
+	}
 }
 
 func validateArgs() {
