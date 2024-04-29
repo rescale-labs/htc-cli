@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"golang.org/x/oauth2/google"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"io"
 	"log"
@@ -24,6 +25,12 @@ type UploadResponse struct {
 	remoteObject string
 	success      bool
 	error        error
+}
+
+type DownloadResponse struct {
+	localFile string
+	success   bool
+	error     error
 }
 
 func main() {
@@ -48,7 +55,7 @@ func main() {
 	if os.Args[1] == "upload" {
 		upload(client, ctx)
 	} else {
-		download(client)
+		download(client, ctx)
 	}
 }
 
@@ -178,16 +185,68 @@ func parseBucket(bucketPath string) (string, string) {
 	return match[1], match[2]
 }
 
-func download(client *storage.Client) {
+func downloadFile(client *storage.Client, ctx context.Context, bucket string, object string, localFile string) DownloadResponse {
+
+	workerCtx, cancel := context.WithTimeout(ctx, time.Hour*1)
+	defer cancel()
+
+	filePtr, err := os.Create(localFile)
+	if err != nil {
+		log.Fatal("Failed to open local file")
+		return DownloadResponse{localFile, false, err}
+	}
+
+	rc, err := client.Bucket(bucket).Object(object).NewReader(workerCtx)
+	if err != nil {
+		log.Fatalf("Object(%q).NewReader: %w", object, err)
+		return DownloadResponse{localFile, false, err}
+	}
+	defer rc.Close()
+
+	if _, err := io.Copy(filePtr, rc); err != nil {
+		log.Fatalf("io.Copy error: %s", err)
+		return DownloadResponse{localFile, false, err}
+	}
+
+	if err = filePtr.Close(); err != nil {
+		log.Fatalf("f.Close: %w", err)
+		return DownloadResponse{localFile, false, err}
+	}
+
+	log.Printf("Blob %v downloaded to local file %v\n", object, localFile)
+	return DownloadResponse{localFile, true, nil}
+}
+
+func download(client *storage.Client, ctx context.Context) {
 	downloadCmd := flag.NewFlagSet("download", flag.ExitOnError)
 	src := downloadCmd.String("src", "", "the source bucket to download from")
 	dest := downloadCmd.String("dest", "", "the destination path to download to")
 
 	downloadCmd.Parse(os.Args[2:])
 
-	log.Printf("Download command: %s\n", downloadCmd.Args())
-	log.Printf("src: %s\n", *src)
-	log.Printf("dest: %s\n", *dest)
+	bucket, path := parseBucket(*src)
+
+	listCtx, cancel := context.WithTimeout(ctx, time.Second*60)
+	defer cancel()
+
+	it := client.Bucket(bucket).Objects(listCtx, &storage.Query{Prefix: path})
+	page := iterator.NewPager(it, 50, "")
+	for {
+		var remoteObjects []*storage.ObjectAttrs
+		nextPageToken, err := page.NextPage(&remoteObjects)
+
+		if err != nil {
+			log.Fatalf("Error getting next page of objects %w", err)
+		}
+
+		for _, object := range remoteObjects {
+			downloadFile(client, ctx, bucket, object.Name, *dest)
+		}
+
+		if nextPageToken == "" {
+			break
+		}
+	}
 }
 
 func validateArgs() {
