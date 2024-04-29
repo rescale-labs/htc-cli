@@ -41,19 +41,27 @@ type DownloadResponse struct {
 }
 
 func main() {
-	validateArgs()
-
 	ctx := context.Background()
 	client, err := getGoogleClient(ctx)
 
 	if err != nil {
-		log.Fatalf("Error creating client %s", err)
+		log.Fatalf("error running command %s", err)
+	}
+
+	if len(os.Args) < 2 {
+		err = errors.New("not enough arguments")
 	}
 
 	if os.Args[1] == "upload" {
-		upload(client, ctx)
+		err = upload(client, ctx)
+	} else if os.Args[1] == "download" {
+		err = download(ctx, client)
 	} else {
-		download(client, ctx)
+		err = errors.New("expected 'upload' or 'download' subcommands")
+	}
+
+	if err != nil {
+		log.Fatalf("error running command %s", err)
 	}
 }
 
@@ -80,11 +88,11 @@ func getGoogleCredentials() (string, error) {
 	return credentials, nil
 }
 
-func uploadDirectory(client *storage.Client, ctx context.Context, bucket string, remotePath string, localPath string) {
+func uploadDirectory(client *storage.Client, ctx context.Context, bucket string, remotePath string, localPath string) error {
 	failedUploads := strings.Builder{}
 	failedUploads.WriteString("Failed to upload files [")
 
-	filepath.Walk(localPath, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(localPath, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			objectPath, _ := strings.CutPrefix(path, localPath)
 			if strings.HasPrefix(objectPath, "/") {
@@ -107,6 +115,7 @@ func uploadDirectory(client *storage.Client, ctx context.Context, bucket string,
 	failedUploads.WriteString("]")
 
 	log.Print(failedUploads.String())
+	return err
 }
 
 func uploadFile(client *storage.Client, ctx context.Context, bucket string, object string, localFile string) UploadResponse {
@@ -138,7 +147,7 @@ func uploadFile(client *storage.Client, ctx context.Context, bucket string, obje
 	return UploadResponse{o.ObjectName(), true, nil}
 }
 
-func upload(client *storage.Client, ctx context.Context) {
+func upload(client *storage.Client, ctx context.Context) error {
 	uploadCmd := flag.NewFlagSet("upload", flag.ExitOnError)
 	src := uploadCmd.String("src", "", "the source path to upload from")
 	dest := uploadCmd.String("dest", "", "the destination bucket to upload to")
@@ -148,18 +157,17 @@ func upload(client *storage.Client, ctx context.Context) {
 
 	filePtr, err := os.Stat(*src)
 	if err != nil {
-		log.Fatal("Unable to check if path is file or directory")
-		os.Exit(1)
+		return errors.New("unable to check if path is file or directory")
 	}
 
 	if filePtr.IsDir() {
-		uploadDirectory(client, ctx, bucket, path, *src)
+		return uploadDirectory(client, ctx, bucket, path, *src)
+	} else if filePtr.Mode().IsRegular() {
+		uploadResponse := uploadFile(client, ctx, bucket, fmt.Sprintf("%s/%s", path, filePtr.Name()), *src)
+		return uploadResponse.error
+	} else {
+		return errors.New("file pointer is not a directory or file")
 	}
-
-	if filePtr.Mode().IsRegular() {
-		uploadFile(client, ctx, bucket, fmt.Sprintf("%s/%s", path, filePtr.Name()), *src)
-	}
-
 }
 
 func parseBucket(bucketPath string) (string, string) {
@@ -177,7 +185,11 @@ func parseBucket(bucketPath string) (string, string) {
 func downloadFile(client *storage.Client, ctx context.Context, bucket string, object string, localFile string) DownloadResponse {
 
 	destinationDirectory := filepath.Dir(localFile)
-	ensureDirectoryExists(destinationDirectory)
+	err := ensureDirectoryExists(destinationDirectory)
+
+	if err != nil {
+		return DownloadResponse{localFile, false, err}
+	}
 
 	workerCtx, cancel := context.WithTimeout(ctx, time.Hour*1)
 	defer cancel()
@@ -209,7 +221,7 @@ func downloadFile(client *storage.Client, ctx context.Context, bucket string, ob
 	return DownloadResponse{localFile, true, nil}
 }
 
-func download(client *storage.Client, ctx context.Context) {
+func download(ctx context.Context, client *storage.Client) error {
 	downloadCmd := flag.NewFlagSet("download", flag.ExitOnError)
 	src := downloadCmd.String("src", "", "the source bucket to download from")
 	dest := downloadCmd.String("dest", "", "the destination path to download to")
@@ -218,11 +230,16 @@ func download(client *storage.Client, ctx context.Context) {
 
 	bucket, path := parseBucket(*src)
 
-	ensureDirectoryExists(*dest)
-	listAndDownloadObjects(client, ctx, bucket, path, *dest)
+	err := ensureDirectoryExists(*dest)
+
+	if err != nil {
+		return err
+	}
+
+	return listAndDownloadObjects(client, ctx, bucket, path, *dest)
 }
 
-func listAndDownloadObjects(client *storage.Client, ctx context.Context, bucket string, path string, destinationDir string) {
+func listAndDownloadObjects(client *storage.Client, ctx context.Context, bucket string, path string, destinationDir string) error {
 
 	listCtx, cancel := context.WithTimeout(ctx, time.Second*60)
 	defer cancel()
@@ -237,7 +254,7 @@ func listAndDownloadObjects(client *storage.Client, ctx context.Context, bucket 
 		nextPageToken, err := page.NextPage(&remoteObjects)
 
 		if err != nil {
-			log.Fatalf("Error getting next page of objects %w", err)
+			return err
 		}
 
 		for _, object := range remoteObjects {
@@ -260,30 +277,20 @@ func listAndDownloadObjects(client *storage.Client, ctx context.Context, bucket 
 	failedDownloads.WriteString("]")
 
 	log.Print(failedDownloads.String())
+	return nil
 }
 
-func ensureDirectoryExists(dirName string) {
-
+func ensureDirectoryExists(dirName string) error {
 	info, err := os.Stat(dirName)
 	if err == nil && info.IsDir() {
-		return
+		return nil
 	}
 
 	// owner has all permissions and the rest have read and execute permissions
 	err = os.MkdirAll(dirName, 0755)
 	if err != nil {
-		log.Fatalf("Error Making directory %w", err)
-	}
-}
-
-func validateArgs() {
-	if len(os.Args) < 2 {
-		log.Fatal("expected 'upload' or 'download' subcommands")
-		os.Exit(1)
+		return err
 	}
 
-	if os.Args[1] != "upload" && os.Args[1] != "download" {
-		log.Fatal("expected one of the following sub commands 'upload' or 'download'")
-		os.Exit(1)
-	}
+	return nil
 }
