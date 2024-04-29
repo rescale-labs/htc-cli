@@ -76,56 +76,27 @@ func getGoogleCredentials() string {
 }
 
 func uploadDirectory(client *storage.Client, ctx context.Context, bucket string, remotePath string, localPath string) {
-	numFiles := 0
+	failedUploads := strings.Builder{}
+	failedUploads.WriteString("Failed to upload files [")
 
-	filesToProcess := make(chan FileUpload)
-	processedFiles := make(chan UploadResponse)
-
-	// adding 5 workers for processing the queue
-	for worker := 0; worker < 5; worker++ {
-		go uploadWorker(client, ctx, bucket, filesToProcess, processedFiles)
-	}
-
-	// puts the files into the queue to process
 	filepath.Walk(localPath, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
-			numFiles += 1
 			objectPath, _ := strings.CutPrefix(path, localPath)
 			if strings.HasPrefix(objectPath, "/") {
 				objectPath = strings.TrimLeft(objectPath, "/")
 			}
 			sourceFilePath := fmt.Sprintf("%s/%s", strings.TrimRight(localPath, "/"), objectPath)
 			log.Printf("Uploading %s to %s", sourceFilePath, objectPath)
-			filesToProcess <- FileUpload{sourceFilePath, objectPath}
+			result := uploadFile(client, ctx, bucket, objectPath, sourceFilePath)
+			if !result.success {
+				failedUploads.WriteString(fmt.Sprintf("%s ", result.remoteObject))
+			}
 		}
 		return nil
 	})
-
-	log.Printf("worker %d", numFiles)
-	// no more work to add to the queue
-	close(filesToProcess)
-
-	failedUploads := strings.Builder{}
-	failedUploads.WriteString("Failed to upload files [")
-
-	// reads from the results if file was uploaded properly
-	for file := 0; file < numFiles; file++ {
-		result := <-processedFiles
-		if result.success == false {
-			log.Printf(result.remoteObject)
-			failedUploads.WriteString(fmt.Sprintf("%s ", result.remoteObject))
-		}
-	}
 	failedUploads.WriteString("]")
 
 	log.Print(failedUploads.String())
-}
-
-func uploadWorker(client *storage.Client, ctx context.Context, bucket string, filesToProcess <-chan FileUpload, processedFiles chan<- UploadResponse) {
-	// processing the elements in the queue
-	for localFile := range filesToProcess {
-		processedFiles <- uploadFile(client, ctx, bucket, localFile.remotePath, localFile.localPath)
-	}
 }
 
 func uploadFile(client *storage.Client, ctx context.Context, bucket string, object string, localFile string) UploadResponse {
@@ -193,13 +164,6 @@ func parseBucket(bucketPath string) (string, string) {
 	return match[1], match[2]
 }
 
-func downloadWorker(client *storage.Client, ctx context.Context, bucket string, filesToProcess <-chan FileDownload, processedFiles chan<- DownloadResponse) {
-	// processing the elements in the queue
-	for object := range filesToProcess {
-		processedFiles <- downloadFile(client, ctx, bucket, object.remoteObject, object.destinationFile)
-	}
-}
-
 func downloadFile(client *storage.Client, ctx context.Context, bucket string, object string, localFile string) DownloadResponse {
 
 	destinationDirectory := filepath.Dir(localFile)
@@ -250,24 +214,17 @@ func download(client *storage.Client, ctx context.Context) {
 
 func listAndDownloadObjects(client *storage.Client, ctx context.Context, bucket string, path string, destinationDir string) {
 
-	filesToProcess := make(chan FileDownload)
-	processedFiles := make(chan DownloadResponse)
-
-	//adding 5 workers for processing the queue
-	for worker := 0; worker < 5; worker++ {
-		go downloadWorker(client, ctx, bucket, filesToProcess, processedFiles)
-	}
-
 	listCtx, cancel := context.WithTimeout(ctx, time.Second*60)
 	defer cancel()
 
-	numDownloads := 0
+	failedDownloads := strings.Builder{}
+	failedDownloads.WriteString("Failed to download files [")
+
 	it := client.Bucket(bucket).Objects(listCtx, &storage.Query{Prefix: path})
-	page := iterator.NewPager(it, 1, "")
+	page := iterator.NewPager(it, 50, "")
 	for {
 		var remoteObjects []*storage.ObjectAttrs
 		nextPageToken, err := page.NextPage(&remoteObjects)
-		numDownloads += len(remoteObjects)
 
 		if err != nil {
 			log.Fatalf("Error getting next page of objects %w", err)
@@ -280,26 +237,14 @@ func listAndDownloadObjects(client *storage.Client, ctx context.Context, bucket 
 			}
 			destinationFilePath := fmt.Sprintf("%s/%s", strings.TrimRight(destinationDir, "/"), objectPath)
 			log.Printf("Downloading %s to %s", object.Name, destinationFilePath)
-			//downloadFile(client, ctx, bucket, object.Name, destinationFilePath)
-			filesToProcess <- FileDownload{destinationFilePath, object.Name}
+			response := downloadFile(client, ctx, bucket, object.Name, destinationFilePath)
+			if !response.success {
+				failedDownloads.WriteString(fmt.Sprintf("%s ", response.localFile))
+			}
 		}
 
 		if nextPageToken == "" {
 			break
-		}
-	}
-	log.Printf("Downloaded %d files", numDownloads)
-	//filesToProcess <- FileDownload{"test/b/nf-google-1.11.0/classes/nextflow/cloud/google/GoogleCloudPlugin.groovy", "projects/9d91e63e-2f3c-4b5b-a553-b179970e9515/tasks/5481ba50-df9c-4ca6-b5f4-121b0386dfd5/work/tmp/08/2041a40131bf8b2f8065fe537a4727/plugins/nf-google-1.11.0/classes/nextflow/cloud/google/GoogleCloudPlugin.groovy"}
-	// no more work to add to the queue
-	close(filesToProcess)
-
-	log.Printf("Downloaded %d files", numDownloads)
-	failedDownloads := strings.Builder{}
-	failedDownloads.WriteString("Failed to download files [")
-	for i := 0; i < numDownloads; i++ {
-		result := <-processedFiles
-		if result.success == false {
-			failedDownloads.WriteString(fmt.Sprintf("%s ", result.localFile))
 		}
 	}
 	failedDownloads.WriteString("]")
