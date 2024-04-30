@@ -4,7 +4,6 @@ import (
 	"cloud.google.com/go/storage"
 	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -14,23 +13,18 @@ import (
 	"time"
 )
 
-func Upload(client *storage.Client, ctx context.Context) error {
-	uploadCmd := flag.NewFlagSet("upload", flag.ExitOnError)
-	src := uploadCmd.String("src", "", "the source path to upload from")
-	dest := uploadCmd.String("dest", "", "the destination bucket to upload to")
-	uploadCmd.Parse(os.Args[2:])
+func Upload(ctx context.Context, client *storage.Client, src string, dest string) error {
+	bucket, path := ParseBucket(dest)
 
-	bucket, path := ParseBucket(*dest)
-
-	filePtr, err := os.Stat(*src)
+	filePtr, err := os.Stat(src)
 	if err != nil {
 		return errors.New("unable to check if path is file or directory")
 	}
 
 	if filePtr.IsDir() {
-		return uploadDirectory(client, ctx, bucket, path, *src)
+		return uploadDirectory(client, ctx, bucket, path, src)
 	} else if filePtr.Mode().IsRegular() {
-		err = uploadFile(client, ctx, bucket, fmt.Sprintf("%s/%s", path, filePtr.Name()), *src)
+		err = uploadFile(client, ctx, bucket, fmt.Sprintf("%s/%s", path, filePtr.Name()), src)
 		return err
 	} else {
 		return errors.New("file pointer is not a directory or file")

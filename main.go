@@ -5,10 +5,12 @@ import (
 	"cloud.google.com/go/storage"
 	"context"
 	"errors"
+	"flag"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 	"log"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -23,12 +25,15 @@ func main() {
 		err = errors.New("not enough arguments")
 	}
 
-	if os.Args[1] == "upload" {
-		err = cli.Upload(client, ctx)
-	} else if os.Args[1] == "download" {
-		err = cli.Download(ctx, client)
+	cmd := flag.NewFlagSet("cp", flag.ExitOnError)
+	cmd.Parse(os.Args[2:])
+	src := cmd.Arg(0)
+	dest := cmd.Arg(1)
+
+	if strings.HasPrefix(src, "gs://") {
+		err = cli.Download(ctx, client, src, dest)
 	} else {
-		err = errors.New("expected 'upload' or 'download' subcommands")
+		err = cli.Upload(ctx, client, src, dest)
 	}
 
 	if err != nil {

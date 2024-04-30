@@ -3,7 +3,6 @@ package cli
 import (
 	"cloud.google.com/go/storage"
 	"context"
-	"flag"
 	"fmt"
 	"google.golang.org/api/iterator"
 	"io"
@@ -14,22 +13,17 @@ import (
 	"time"
 )
 
-func Download(ctx context.Context, client *storage.Client) error {
-	downloadCmd := flag.NewFlagSet("download", flag.ExitOnError)
-	src := downloadCmd.String("src", "", "the source bucket to download from")
-	dest := downloadCmd.String("dest", "", "the destination path to download to")
+func Download(ctx context.Context, client *storage.Client, src string, dest string) error {
 
-	downloadCmd.Parse(os.Args[2:])
+	bucket, path := ParseBucket(src)
 
-	bucket, path := ParseBucket(*src)
-
-	err := ensureDirectoryExists(*dest)
+	err := ensureDirectoryExists(dest)
 
 	if err != nil {
 		return err
 	}
 
-	return listAndDownloadObjects(client, ctx, bucket, path, *dest)
+	return listAndDownloadObjects(client, ctx, bucket, path, dest)
 }
 
 func listAndDownloadObjects(client *storage.Client, ctx context.Context, bucket string, path string, destinationDir string) error {
