@@ -44,11 +44,9 @@ RUN go mod download
 
 COPY *.go ./
 
-RUN go build -o /htccli
+RUN go build -ldflags="-extldflags=-static" -o /htccli
 
 FROM scratch
 
-COPY --from=build /htccli /htccli
-COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-
-CMD ["/htccli"]
+COPY VERSION /opt/rescale/VERSION
+COPY --from=build /htccli /opt/rescale/bin/htccli
