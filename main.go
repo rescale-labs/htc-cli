@@ -1,15 +1,14 @@
 package main
 
 import (
+	"cli"
 	"cloud.google.com/go/storage"
 	"context"
-	"download"
 	"errors"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 	"log"
 	"os"
-	"upload"
 )
 
 func main() {
@@ -25,9 +24,9 @@ func main() {
 	}
 
 	if os.Args[1] == "upload" {
-		err = upload.Upload(client, ctx)
+		err = cli.Upload(client, ctx)
 	} else if os.Args[1] == "download" {
-		err = download.Download(ctx, client)
+		err = cli.Download(ctx, client)
 	} else {
 		err = errors.New("expected 'upload' or 'download' subcommands")
 	}

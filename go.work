@@ -2,7 +2,5 @@ go 1.21.6
 
 use (
 	.
-	./commands/download
-	./commands/upload
-	./commands/utils
+	./cli
 )

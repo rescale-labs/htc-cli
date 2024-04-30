@@ -1,4 +1,4 @@
-package download
+package cli
 
 import (
 	"cloud.google.com/go/storage"
@@ -12,19 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-	"utils"
 )
-
-type FileDownload struct {
-	destinationFile string
-	remoteObject    string
-}
-
-type DownloadResponse struct {
-	localFile string
-	success   bool
-	error     error
-}
 
 func Download(ctx context.Context, client *storage.Client) error {
 	downloadCmd := flag.NewFlagSet("download", flag.ExitOnError)
@@ -33,7 +21,7 @@ func Download(ctx context.Context, client *storage.Client) error {
 
 	downloadCmd.Parse(os.Args[2:])
 
-	bucket, path := utils.ParseBucket(*src)
+	bucket, path := ParseBucket(*src)
 
 	err := ensureDirectoryExists(*dest)
 
@@ -69,9 +57,9 @@ func listAndDownloadObjects(client *storage.Client, ctx context.Context, bucket 
 			}
 			destinationFilePath := fmt.Sprintf("%s/%s", strings.TrimRight(destinationDir, "/"), objectPath)
 			log.Printf("Downloading %s to %s", object.Name, destinationFilePath)
-			response := downloadFile(client, ctx, bucket, object.Name, destinationFilePath)
-			if !response.success {
-				failedDownloads.WriteString(fmt.Sprintf("%s ", response.localFile))
+			err = downloadFile(client, ctx, bucket, object.Name, destinationFilePath)
+			if err != nil {
+				failedDownloads.WriteString(fmt.Sprintf("%s ", destinationFilePath))
 			}
 		}
 
@@ -85,13 +73,13 @@ func listAndDownloadObjects(client *storage.Client, ctx context.Context, bucket 
 	return nil
 }
 
-func downloadFile(client *storage.Client, ctx context.Context, bucket string, object string, localFile string) DownloadResponse {
+func downloadFile(client *storage.Client, ctx context.Context, bucket string, object string, localFile string) error {
 
 	destinationDirectory := filepath.Dir(localFile)
 	err := ensureDirectoryExists(destinationDirectory)
 
 	if err != nil {
-		return DownloadResponse{localFile, false, err}
+		return err
 	}
 
 	workerCtx, cancel := context.WithTimeout(ctx, time.Hour*1)
@@ -99,26 +87,26 @@ func downloadFile(client *storage.Client, ctx context.Context, bucket string, ob
 
 	filePtr, err := os.Create(localFile)
 	if err != nil {
-		log.Fatal("Failed to open local file")
-		return DownloadResponse{localFile, false, err}
+		log.Print("Failed to open local file")
+		return err
 	}
 
 	rc, err := client.Bucket(bucket).Object(object).NewReader(workerCtx)
 	if err != nil {
-		return DownloadResponse{localFile, false, err}
+		return err
 	}
 	defer rc.Close()
 
 	if _, err = io.Copy(filePtr, rc); err != nil {
-		return DownloadResponse{localFile, false, err}
+		return err
 	}
 
 	if err = filePtr.Close(); err != nil {
-		return DownloadResponse{localFile, false, err}
+		return err
 	}
 
 	log.Printf("Blob %v downloaded to local file %v\n", object, localFile)
-	return DownloadResponse{localFile, true, nil}
+	return nil
 }
 
 func ensureDirectoryExists(dirName string) error {

@@ -1,4 +1,4 @@
-package upload
+package cli
 
 import (
 	"cloud.google.com/go/storage"
@@ -12,19 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-	"utils"
 )
-
-type FileUpload struct {
-	localPath  string
-	remotePath string
-}
-
-type UploadResponse struct {
-	remoteObject string
-	success      bool
-	error        error
-}
 
 func Upload(client *storage.Client, ctx context.Context) error {
 	uploadCmd := flag.NewFlagSet("upload", flag.ExitOnError)
@@ -32,7 +20,7 @@ func Upload(client *storage.Client, ctx context.Context) error {
 	dest := uploadCmd.String("dest", "", "the destination bucket to upload to")
 	uploadCmd.Parse(os.Args[2:])
 
-	bucket, path := utils.ParseBucket(*dest)
+	bucket, path := ParseBucket(*dest)
 
 	filePtr, err := os.Stat(*src)
 	if err != nil {
@@ -42,8 +30,8 @@ func Upload(client *storage.Client, ctx context.Context) error {
 	if filePtr.IsDir() {
 		return uploadDirectory(client, ctx, bucket, path, *src)
 	} else if filePtr.Mode().IsRegular() {
-		uploadResponse := uploadFile(client, ctx, bucket, fmt.Sprintf("%s/%s", path, filePtr.Name()), *src)
-		return uploadResponse.error
+		err = uploadFile(client, ctx, bucket, fmt.Sprintf("%s/%s", path, filePtr.Name()), *src)
+		return err
 	} else {
 		return errors.New("file pointer is not a directory or file")
 	}
@@ -66,9 +54,9 @@ func uploadDirectory(client *storage.Client, ctx context.Context, bucket string,
 			remoteFilePath := fmt.Sprintf("%s/%s", remotePath, objectPath)
 
 			log.Printf("Uploading %s to %s", sourceFilePath, remoteFilePath)
-			result := uploadFile(client, ctx, bucket, remoteFilePath, sourceFilePath)
-			if !result.success {
-				failedUploads.WriteString(fmt.Sprintf("%s ", result.remoteObject))
+			err = uploadFile(client, ctx, bucket, remoteFilePath, sourceFilePath)
+			if err != nil {
+				failedUploads.WriteString(fmt.Sprintf("%s ", remoteFilePath))
 			}
 		}
 		return nil
@@ -79,11 +67,11 @@ func uploadDirectory(client *storage.Client, ctx context.Context, bucket string,
 	return err
 }
 
-func uploadFile(client *storage.Client, ctx context.Context, bucket string, object string, localFile string) UploadResponse {
+func uploadFile(client *storage.Client, ctx context.Context, bucket string, object string, localFile string) error {
 	f, err := os.Open(localFile)
 	if err != nil {
 		log.Fatal("Failed to open local file")
-		return UploadResponse{object, false, err}
+		return err
 	}
 	defer f.Close()
 
@@ -95,13 +83,13 @@ func uploadFile(client *storage.Client, ctx context.Context, bucket string, obje
 	writer := o.NewWriter(workerCtx)
 
 	if _, err = io.Copy(writer, f); err != nil {
-		return UploadResponse{object, false, err}
+		return err
 	}
 
 	if err = writer.Close(); err != nil {
-		return UploadResponse{object, false, err}
+		return err
 	}
 
 	log.Printf("Blob %s uploaded.\n", object)
-	return UploadResponse{o.ObjectName(), true, nil}
+	return nil
 }
