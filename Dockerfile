@@ -40,9 +40,12 @@ WORKDIR /app
 
 COPY go.mod ./
 COPY go.sum ./
-RUN go mod download
-
+COPY go.work go.work
+COPY go.work.sum go.work.sum
 COPY *.go ./
+COPY commands commands
+
+RUN go mod download
 
 RUN go build -ldflags="-extldflags=-static" -o /htccli
 
