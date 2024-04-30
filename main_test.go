@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"cli"
+	"testing"
+)
 
 func TestParseBucket(t *testing.T) {
 	tests := map[string]struct {
@@ -17,7 +20,7 @@ func TestParseBucket(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			actualBucket, actualPath := parseBucket(test.input)
+			actualBucket, actualPath := cli.ParseBucket(test.input)
 
 			if actualBucket != test.expectedBucket {
 				t.Errorf("Actual bucket %s did not equal expected bucket %s", actualBucket, test.expectedBucket)

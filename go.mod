@@ -1,4 +1,4 @@
-module htc-storage-cli
+module github.com/rescale/htc-storage-cli
 
 go 1.21
 

@@ -22,16 +22,16 @@ func Upload(ctx context.Context, client *storage.Client, src string, dest string
 	}
 
 	if filePtr.IsDir() {
-		return uploadDirectory(client, ctx, bucket, path, src)
+		return uploadDirectory(ctx, client, bucket, path, src)
 	} else if filePtr.Mode().IsRegular() {
-		err = uploadFile(client, ctx, bucket, fmt.Sprintf("%s/%s", path, filePtr.Name()), src)
+		err = uploadFile(ctx, client, bucket, fmt.Sprintf("%s/%s", path, filePtr.Name()), src)
 		return err
 	} else {
 		return errors.New("file pointer is not a directory or file")
 	}
 }
 
-func uploadDirectory(client *storage.Client, ctx context.Context, bucket string, remotePath string, localPath string) error {
+func uploadDirectory(ctx context.Context, client *storage.Client, bucket string, remotePath string, localPath string) error {
 	failedUploads := strings.Builder{}
 	failedUploads.WriteString("Failed to upload files [")
 
@@ -48,7 +48,7 @@ func uploadDirectory(client *storage.Client, ctx context.Context, bucket string,
 			remoteFilePath := fmt.Sprintf("%s/%s", remotePath, objectPath)
 
 			log.Printf("Uploading %s to %s", sourceFilePath, remoteFilePath)
-			err = uploadFile(client, ctx, bucket, remoteFilePath, sourceFilePath)
+			err = uploadFile(ctx, client, bucket, remoteFilePath, sourceFilePath)
 			if err != nil {
 				failedUploads.WriteString(fmt.Sprintf("%s ", remoteFilePath))
 			}
@@ -61,10 +61,9 @@ func uploadDirectory(client *storage.Client, ctx context.Context, bucket string,
 	return err
 }
 
-func uploadFile(client *storage.Client, ctx context.Context, bucket string, object string, localFile string) error {
+func uploadFile(ctx context.Context, client *storage.Client, bucket string, object string, localFile string) error {
 	f, err := os.Open(localFile)
 	if err != nil {
-		log.Fatal("Failed to open local file")
 		return err
 	}
 	defer f.Close()

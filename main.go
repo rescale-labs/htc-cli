@@ -1,11 +1,11 @@
 package main
 
 import (
-	"cli"
 	"cloud.google.com/go/storage"
 	"context"
 	"errors"
 	"flag"
+	"github.com/rescale/htc-storage-cli/cli"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 	"log"

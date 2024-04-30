@@ -23,10 +23,10 @@ func Download(ctx context.Context, client *storage.Client, src string, dest stri
 		return err
 	}
 
-	return listAndDownloadObjects(client, ctx, bucket, path, dest)
+	return listAndDownloadObjects(ctx, client, bucket, path, dest)
 }
 
-func listAndDownloadObjects(client *storage.Client, ctx context.Context, bucket string, path string, destinationDir string) error {
+func listAndDownloadObjects(ctx context.Context, client *storage.Client, bucket string, path string, destinationDir string) error {
 
 	listCtx, cancel := context.WithTimeout(ctx, time.Second*60)
 	defer cancel()
@@ -51,7 +51,7 @@ func listAndDownloadObjects(client *storage.Client, ctx context.Context, bucket 
 			}
 			destinationFilePath := fmt.Sprintf("%s/%s", strings.TrimRight(destinationDir, "/"), objectPath)
 			log.Printf("Downloading %s to %s", object.Name, destinationFilePath)
-			err = downloadFile(client, ctx, bucket, object.Name, destinationFilePath)
+			err = downloadFile(ctx, client, bucket, object.Name, destinationFilePath)
 			if err != nil {
 				failedDownloads.WriteString(fmt.Sprintf("%s ", destinationFilePath))
 			}
@@ -67,7 +67,7 @@ func listAndDownloadObjects(client *storage.Client, ctx context.Context, bucket 
 	return nil
 }
 
-func downloadFile(client *storage.Client, ctx context.Context, bucket string, object string, localFile string) error {
+func downloadFile(ctx context.Context, client *storage.Client, bucket string, object string, localFile string) error {
 
 	destinationDirectory := filepath.Dir(localFile)
 	err := ensureDirectoryExists(destinationDirectory)
@@ -81,7 +81,6 @@ func downloadFile(client *storage.Client, ctx context.Context, bucket string, ob
 
 	filePtr, err := os.Create(localFile)
 	if err != nil {
-		log.Print("Failed to open local file")
 		return err
 	}
 
