@@ -1,4 +1,4 @@
-package main
+package upload
 
 import (
 	"cloud.google.com/go/storage"
@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"utils"
 )
 
 type FileUpload struct {
@@ -31,7 +32,7 @@ func Upload(client *storage.Client, ctx context.Context) error {
 	dest := uploadCmd.String("dest", "", "the destination bucket to upload to")
 	uploadCmd.Parse(os.Args[2:])
 
-	bucket, path := ParseBucket(*dest)
+	bucket, path := utils.ParseBucket(*dest)
 
 	filePtr, err := os.Stat(*src)
 	if err != nil {

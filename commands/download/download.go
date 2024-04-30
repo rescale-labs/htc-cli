@@ -1,4 +1,4 @@
-package main
+package download
 
 import (
 	"cloud.google.com/go/storage"
@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"utils"
 )
 
 type FileDownload struct {
@@ -32,7 +33,7 @@ func Download(ctx context.Context, client *storage.Client) error {
 
 	downloadCmd.Parse(os.Args[2:])
 
-	bucket, path := ParseBucket(*src)
+	bucket, path := utils.ParseBucket(*src)
 
 	err := ensureDirectoryExists(*dest)
 
