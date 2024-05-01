@@ -32,8 +32,7 @@ func Upload(ctx context.Context, client *storage.Client, src string, dest string
 }
 
 func uploadDirectory(ctx context.Context, client *storage.Client, bucket string, remotePath string, localPath string) error {
-	failedUploads := strings.Builder{}
-	failedUploads.WriteString("Failed to upload files [")
+	var failedUploads []string
 
 	err := filepath.Walk(localPath, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
@@ -50,14 +49,15 @@ func uploadDirectory(ctx context.Context, client *storage.Client, bucket string,
 			log.Printf("Uploading %s to %s", sourceFilePath, remoteFilePath)
 			err = uploadFile(ctx, client, bucket, remoteFilePath, sourceFilePath)
 			if err != nil {
-				failedUploads.WriteString(fmt.Sprintf("%s ", remoteFilePath))
+				failedUploads = append(failedUploads, remoteFilePath)
 			}
 		}
 		return nil
 	})
-	failedUploads.WriteString("]")
 
-	log.Print(failedUploads.String())
+	if len(failedUploads) != 0 {
+		return errors.New("some or all files failed to upload")
+	}
 	return err
 }
 

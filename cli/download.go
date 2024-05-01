@@ -3,6 +3,7 @@ package cli
 import (
 	"cloud.google.com/go/storage"
 	"context"
+	"errors"
 	"fmt"
 	"google.golang.org/api/iterator"
 	"io"
@@ -14,11 +15,9 @@ import (
 )
 
 func Download(ctx context.Context, client *storage.Client, src string, dest string) error {
-
 	bucket, path := ParseBucket(src)
 
 	err := ensureDirectoryExists(dest)
-
 	if err != nil {
 		return err
 	}
@@ -31,8 +30,7 @@ func listAndDownloadObjects(ctx context.Context, client *storage.Client, bucket 
 	listCtx, cancel := context.WithTimeout(ctx, time.Second*60)
 	defer cancel()
 
-	failedDownloads := strings.Builder{}
-	failedDownloads.WriteString("Failed to download files [")
+	var failedDownloads []string
 
 	it := client.Bucket(bucket).Objects(listCtx, &storage.Query{Prefix: path})
 	page := iterator.NewPager(it, 50, "")
@@ -45,15 +43,11 @@ func listAndDownloadObjects(ctx context.Context, client *storage.Client, bucket 
 		}
 
 		for _, object := range remoteObjects {
-			objectPath, _ := strings.CutPrefix(object.Name, path)
-			if strings.HasPrefix(objectPath, "/") {
-				objectPath = strings.TrimLeft(objectPath, "/")
-			}
-			destinationFilePath := fmt.Sprintf("%s/%s", strings.TrimRight(destinationDir, "/"), objectPath)
+			destinationFilePath := getLocalDestinationFile(object.Name, path, destinationDir)
 			log.Printf("Downloading %s to %s", object.Name, destinationFilePath)
 			err = downloadFile(ctx, client, bucket, object.Name, destinationFilePath)
 			if err != nil {
-				failedDownloads.WriteString(fmt.Sprintf("%s ", destinationFilePath))
+				failedDownloads = append(failedDownloads, object.Name)
 			}
 		}
 
@@ -61,9 +55,10 @@ func listAndDownloadObjects(ctx context.Context, client *storage.Client, bucket 
 			break
 		}
 	}
-	failedDownloads.WriteString("]")
 
-	log.Print(failedDownloads.String())
+	if len(failedDownloads) != 0 {
+		return errors.New("some or all files failed to download")
+	}
 	return nil
 }
 
@@ -115,4 +110,12 @@ func ensureDirectoryExists(dirName string) error {
 	}
 
 	return nil
+}
+
+func getLocalDestinationFile(objectName string, path string, destinationDir string) string {
+	objectPath, _ := strings.CutPrefix(objectName, path)
+	if strings.HasPrefix(objectPath, "/") {
+		objectPath = strings.TrimLeft(objectPath, "/")
+	}
+	return fmt.Sprintf("%s/%s", strings.TrimRight(destinationDir, "/"), objectPath)
 }
