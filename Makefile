@@ -28,11 +28,18 @@ format:
 # Pattern for building all architectures.
 # E.g. build/htccli.linux-amd64
 # depending on the version of make you may need to replace GOARCH=$(lastword $(subst -, ,$*))
-$(BUILD)/htccli.%: $(GO_SOURCES)
+$(BUILD)/htccli.linux-amd64: $(GO_SOURCES)
 	@mkdir -p $(BUILD)
 	CGO_ENABLED=0 \
-		GOOS=$(firstword $(subst -, ,$*)) \
-		GOARCH=$(firstword $(subst ., ,$(lastword $(subst -, ,$*)))) \
+		GOOS=linux \
+		GOARCH=amd64 \
+		go build -o $@
+
+$(BUILD)/htccli.linux-arm64: $(GO_SOURCES)
+	@mkdir -p $(BUILD)
+	CGO_ENABLED=0 \
+		GOOS=linux \
+		GOARCH=arm64 \
 		go build -o $@
 
 .PHONY: image
@@ -49,14 +56,18 @@ image: $(GO_LINUX_BINARIES)
 		--build-arg BINARY_FILE=$(BUILD)/htccli.linux-arm64 .
 
 
-$(BUILD)/htccli.%.tar.gz: $(BUILD)/htccli.%
+$(BUILD)/htccli.linux-arm64.tar.gz: $(BUILD)/htccli.linux-arm64
+	@mkdir -p $(BUILD)/dist.$*
+	cp $< $(BUILD)/dist.$*/htccli
+	tar -czf $@ -C $(BUILD)/dist.$* .
+
+$(BUILD)/htccli.linux-amd64.tar.gz: $(BUILD)/htccli.linux-amd64
 	@mkdir -p $(BUILD)/dist.$*
 	cp $< $(BUILD)/dist.$*/htccli
 	tar -czf $@ -C $(BUILD)/dist.$* .
 
 .PHONY: archive
 archive: $(GO_LINUX_ARCHIVES)
-
 
 .PHONY: build-binary
 build-binary: format
