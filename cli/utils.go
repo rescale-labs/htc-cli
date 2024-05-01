@@ -3,7 +3,6 @@ package cli
 import (
 	"flag"
 	"log"
-	"os"
 	"regexp"
 	"strings"
 )
@@ -19,9 +18,9 @@ func ParseBucket(bucketPath string) (string, string) {
 	return match[1], match[2]
 }
 
-func ParseArgs() (string, string) {
+func ParseArgs(args []string) (string, string) {
 	cmd := flag.NewFlagSet("cp", flag.ContinueOnError)
-	err := cmd.Parse(os.Args[2:])
+	err := cmd.Parse(args)
 	if err != nil || len(cmd.Args()) != 2 {
 		log.Fatalf("error parsing args")
 	}

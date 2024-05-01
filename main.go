@@ -24,7 +24,7 @@ func main() {
 		err = errors.New("not enough arguments")
 	}
 
-	src, dest := cli.ParseArgs()
+	src, dest := cli.ParseArgs(os.Args[2:])
 
 	if strings.HasPrefix(src, "gs://") {
 		err = cli.Download(ctx, client, src, dest)
