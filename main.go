@@ -4,7 +4,6 @@ import (
 	"cloud.google.com/go/storage"
 	"context"
 	"errors"
-	"flag"
 	"github.com/rescale/htc-storage-cli/cli"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
@@ -25,10 +24,7 @@ func main() {
 		err = errors.New("not enough arguments")
 	}
 
-	cmd := flag.NewFlagSet("cp", flag.ExitOnError)
-	cmd.Parse(os.Args[2:])
-	src := cmd.Arg(0)
-	dest := cmd.Arg(1)
+	src, dest := cli.ParseArgs()
 
 	if strings.HasPrefix(src, "gs://") {
 		err = cli.Download(ctx, client, src, dest)
@@ -58,7 +54,7 @@ func getGoogleClient(ctx context.Context) (*storage.Client, error) {
 func getGoogleCredentials() (string, error) {
 	credentials, ok := os.LookupEnv("GCP_APPLICATION_CREDENTIALS")
 	if !ok {
-		return "", errors.New("Error GCP_APPLICATION_CREDENTIALS not set")
+		return "", errors.New("error GCP_APPLICATION_CREDENTIALS not set")
 	}
 
 	return credentials, nil

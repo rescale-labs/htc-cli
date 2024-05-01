@@ -69,8 +69,8 @@ $(BUILD)/htccli.linux-amd64.tar.gz: $(BUILD)/htccli.linux-amd64
 .PHONY: archive
 archive: $(GO_LINUX_ARCHIVES)
 
-.PHONY: build-binary
-build-binary: format
+.PHONY: binary
+binary: format
 	go build -o ./htccli
 
 .PHONY: test
