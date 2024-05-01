@@ -80,3 +80,19 @@ test:
 .PHONY: clean
 clean:
 	rm -f htccli
+
+
+.PHONY: deploy
+deploy: $(GO_LINUX_BINARIES)
+	$(DOCKER) build \
+			--file Dockerfile.alpine \
+    		-t europe-docker.pkg.dev/rescale-htc-scale-test-sandbox/workload/rescale/$(IMAGE_NAME)_amd64:$(VERSION) \
+    		--platform linux/amd64 \
+    		--build-arg BINARY_FILE=$(BUILD)/htccli.linux-amd64 .
+	$(DOCKER) build \
+			--file Dockerfile.alpine \
+    		-t europe-docker.pkg.dev/rescale-htc-scale-test-sandbox/workload/rescale/$(IMAGE_NAME)_arm64:$(VERSION) \
+    		--platform linux/arm64 \
+    		--build-arg BINARY_FILE=$(BUILD)/htccli.linux-arm64 .
+	$(DOCKER) push europe-docker.pkg.dev/rescale-htc-scale-test-sandbox/workload/rescale/$(IMAGE_NAME)_amd64:$(VERSION)
+	$(DOCKER) push europe-docker.pkg.dev/rescale-htc-scale-test-sandbox/workload/rescale/$(IMAGE_NAME)_arm64:$(VERSION)
