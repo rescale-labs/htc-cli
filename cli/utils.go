@@ -15,7 +15,7 @@ func ParseBucket(bucketPath string) (string, string) {
 	re := regexp.MustCompile("gs://(.+?)/(.+)")
 	match := re.FindStringSubmatch(bucketPath)
 
-	return match[1], match[2]
+	return match[1], strings.TrimRight(match[2], "/")
 }
 
 func ParseArgs(args []string) (string, string) {
