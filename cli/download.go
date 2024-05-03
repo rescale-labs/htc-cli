@@ -28,7 +28,7 @@ func Download(ctx context.Context, client *storage.Client, src string, dest stri
 
 func listAndDownloadObjects(ctx context.Context, client *storage.Client, bucket string, path string, destinationDir string) error {
 
-	listCtx, cancel := context.WithTimeout(ctx, time.Second*60)
+	listCtx, cancel := context.WithTimeout(ctx, time.Hour)
 	defer cancel()
 
 	var failedDownloads []string
@@ -72,7 +72,7 @@ func downloadFile(ctx context.Context, client *storage.Client, bucket string, ob
 		return err
 	}
 
-	workerCtx, cancel := context.WithTimeout(ctx, time.Hour*1)
+	workerCtx, cancel := context.WithTimeout(ctx, time.Hour)
 	defer cancel()
 
 	filePtr, err := os.Create(localFile)
