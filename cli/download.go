@@ -44,7 +44,7 @@ func listAndDownloadObjects(ctx context.Context, client *storage.Client, bucket 
 		}
 
 		for _, object := range remoteObjects {
-			destinationFilePath := getLocalDestinationFile(object.Name, path, destinationDir)
+			destinationFilePath := getLocalDestination(object.Name, path, destinationDir)
 			log.Printf("Downloading %s to %s", object.Name, destinationFilePath)
 			err = downloadFile(ctx, client, bucket, object.Name, destinationFilePath)
 			if err != nil {

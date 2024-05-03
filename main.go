@@ -13,18 +13,16 @@ import (
 )
 
 func main() {
+	if len(os.Args) < 2 {
+		cli.Usage()
+	}
+	src, dest := cli.ParseArgs(os.Args[2:])
+
 	ctx := context.Background()
 	client, err := getGoogleClient(ctx)
-
 	if err != nil {
 		log.Fatalf("error creating client %s", err)
 	}
-
-	if len(os.Args) < 2 {
-		err = errors.New("not enough arguments")
-	}
-
-	src, dest := cli.ParseArgs(os.Args[2:])
 
 	if strings.HasPrefix(src, "gs://") {
 		err = cli.Download(ctx, client, src, dest)
@@ -52,8 +50,8 @@ func getGoogleClient(ctx context.Context) (*storage.Client, error) {
 }
 
 func getGoogleCredentials() (string, error) {
-	credentials, ok := os.LookupEnv("GCP_APPLICATION_CREDENTIALS")
-	if !ok {
+	credentials := os.Getenv("GCP_APPLICATION_CREDENTIALS")
+	if credentials == "" {
 		return "", errors.New("error GCP_APPLICATION_CREDENTIALS not set")
 	}
 
