@@ -17,7 +17,7 @@ GO_LINUX_BINARIES := \
 
 GO_LINUX_ARCHIVES := \
 	$(BUILD)/htccli.linux-amd64.tar.gz \
-    $(BUILD)/htccli.linux-arm64.tar.gz
+	$(BUILD)/htccli.linux-arm64.tar.gz
 
 IMAGE_NAME := htc_storage_cli
 
@@ -25,9 +25,6 @@ IMAGE_NAME := htc_storage_cli
 format:
 	test -z $(gofmt -l .)
 
-# Pattern for building all architectures.
-# E.g. build/htccli.linux-amd64
-# depending on the version of make you may need to replace GOARCH=$(lastword $(subst -, ,$*))
 $(BUILD)/htccli.linux-amd64: $(GO_SOURCES)
 	@mkdir -p $(BUILD)
 	CGO_ENABLED=0 \
@@ -82,8 +79,8 @@ clean:
 	rm -f htccli
 
 
-.PHONY: deploy
-deploy: $(GO_LINUX_BINARIES)
+.PHONY: push-dev
+push-dev: $(GO_LINUX_BINARIES)
 	$(DOCKER) build \
 			--file Dockerfile.alpine \
     		-t europe-docker.pkg.dev/rescale-htc-scale-test-sandbox/workload/rescale/$(IMAGE_NAME)_amd64:$(VERSION) \
