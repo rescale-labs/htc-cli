@@ -49,14 +49,18 @@ func uploadDirectory(ctx context.Context, client *storage.Client, bucket string,
 			log.Printf("Uploading %s to %s", sourceFilePath, remoteFilePath)
 			err = uploadFile(ctx, client, bucket, remoteFilePath, sourceFilePath)
 			if err != nil {
-				failedUploads = append(failedUploads, remoteFilePath)
+				failedUploads = append(failedUploads, sourceFilePath)
 			}
 		}
 		return nil
 	})
 
 	if len(failedUploads) != 0 {
-		return errors.New("some or all files failed to upload")
+		pathNames := ""
+		for _, sourcePath := range failedUploads {
+			pathNames += " " + sourcePath
+		}
+		return errors.New(fmt.Sprintf("The following files failed to upload: %s", pathNames))
 	}
 	return err
 }

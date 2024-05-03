@@ -58,7 +58,11 @@ func listAndDownloadObjects(ctx context.Context, client *storage.Client, bucket 
 	}
 
 	if len(failedDownloads) != 0 {
-		return errors.New("some or all files failed to download")
+		pathNames := ""
+		for _, sourcePath := range failedDownloads {
+			pathNames += " " + sourcePath
+		}
+		return errors.New(fmt.Sprintf("The following files failed to upload: %s", pathNames))
 	}
 	return nil
 }
