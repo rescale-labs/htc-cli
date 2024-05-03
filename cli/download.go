@@ -18,7 +18,7 @@ func Download(ctx context.Context, client *storage.Client, src string, dest stri
 	bucket, path := ParseBucket(src)
 
 	destinationDirectory := filepath.Dir(dest)
-	err := ensureDirectoryExists(destinationDirectory)
+	err := os.MkdirAll(destinationDirectory, 0755)
 	if err != nil {
 		return err
 	}
@@ -70,8 +70,7 @@ func listAndDownloadObjects(ctx context.Context, client *storage.Client, bucket 
 func downloadFile(ctx context.Context, client *storage.Client, bucket string, object string, localFile string) error {
 
 	destinationDirectory := filepath.Dir(localFile)
-	err := ensureDirectoryExists(destinationDirectory)
-
+	err := os.MkdirAll(destinationDirectory, 0755)
 	if err != nil {
 		return err
 	}
@@ -99,21 +98,6 @@ func downloadFile(ctx context.Context, client *storage.Client, bucket string, ob
 	}
 
 	log.Printf("Blob %v downloaded to local file %v\n", object, localFile)
-	return nil
-}
-
-func ensureDirectoryExists(dirName string) error {
-	info, err := os.Stat(dirName)
-	if err == nil && info.IsDir() {
-		return nil
-	}
-
-	// owner has all permissions and the rest have read and execute permissions
-	err = os.MkdirAll(dirName, 0755)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
