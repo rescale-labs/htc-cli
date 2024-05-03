@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 	"time"
@@ -15,36 +16,36 @@ import (
 
 func Upload(ctx context.Context, client *storage.Client, src string, dest string) error {
 	bucket, path, err := ParseBucket(dest)
+	if err != nil {
+		return err
+	}
 
-	filePtr, err := os.Stat(src)
+	stat, err := os.Stat(src)
 	if err != nil {
 		return errors.New("unable to check if path is file or directory")
 	}
 
-	if filePtr.IsDir() {
+	if stat.IsDir() {
 		return uploadDirectory(ctx, client, bucket, path, src)
-	} else if filePtr.Mode().IsRegular() {
-		err = uploadFile(ctx, client, bucket, fmt.Sprintf("%s/%s", path, filePtr.Name()), src)
+	} else if stat.Mode().IsRegular() {
+		err = uploadFile(ctx, client, bucket, fmt.Sprintf("%s/%s", path, stat.Name()), src)
 		return err
 	} else {
-		return errors.New("file pointer is not a directory or file")
+		return fmt.Errorf("path %s is not a directory or file", src)
 	}
 }
 
 func uploadDirectory(ctx context.Context, client *storage.Client, bucket string, remotePath string, localPath string) error {
 	var failedUploads []string
 
-	err := filepath.Walk(localPath, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(localPath, func(pathStr string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
-			objectPath, _ := strings.CutPrefix(path, localPath)
-			if strings.HasPrefix(objectPath, "/") {
-				objectPath = strings.TrimLeft(objectPath, "/")
-			}
-			if strings.HasPrefix(remotePath, "/") {
-				remotePath = strings.TrimLeft(remotePath, "/")
-			}
-			sourceFilePath := fmt.Sprintf("%s/%s", strings.TrimRight(localPath, "/"), objectPath)
-			remoteFilePath := fmt.Sprintf("%s/%s", remotePath, objectPath)
+			objectPath := strings.TrimPrefix(pathStr, localPath)
+			objectPath = strings.TrimPrefix(objectPath, "/")
+			remotePath = strings.TrimPrefix(remotePath, "/")
+
+			sourceFilePath := path.Join(strings.TrimSuffix(localPath, "/"), objectPath)
+			remoteFilePath := path.Join(remotePath, objectPath)
 
 			log.Printf("Uploading %s to %s", sourceFilePath, remoteFilePath)
 			err = uploadFile(ctx, client, bucket, remoteFilePath, sourceFilePath)
