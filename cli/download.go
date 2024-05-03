@@ -113,7 +113,7 @@ func ensureDirectoryExists(dirName string) error {
 	return nil
 }
 
-func getLocalDestinationFile(objectName string, path string, destinationDir string) string {
+func getLocalDestination(objectName string, path string, destinationDir string) string {
 	objectPath, _ := strings.CutPrefix(objectName, path)
 	if strings.HasPrefix(objectPath, "/") {
 		objectPath = strings.TrimLeft(objectPath, "/")
