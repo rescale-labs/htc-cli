@@ -15,7 +15,7 @@ import (
 )
 
 func Download(ctx context.Context, client *storage.Client, src string, dest string) error {
-	bucket, path := ParseBucket(src)
+	bucket, path, err := ParseBucket(src)
 
 	destinationDirectory := filepath.Dir(dest)
 	err := os.MkdirAll(destinationDirectory, 0755)
@@ -102,9 +102,7 @@ func downloadFile(ctx context.Context, client *storage.Client, bucket string, ob
 }
 
 func getLocalDestination(objectName string, path string, destinationDir string) string {
-	objectPath, _ := strings.CutPrefix(objectName, path)
-	if strings.HasPrefix(objectPath, "/") {
-		objectPath = strings.TrimLeft(objectPath, "/")
-	}
-	return strings.TrimRight(fmt.Sprintf("%s/%s", strings.TrimRight(destinationDir, "/"), objectPath), "/")
+	objectPath := strings.TrimPrefix(objectName, path)
+	objectPath = strings.TrimPrefix(objectPath, "/")
+	return strings.TrimPrefix(fmt.Sprintf("%s/%s", strings.TrimSuffix(destinationDir, "/"), objectPath), "/")
 }

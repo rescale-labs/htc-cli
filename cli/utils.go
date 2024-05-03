@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -9,15 +10,15 @@ import (
 	"strings"
 )
 
-func ParseBucket(bucketPath string) (string, string) {
+func ParseBucket(bucketPath string) (string, string, error) {
 	if !strings.HasPrefix(bucketPath, "gs://") {
-		log.Fatal("Invalid bucket. Bucket must start with gs://")
+		return "", "", errors.New("Invalid bucket. Bucket must start with gs://")
 	}
 
 	re := regexp.MustCompile("^gs://(.+?)/(.+)")
 	match := re.FindStringSubmatch(bucketPath)
 
-	return match[1], strings.TrimRight(match[2], "/")
+	return match[1], strings.TrimRight(match[2], "/"), nil
 }
 
 func ParseArgs(args []string) (string, string) {

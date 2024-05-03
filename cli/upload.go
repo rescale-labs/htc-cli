@@ -14,7 +14,7 @@ import (
 )
 
 func Upload(ctx context.Context, client *storage.Client, src string, dest string) error {
-	bucket, path := ParseBucket(dest)
+	bucket, path, err := ParseBucket(dest)
 
 	filePtr, err := os.Stat(src)
 	if err != nil {

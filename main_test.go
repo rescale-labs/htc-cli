@@ -20,7 +20,11 @@ func TestParseBucket(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			actualBucket, actualPath := cli.ParseBucket(test.input)
+			actualBucket, actualPath, err := cli.ParseBucket(test.input)
+
+			if err != nil {
+				t.Errorf("There was an error parsing the bucket")
+			}
 
 			if actualBucket != test.expectedBucket {
 				t.Errorf("Actual bucket %s did not equal expected bucket %s", actualBucket, test.expectedBucket)
