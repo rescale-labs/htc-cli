@@ -17,7 +17,8 @@ import (
 func Download(ctx context.Context, client *storage.Client, src string, dest string) error {
 	bucket, path := ParseBucket(src)
 
-	err := ensureDirectoryExists(dest)
+	destinationDirectory := filepath.Dir(dest)
+	err := ensureDirectoryExists(destinationDirectory)
 	if err != nil {
 		return err
 	}
@@ -117,5 +118,5 @@ func getLocalDestinationFile(objectName string, path string, destinationDir stri
 	if strings.HasPrefix(objectPath, "/") {
 		objectPath = strings.TrimLeft(objectPath, "/")
 	}
-	return fmt.Sprintf("%s/%s", strings.TrimRight(destinationDir, "/"), objectPath)
+	return strings.TrimRight(fmt.Sprintf("%s/%s", strings.TrimRight(destinationDir, "/"), objectPath), "/")
 }
