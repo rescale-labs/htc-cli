@@ -107,7 +107,10 @@ func downloadFile(ctx context.Context, client *storage.Client, bucket string, ob
 func getLocalDestination(objectName string, remotePath string, destinationDir string) string {
 	objectPath := strings.TrimPrefix(objectName, remotePath)
 	objectPath = strings.TrimPrefix(objectPath, "/")
-	localDestination := strings.TrimPrefix(fmt.Sprintf("%s/%s", strings.TrimSuffix(destinationDir, "/"), objectPath), "/")
+	destinationDir = strings.TrimSuffix(destinationDir, "/")
+	destinationPath := path.Join(destinationDir, objectPath)
+	localDestination := strings.TrimPrefix(destinationPath, "/")
+	// this check is to support downloading a single remote object, not just a path
 	if objectName == remotePath {
 		_, file := filepath.Split(objectName)
 		localDestination = path.Join(localDestination, file)
