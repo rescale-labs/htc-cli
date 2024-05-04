@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"github.com/rescale/htc-storage-cli/cli"
+	"os"
 	"testing"
 )
 
@@ -60,4 +62,53 @@ func TestParseArgs(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestTransfer(t *testing.T) {
+	// create a test file
+	localSrc := "test.txt"
+	touchFile(localSrc)
+	localDest := "test/test.txt"
+
+	tests := map[string]struct {
+		src  string
+		dest string
+	}{
+		"Test Local Transfer": {
+			src:  localSrc,
+			dest: localDest,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			transfer := cli.NewTransfer(test.src, test.dest)
+			err := transfer.Transfer(context.Background())
+			if err != nil {
+				t.Errorf("Error transfering file %s", err)
+			}
+
+			stat, err := os.Stat(test.dest)
+			if err != nil {
+				t.Errorf("Error opening stat %s", err)
+			}
+			if !stat.Mode().IsRegular() {
+				t.Errorf("Error destination file does not exist")
+			}
+		})
+	}
+	cleanUpFiles(localSrc, localDest)
+}
+
+func cleanUpFiles(src string, dest string) {
+	os.Remove(src)
+	os.Remove(dest)
+}
+
+func touchFile(name string) error {
+	file, err := os.OpenFile(name, os.O_RDONLY|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+	return file.Close()
 }
