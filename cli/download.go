@@ -15,6 +15,9 @@ import (
 	"time"
 )
 
+// Download iterates over remote objects from a csp to download into a destination directory
+// An error is returned if there was a failure listing or downloading files
+// The local destination path is created if it does not exist
 func Download(ctx context.Context, client *storage.Client, src string, dest string) error {
 	bucket, remotePath, err := ParseBucket(src)
 	if err != nil {
@@ -27,10 +30,10 @@ func Download(ctx context.Context, client *storage.Client, src string, dest stri
 		return err
 	}
 
-	return listAndDownloadObjects(ctx, client, bucket, remotePath, dest)
+	return downloadObjects(ctx, client, bucket, remotePath, dest)
 }
 
-func listAndDownloadObjects(ctx context.Context, client *storage.Client, bucket string, remotePath string, destinationDir string) error {
+func downloadObjects(ctx context.Context, client *storage.Client, bucket string, remotePath string, destinationDir string) error {
 
 	listCtx, cancel := context.WithTimeout(ctx, time.Hour)
 	defer cancel()

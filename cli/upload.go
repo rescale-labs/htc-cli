@@ -14,6 +14,8 @@ import (
 	"time"
 )
 
+// Upload iterates over local paths to upload as a remote object
+// An error is returned if there was a failure uploading
 func Upload(ctx context.Context, client *storage.Client, src string, dest string) error {
 	bucket, path, err := ParseBucket(dest)
 	if err != nil {
