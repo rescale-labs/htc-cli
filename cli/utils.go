@@ -79,3 +79,9 @@ func getGoogleCredentials() (string, error) {
 
 	return credentials, nil
 }
+
+type TransferObject struct {
+	source      string
+	destination string
+	err         error
+}

@@ -11,6 +11,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -30,8 +31,8 @@ func Upload(ctx context.Context, client *storage.Client, src string, dest string
 	if stat.IsDir() {
 		return uploadDirectory(ctx, client, bucket, path, src)
 	} else if stat.Mode().IsRegular() {
-		err = uploadFile(ctx, client, bucket, fmt.Sprintf("%s/%s", path, stat.Name()), src)
-		return err
+		upload := uploadFile(ctx, client, bucket, fmt.Sprintf("%s/%s", path, stat.Name()), src)
+		return upload.err
 	} else {
 		return fmt.Errorf("path %s is not a directory or file", src)
 	}
@@ -40,23 +41,43 @@ func Upload(ctx context.Context, client *storage.Client, src string, dest string
 func uploadDirectory(ctx context.Context, client *storage.Client, bucket string, remotePath string, localPath string) error {
 	var failedUploads []string
 
-	err := filepath.Walk(localPath, func(pathStr string, info os.FileInfo, err error) error {
-		if !info.IsDir() {
-			objectPath := strings.TrimPrefix(pathStr, localPath)
-			objectPath = strings.TrimPrefix(objectPath, "/")
-			remotePath = strings.TrimPrefix(remotePath, "/")
+	jobs := make(chan TransferObject)
+	results := make(chan TransferObject)
+	wg := sync.WaitGroup{}
 
-			sourceFilePath := path.Join(strings.TrimSuffix(localPath, "/"), objectPath)
-			remoteFilePath := path.Join(remotePath, objectPath)
+	const numWorkers = 10
 
-			log.Printf("Uploading %s to %s", sourceFilePath, remoteFilePath)
-			err = uploadFile(ctx, client, bucket, remoteFilePath, sourceFilePath)
-			if err != nil {
-				failedUploads = append(failedUploads, sourceFilePath)
+	for w := 0; w < numWorkers; w++ {
+		wg.Add(1)
+		go uploadWorker(ctx, client, bucket, jobs, results, &wg)
+	}
+
+	go func() {
+		filepath.Walk(localPath, func(pathStr string, info os.FileInfo, err error) error {
+			if !info.IsDir() {
+				objectPath := strings.TrimPrefix(pathStr, localPath)
+				objectPath = strings.TrimPrefix(objectPath, "/")
+				remotePath = strings.TrimPrefix(remotePath, "/")
+				sourceFilePath := path.Join(strings.TrimSuffix(localPath, "/"), objectPath)
+				remoteFilePath := path.Join(remotePath, objectPath)
+
+				log.Printf("Uploading %s to %s", sourceFilePath, remoteFilePath)
+				upload := TransferObject{sourceFilePath, remoteFilePath, nil}
+				jobs <- upload
 			}
+			return nil
+		})
+		// when there are no more files to upload we close the jobs channel wait then close the results
+		close(jobs)
+		wg.Wait()
+		close(results)
+	}()
+
+	for result := range results {
+		if result.err != nil {
+			failedUploads = append(failedUploads, result.source)
 		}
-		return nil
-	})
+	}
 
 	if len(failedUploads) != 0 {
 		pathNames := ""
@@ -65,13 +86,13 @@ func uploadDirectory(ctx context.Context, client *storage.Client, bucket string,
 		}
 		return errors.New(fmt.Sprintf("The following files failed to upload: %s", pathNames))
 	}
-	return err
+	return nil
 }
 
-func uploadFile(ctx context.Context, client *storage.Client, bucket string, object string, localFile string) error {
+func uploadFile(ctx context.Context, client *storage.Client, bucket string, object string, localFile string) TransferObject {
 	f, err := os.Open(localFile)
 	if err != nil {
-		return err
+		return TransferObject{localFile, object, err}
 	}
 	defer f.Close()
 
@@ -83,13 +104,20 @@ func uploadFile(ctx context.Context, client *storage.Client, bucket string, obje
 	writer := o.NewWriter(workerCtx)
 
 	if _, err = io.Copy(writer, f); err != nil {
-		return err
+		return TransferObject{localFile, object, err}
 	}
 
 	if err = writer.Close(); err != nil {
-		return err
+		return TransferObject{localFile, object, err}
 	}
 
 	log.Printf("Blob %s uploaded.\n", object)
-	return nil
+	return TransferObject{localFile, object, nil}
+}
+
+func uploadWorker(ctx context.Context, client *storage.Client, bucket string, jobs <-chan TransferObject, results chan<- TransferObject, wg *sync.WaitGroup) {
+	for job := range jobs {
+		results <- uploadFile(ctx, client, bucket, job.destination, job.source)
+	}
+	wg.Done()
 }
