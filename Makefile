@@ -83,13 +83,28 @@ clean:
 push-dev: $(GO_LINUX_BINARIES)
 	$(DOCKER) build \
 			--file Dockerfile.alpine \
-    		-t europe-docker.pkg.dev/rescale-htc-scale-test-sandbox/workload/rescale/$(IMAGE_NAME)_amd64:$(VERSION) \
+    		-t us-docker.pkg.dev/rescale-htc-scale-test-sandbox/shared/$(IMAGE_NAME)_amd64:$(VERSION) \
     		--platform linux/amd64 \
     		--build-arg BINARY_FILE=$(BUILD)/htccli.linux-amd64 .
 	$(DOCKER) build \
 			--file Dockerfile.alpine \
-    		-t europe-docker.pkg.dev/rescale-htc-scale-test-sandbox/workload/rescale/$(IMAGE_NAME)_arm64:$(VERSION) \
+    		-t us-docker.pkg.dev/rescale-htc-scale-test-sandbox/shared/$(IMAGE_NAME)_arm64:$(VERSION) \
     		--platform linux/arm64 \
     		--build-arg BINARY_FILE=$(BUILD)/htccli.linux-arm64 .
-	$(DOCKER) push europe-docker.pkg.dev/rescale-htc-scale-test-sandbox/workload/rescale/$(IMAGE_NAME)_amd64:$(VERSION)
-	$(DOCKER) push europe-docker.pkg.dev/rescale-htc-scale-test-sandbox/workload/rescale/$(IMAGE_NAME)_arm64:$(VERSION)
+	$(DOCKER) push us-docker.pkg.dev/rescale-htc-scale-test-sandbox/shared/$(IMAGE_NAME)_amd64:$(VERSION)
+	$(DOCKER) push us-docker.pkg.dev/rescale-htc-scale-test-sandbox/shared/$(IMAGE_NAME)_arm64:$(VERSION)
+
+.PHONY: push-prod
+push-prod: $(GO_LINUX_BINARIES)
+	$(DOCKER) build \
+			--file Dockerfile.alpine \
+    		-t us-docker.pkg.dev/rescale-htc-prod/shared/$(IMAGE_NAME)_amd64:$(VERSION) \
+    		--platform linux/amd64 \
+    		--build-arg BINARY_FILE=$(BUILD)/htccli.linux-amd64 .
+	$(DOCKER) build \
+			--file Dockerfile.alpine \
+    		-t us-docker.pkg.dev/rescale-htc-prod/shared/$(IMAGE_NAME)_arm64:$(VERSION) \
+    		--platform linux/arm64 \
+    		--build-arg BINARY_FILE=$(BUILD)/htccli.linux-arm64 .
+	$(DOCKER) push us-docker.pkg.dev/rescale-htc-prod/shared/$(IMAGE_NAME)_amd64:$(VERSION)
+	$(DOCKER) push us-docker.pkg.dev/rescale-htc-prod/shared/$(IMAGE_NAME)_arm64:$(VERSION)
