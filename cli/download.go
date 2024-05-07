@@ -127,13 +127,12 @@ func getLocalDestination(objectName string, remotePath string, destinationDir st
 	objectPath = strings.TrimPrefix(objectPath, "/")
 	destinationDir = strings.TrimSuffix(destinationDir, "/")
 	destinationPath := path.Join(destinationDir, objectPath)
-	localDestination := strings.TrimPrefix(destinationPath, "/")
 	// this check is to support downloading a single remote object, not just a path
 	if objectName == remotePath {
 		_, file := filepath.Split(objectName)
-		localDestination = path.Join(localDestination, file)
+		destinationPath = path.Join(destinationPath, file)
 	}
-	return localDestination
+	return destinationPath
 }
 
 func downloadWorker(ctx context.Context, client *storage.Client, bucket string, jobs <-chan TransferObject, results chan<- TransferObject, wg *sync.WaitGroup) {
