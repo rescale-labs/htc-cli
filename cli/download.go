@@ -34,7 +34,7 @@ func Download(ctx context.Context, client *storage.Client, src string, dest stri
 	return downloadObjects(ctx, client, bucket, remotePath, dest)
 }
 
-func downloadObjects(ctx context.Context, client *storage.Client, bucket string, remotePath string, destinationDir string) error {
+func downloadObjects(ctx context.Context, client *storage.Client, bucket, remotePath, destinationDir string) error {
 	var failedDownloads []string
 
 	jobs := make(chan TransferObject)
