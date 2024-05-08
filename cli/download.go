@@ -86,7 +86,7 @@ func downloadObjects(ctx context.Context, client *storage.Client, bucket, remote
 		for _, sourcePath := range failedDownloads {
 			pathNames += "\n" + sourcePath
 		}
-		return errors.New(fmt.Sprintf("The following files failed to download: %s", pathNames))
+		return errors.New(fmt.Sprintf("The following files failed to download:\n%s", pathNames))
 	}
 	return nil
 }
