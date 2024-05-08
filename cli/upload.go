@@ -43,7 +43,7 @@ func uploadDirectory(ctx context.Context, client *storage.Client, bucket string,
 
 	jobs := make(chan TransferObject)
 	results := make(chan TransferObject)
-	walkErrors := make(chan error)
+	walkError := make(chan error)
 	wg := sync.WaitGroup{}
 
 	const numWorkers = 10
@@ -71,7 +71,7 @@ func uploadDirectory(ctx context.Context, client *storage.Client, bucket string,
 		close(jobs)
 		wg.Wait()
 		close(results)
-		walkErrors <- err
+		walkError <- err
 	}()
 
 	for result := range results {
@@ -80,8 +80,8 @@ func uploadDirectory(ctx context.Context, client *storage.Client, bucket string,
 		}
 	}
 
-	close(walkErrors)
-	if err := <-walkErrors; err != nil {
+	close(walkError)
+	if err := <-walkError; err != nil {
 		return err
 	}
 

@@ -39,6 +39,7 @@ func downloadObjects(ctx context.Context, client *storage.Client, bucket, remote
 
 	jobs := make(chan TransferObject)
 	results := make(chan TransferObject)
+	pageError := make(chan error)
 	wg := sync.WaitGroup{}
 
 	const numWorkers = 10
@@ -57,6 +58,7 @@ func downloadObjects(ctx context.Context, client *storage.Client, bucket, remote
 			var remoteObjects []*storage.ObjectAttrs
 			nextPageToken, err := page.NextPage(&remoteObjects)
 			if err != nil {
+				pageError <- err
 				break
 			}
 
@@ -79,6 +81,11 @@ func downloadObjects(ctx context.Context, client *storage.Client, bucket, remote
 		if result.err != nil {
 			failedDownloads = append(failedDownloads, result.source)
 		}
+	}
+
+	close(pageError)
+	if err := <-pageError; err != nil {
+		return err
 	}
 
 	if len(failedDownloads) != 0 {
