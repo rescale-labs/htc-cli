@@ -90,29 +90,37 @@ func uploadDirectory(ctx context.Context, client *storage.Client, bucket string,
 }
 
 func uploadFile(ctx context.Context, client *storage.Client, bucket string, object string, localFile string) TransferObject {
+	result := TransferObject{localFile, object, nil}
 	f, err := os.Open(localFile)
 	if err != nil {
-		return TransferObject{localFile, object, err}
+		result.err = err
+		return result
 	}
-	defer f.Close()
+
+	defer func() {
+		result.err = f.Close()
+	}()
 
 	o := client.Bucket(bucket).Object(object)
 
 	workerCtx, cancel := context.WithTimeout(ctx, time.Hour*1)
-	defer cancel()
+	defer func() {
+		result.err = errors.New("failed to upload in time")
+		cancel()
+	}()
 
 	writer := o.NewWriter(workerCtx)
+	defer func() {
+		result.err = writer.Close()
+	}()
 
 	if _, err = io.Copy(writer, f); err != nil {
-		return TransferObject{localFile, object, err}
-	}
-
-	if err = writer.Close(); err != nil {
-		return TransferObject{localFile, object, err}
+		result.err = err
+		return result
 	}
 
 	log.Printf("Blob %s uploaded.\n", object)
-	return TransferObject{localFile, object, nil}
+	return result
 }
 
 func uploadWorker(ctx context.Context, client *storage.Client, bucket string, jobs <-chan TransferObject, results chan<- TransferObject, wg *sync.WaitGroup) {

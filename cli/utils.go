@@ -44,7 +44,7 @@ func ParseArgs(args []string) (string, string) {
 }
 
 func Usage() {
-	const usage := `Usage: htccli cp <src> <dst>
+	const usage = `Usage: htccli cp <src> <dst>
 
 
 Available commands:
