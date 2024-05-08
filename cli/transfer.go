@@ -26,20 +26,23 @@ type TransferFile interface {
 }
 
 func (transfer *TransferPath) Transfer(ctx context.Context) error {
-	client, err := GetGoogleClient(ctx)
-	if err != nil {
-		return err
-	}
-	defer client.Close()
-
 	if strings.HasPrefix(transfer.src, "gs://") {
-		err = Download(ctx, client, transfer.src, transfer.dest)
+		client, err := GetGoogleClient(ctx)
+		if err != nil {
+			return err
+		}
+		defer client.Close()
+		return Download(ctx, client, transfer.src, transfer.dest)
 	} else if strings.HasPrefix(transfer.dest, "gs://") {
-		err = Upload(ctx, client, transfer.src, transfer.dest)
+		client, err := GetGoogleClient(ctx)
+		if err != nil {
+			return err
+		}
+		defer client.Close()
+		return Upload(ctx, client, transfer.src, transfer.dest)
 	} else {
-		err = localTransfer(transfer.src, transfer.dest)
+		return localTransfer(transfer.src, transfer.dest)
 	}
-	return err
 }
 
 func localTransfer(src string, dest string) error {

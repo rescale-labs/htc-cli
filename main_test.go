@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"github.com/rescale/htc-storage-cli/cli"
 	"os"
 	"testing"
@@ -12,19 +13,26 @@ func TestParseBucket(t *testing.T) {
 		input          string
 		expectedBucket string
 		expectedPath   string
+		expectedErr    error
 	}{
 		"Test Valid Bucket": {
 			input:          "gs://my-bucket/object/prefix",
 			expectedBucket: "my-bucket",
 			expectedPath:   "object/prefix",
+			expectedErr:    nil,
+		},
+		"Test Invalid Bucket": {
+			input:          "my-bucket/object/prefix",
+			expectedBucket: "",
+			expectedPath:   "",
+			expectedErr:    errors.New("invalid bucket. Bucket must start with gs://"),
 		},
 	}
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			actualBucket, actualPath, err := cli.ParseBucket(test.input)
-
-			if err != nil {
+			if err != nil && err.Error() != test.expectedErr.Error() {
 				t.Errorf("There was an error parsing the bucket")
 			}
 
@@ -66,16 +74,20 @@ func TestParseArgs(t *testing.T) {
 
 func TestTransfer(t *testing.T) {
 	// create a test file
-	localSrc := "test.txt"
-	touchFile(localSrc)
+	localSrc := "src"
 	localDest := "test/test.txt"
+	src, err := createTempFile("", localSrc)
+	if err != nil {
+		t.Errorf("Unable to create source temp file")
+	}
+	defer os.Remove(src.Name())
 
 	tests := map[string]struct {
 		src  string
 		dest string
 	}{
 		"Test Local Transfer": {
-			src:  localSrc,
+			src:  src.Name(),
 			dest: localDest,
 		},
 	}
@@ -83,10 +95,11 @@ func TestTransfer(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			transfer := cli.NewTransfer(test.src, test.dest)
-			err := transfer.Transfer(context.Background())
+			err = transfer.Transfer(context.Background())
 			if err != nil {
 				t.Errorf("Error transfering file %s", err)
 			}
+			defer os.Remove(test.dest)
 
 			stat, err := os.Stat(test.dest)
 			if err != nil {
@@ -97,18 +110,12 @@ func TestTransfer(t *testing.T) {
 			}
 		})
 	}
-	cleanUpFiles(localSrc, localDest)
 }
 
-func cleanUpFiles(src string, dest string) {
-	os.Remove(src)
-	os.Remove(dest)
-}
-
-func touchFile(name string) error {
-	file, err := os.OpenFile(name, os.O_RDONLY|os.O_CREATE, 0644)
+func createTempFile(dir string, name string) (*os.File, error) {
+	file, err := os.CreateTemp(dir, name)
 	if err != nil {
-		return err
+		return file, err
 	}
-	return file.Close()
+	return file, err
 }

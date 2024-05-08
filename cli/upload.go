@@ -61,7 +61,7 @@ func uploadDirectory(ctx context.Context, client *storage.Client, bucket string,
 				sourceFilePath := path.Join(strings.TrimSuffix(localPath, "/"), objectPath)
 				remoteFilePath := path.Join(remotePath, objectPath)
 
-				log.Printf("Uploading %s to %s", sourceFilePath, remoteFilePath)
+				//log.Printf("Uploading %s to %s", sourceFilePath, remoteFilePath)
 				upload := TransferObject{sourceFilePath, remoteFilePath, nil}
 				jobs <- upload
 			}
