@@ -52,16 +52,21 @@ func TestParseArgs(t *testing.T) {
 		input        []string
 		expectedSrc  string
 		expectedDest string
+		expectedErr  error
 	}{
 		"Test Valid Args": {
 			input:        []string{"cp", "gs://my-bucket/object/prefix", "local/path"},
 			expectedSrc:  "gs://my-bucket/object/prefix",
 			expectedDest: "local/path",
+			expectedErr:  nil,
 		},
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			src, dest := cli.ParseArgs(test.input[1:])
+			src, dest, err := cli.ParseArgs(test.input[1:])
+			if err != test.expectedErr {
+				t.Errorf("Actual error did not equal expected error")
+			}
 			if src != test.expectedSrc {
 				t.Errorf("Actual src %s did not equal expected src %s", src, test.expectedSrc)
 			}
