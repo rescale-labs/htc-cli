@@ -52,7 +52,7 @@ func Usage() {
 	usage += "\tdest		path or cloud storage URI\n\n"
 	usage += "Environment variables:\n"
 	usage += "\tGCP_APPLICATION_CREDENTIALS		JSON string containing GCP application credentials\n"
-	fmt.Printf(usage)
+	fmt.Fprintf(os.Stderr, usage)
 
 	os.Exit(1)
 }
