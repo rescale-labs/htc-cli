@@ -44,14 +44,18 @@ func ParseArgs(args []string) (string, string) {
 }
 
 func Usage() {
-	usage := "Usage: htccli cp <src> <dst>\n\n"
-	usage += "Available commands:\n"
-	usage += "\tcp		uploads or downloads one or more files to a destination URL\n\n"
-	usage += "cp arguments:\n"
-	usage += "\tsrc		path or cloud storage URI\n"
-	usage += "\tdest		path or cloud storage URI\n\n"
-	usage += "Environment variables:\n"
-	usage += "\tGCP_APPLICATION_CREDENTIALS		JSON string containing GCP application credentials\n"
+	const usage := `Usage: htccli cp <src> <dst>
+
+
+Available commands:
+    cp      uploads or downloads one or more files to a destination URL
+
+cp arguments:
+    src		  path or cloud storage URI
+    dest		path or cloud storage URI
+
+Environment variables:
+    GCP_APPLICATION_CREDENTIALS		JSON string containing GCP application credentials`
 	fmt.Fprintf(os.Stderr, usage)
 
 	os.Exit(1)
