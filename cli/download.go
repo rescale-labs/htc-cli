@@ -91,8 +91,8 @@ func downloadObjects(ctx context.Context, client *storage.Client, bucket, remote
 	return nil
 }
 
-func downloadFile(ctx context.Context, client *storage.Client, bucket string, object string, localFile string) TransferObject {
-	result := TransferObject{localFile, object, nil}
+func downloadFile(ctx context.Context, client *storage.Client, bucket string, object string, localFile string) (result TransferObject) {
+	result = TransferObject{localFile, object, nil}
 	destinationDirectory := filepath.Dir(localFile)
 	err := os.MkdirAll(destinationDirectory, 0755)
 	if err != nil {
@@ -100,6 +100,7 @@ func downloadFile(ctx context.Context, client *storage.Client, bucket string, ob
 		return result
 	}
 
+	// TODO: reduce default timeout and make it configurable
 	workerCtx, cancel := context.WithTimeout(ctx, time.Hour)
 	defer cancel()
 

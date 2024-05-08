@@ -89,8 +89,8 @@ func uploadDirectory(ctx context.Context, client *storage.Client, bucket string,
 	return nil
 }
 
-func uploadFile(ctx context.Context, client *storage.Client, bucket string, object string, localFile string) TransferObject {
-	result := TransferObject{localFile, object, nil}
+func uploadFile(ctx context.Context, client *storage.Client, bucket string, object string, localFile string) (result TransferObject) {
+	result = TransferObject{localFile, object, nil}
 	f, err := os.Open(localFile)
 	if err != nil {
 		result.err = err
@@ -106,6 +106,7 @@ func uploadFile(ctx context.Context, client *storage.Client, bucket string, obje
 
 	o := client.Bucket(bucket).Object(object)
 
+	// TODO: reduce default timeout and make it configurable
 	workerCtx, cancel := context.WithTimeout(ctx, time.Hour*1)
 	defer cancel()
 
