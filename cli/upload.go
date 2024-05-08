@@ -43,6 +43,7 @@ func uploadDirectory(ctx context.Context, client *storage.Client, bucket string,
 
 	jobs := make(chan TransferObject)
 	results := make(chan TransferObject)
+	walkErrors := make(chan error)
 	wg := sync.WaitGroup{}
 
 	const numWorkers = 10
@@ -53,7 +54,7 @@ func uploadDirectory(ctx context.Context, client *storage.Client, bucket string,
 	}
 
 	go func() {
-		filepath.Walk(localPath, func(pathStr string, info os.FileInfo, err error) error {
+		err := filepath.Walk(localPath, func(pathStr string, info os.FileInfo, err error) error {
 			if !info.IsDir() {
 				objectPath := strings.TrimPrefix(pathStr, localPath)
 				objectPath = strings.TrimPrefix(objectPath, "/")
@@ -61,16 +62,16 @@ func uploadDirectory(ctx context.Context, client *storage.Client, bucket string,
 				sourceFilePath := path.Join(strings.TrimSuffix(localPath, "/"), objectPath)
 				remoteFilePath := path.Join(remotePath, objectPath)
 
-				//log.Printf("Uploading %s to %s", sourceFilePath, remoteFilePath)
 				upload := TransferObject{sourceFilePath, remoteFilePath, nil}
 				jobs <- upload
 			}
-			return nil
+			return err
 		})
 		// when there are no more files to upload we close the jobs channel wait then close the results
 		close(jobs)
 		wg.Wait()
 		close(results)
+		walkErrors <- err
 	}()
 
 	for result := range results {
@@ -79,10 +80,15 @@ func uploadDirectory(ctx context.Context, client *storage.Client, bucket string,
 		}
 	}
 
+	close(walkErrors)
+	if err := <-walkErrors; err != nil {
+		return err
+	}
+
 	if len(failedUploads) != 0 {
 		pathNames := ""
 		for _, sourcePath := range failedUploads {
-			pathNames += " " + sourcePath
+			pathNames += "\n" + sourcePath
 		}
 		return errors.New(fmt.Sprintf("The following files failed to upload: %s", pathNames))
 	}
