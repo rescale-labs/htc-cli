@@ -98,20 +98,23 @@ func uploadFile(ctx context.Context, client *storage.Client, bucket string, obje
 	}
 
 	defer func() {
-		result.err = f.Close()
+		err = f.Close()
+		if err != nil {
+			result.err = err
+		}
 	}()
 
 	o := client.Bucket(bucket).Object(object)
 
 	workerCtx, cancel := context.WithTimeout(ctx, time.Hour*1)
-	defer func() {
-		result.err = errors.New("failed to upload in time")
-		cancel()
-	}()
+	defer cancel()
 
 	writer := o.NewWriter(workerCtx)
 	defer func() {
-		result.err = writer.Close()
+		err = writer.Close()
+		if err != nil {
+			result.err = err
+		}
 	}()
 
 	if _, err = io.Copy(writer, f); err != nil {

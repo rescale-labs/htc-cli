@@ -92,11 +92,12 @@ func downloadObjects(ctx context.Context, client *storage.Client, bucket string,
 }
 
 func downloadFile(ctx context.Context, client *storage.Client, bucket string, object string, localFile string) TransferObject {
-
+	result := TransferObject{localFile, object, nil}
 	destinationDirectory := filepath.Dir(localFile)
 	err := os.MkdirAll(destinationDirectory, 0755)
 	if err != nil {
-		return TransferObject{localFile, object, err}
+		result.err = err
+		return result
 	}
 
 	workerCtx, cancel := context.WithTimeout(ctx, time.Hour)
@@ -104,22 +105,35 @@ func downloadFile(ctx context.Context, client *storage.Client, bucket string, ob
 
 	filePtr, err := os.Create(localFile)
 	if err != nil {
-		return TransferObject{localFile, object, err}
+		result.err = err
+		return result
 	}
-	defer filePtr.Close()
+	defer func() {
+		err = filePtr.Close()
+		if err != nil {
+			result.err = err
+		}
+	}()
 
 	rc, err := client.Bucket(bucket).Object(object).NewReader(workerCtx)
 	if err != nil {
-		return TransferObject{localFile, object, err}
+		result.err = err
+		return result
 	}
-	defer rc.Close()
+	defer func() {
+		err = rc.Close()
+		if err != nil {
+			result.err = err
+		}
+	}()
 
 	if _, err = io.Copy(filePtr, rc); err != nil {
-		return TransferObject{localFile, object, err}
+		result.err = err
+		return result
 	}
 
 	log.Printf("Blob %v downloaded to local file %v\n", object, localFile)
-	return TransferObject{localFile, object, nil}
+	return result
 }
 
 func getLocalDestination(objectName string, remotePath string, destinationDir string) string {
