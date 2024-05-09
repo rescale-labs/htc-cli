@@ -76,7 +76,7 @@ test:
 
 .PHONY: clean
 clean:
-	rm -f htccli
+	rm -rf $(BUILD)
 
 
 .PHONY: push-dev
