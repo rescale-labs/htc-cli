@@ -110,7 +110,7 @@ func downloadFile(ctx context.Context, client *storage.Client, bucket string, ob
 	}
 
 	// TODO: reduce default timeout and make it configurable
-	workerCtx, cancel := context.WithTimeout(ctx, time.Hour)
+	workerCtx, cancel := context.WithTimeout(ctx, time.Minute*20)
 	defer cancel()
 
 	filePtr, err := os.Create(localFile)

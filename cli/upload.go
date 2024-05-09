@@ -31,6 +31,7 @@ func uploadFiles(ctx context.Context, client *storage.Client, bucket, remotePath
 
 	jobs := make(chan TransferResult)
 	results := make(chan TransferResult)
+	walkError := make(chan error)
 	wg := sync.WaitGroup{}
 
 	numWorkers := transfer.parallelization
@@ -41,8 +42,12 @@ func uploadFiles(ctx context.Context, client *storage.Client, bucket, remotePath
 	}
 
 	go func() {
+		var err error = nil
 		for _, source := range transfer.sourcePaths {
-			filepath.Walk(source, func(pathStr string, info os.FileInfo, err error) error {
+			if _, err := os.Stat(source); err != nil {
+				continue
+			}
+			err = filepath.Walk(source, func(pathStr string, info os.FileInfo, err error) error {
 				if !info.IsDir() {
 					// if we upload a file we just want to get the directory of that file
 					dir := filepath.Dir(pathStr)
@@ -56,10 +61,7 @@ func uploadFiles(ctx context.Context, client *storage.Client, bucket, remotePath
 					}
 					objectPath := strings.TrimPrefix(pathStr, dir)
 					objectPath = strings.TrimPrefix(objectPath, "/")
-
 					remotePath = strings.TrimPrefix(remotePath, "/")
-
-					//sourceFilePath := path.Join(strings.TrimSuffix(files, "/"), objectPath)
 					remoteFilePath := path.Join(remotePath, objectPath)
 
 					upload := TransferResult{pathStr, remoteFilePath, nil}
@@ -72,12 +74,18 @@ func uploadFiles(ctx context.Context, client *storage.Client, bucket, remotePath
 		close(jobs)
 		wg.Wait()
 		close(results)
+		walkError <- err
 	}()
 
 	for result := range results {
 		if result.err != nil {
 			failedUploads = append(failedUploads, result.source)
 		}
+	}
+
+	close(walkError)
+	if err := <-walkError; err != nil {
+		return err
 	}
 
 	if len(failedUploads) != 0 {
@@ -108,7 +116,7 @@ func uploadFile(ctx context.Context, client *storage.Client, bucket string, obje
 	o := client.Bucket(bucket).Object(object)
 
 	// TODO: reduce default timeout and make it configurable
-	workerCtx, cancel := context.WithTimeout(ctx, time.Hour*1)
+	workerCtx, cancel := context.WithTimeout(ctx, time.Minute*20)
 	defer cancel()
 
 	writer := o.NewWriter(workerCtx)
