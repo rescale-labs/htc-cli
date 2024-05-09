@@ -49,7 +49,6 @@ func uploadDirectory(ctx context.Context, client *storage.Client, bucket, remote
 	wg := sync.WaitGroup{}
 
 	numWorkers := options.parallelization
-	log.Printf("%d", numWorkers)
 
 	for w := 0; w < numWorkers; w++ {
 		wg.Add(1)

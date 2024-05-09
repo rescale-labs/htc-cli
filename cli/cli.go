@@ -51,6 +51,12 @@ func Usage() {
 Available commands:
     cp      uploads or downloads one or more files to a destination URL
 
+Available options:
+	-h			Print this usage
+
+Available cp Options:
+	-p			Number of uploads/downloads to make in parallel [default=10]
+
 cp arguments:
     src		  path or cloud storage URI
     dest		path or cloud storage URI
