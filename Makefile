@@ -72,7 +72,11 @@ binary: format
 
 .PHONY: test
 test:
+<<<<<<< HEAD
 	go test ./...
+=======
+	go test && cd cli && go test
+>>>>>>> 55d053d (adding parallelization option and fixing tests)
 
 .PHONY: clean
 clean:
