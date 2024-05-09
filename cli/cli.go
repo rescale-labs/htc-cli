@@ -32,16 +32,14 @@ func ParseArgs(args []string) (Transfer, error) {
 	err := cmd.Parse(args)
 
 	if err != nil {
-		return Transfer{"", "", 0}, errors.New("error parsing args")
+		return Transfer{[]string{""}, "", 0}, errors.New("error parsing args")
 	}
 
 	if *help || len(cmd.Args()) != 2 {
-		return Transfer{"", "", 0}, errors.New("user chose help or not enough args")
+		return Transfer{[]string{""}, "", 0}, errors.New("user chose help or not enough args")
 	}
 
-	src := cmd.Arg(0)
-	dest := cmd.Arg(1)
-	return Transfer{src, dest, *parallel}, nil
+	return Transfer{cmd.Args()[:len(cmd.Args())-1], cmd.Args()[len(cmd.Args())-1], *parallel}, nil
 }
 
 func Usage() {
@@ -92,7 +90,7 @@ func getGoogleCredentials() (string, error) {
 }
 
 type Transfer struct {
-	sourcePath      string
+	sourcePaths     []string
 	destinationPath string
 	parallelization int
 }

@@ -26,8 +26,8 @@ func TestParseArgs(t *testing.T) {
 			if err != test.expectedErr {
 				t.Errorf("Actual error did not equal expected error")
 			}
-			if transferOpts.sourcePath != test.expectedSrc {
-				t.Errorf("Actual src %s did not equal expected src %s", transferOpts.sourcePath, test.expectedSrc)
+			if transferOpts.sourcePaths[0] != test.expectedSrc {
+				t.Errorf("Actual src %s did not equal expected src %s", transferOpts.sourcePaths[0], test.expectedSrc)
 			}
 			if transferOpts.destinationPath != test.expectedDest {
 				t.Errorf("Actual dest %s did not equal expected dest %s", transferOpts.destinationPath, test.expectedDest)
@@ -58,7 +58,7 @@ func TestTransfer(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			transfer := &Transfer{test.src, test.dest, 10}
+			transfer := &Transfer{[]string{test.src}, test.dest, 10}
 			err = transfer.Transfer(context.Background())
 			if err != nil {
 				t.Errorf("Error transfering file %s", err)
