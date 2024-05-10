@@ -49,18 +49,7 @@ func uploadFiles(ctx context.Context, client *storage.Client, bucket, remotePath
 			}
 			err = filepath.Walk(source, func(pathStr string, info os.FileInfo, err error) error {
 				if !info.IsDir() {
-					// if we upload a file we just want to get the directory of that file
-					dir := filepath.Dir(pathStr)
-					// if we upload a directory
-					stat, err := os.Stat(source)
-					if stat.IsDir() {
-						dir = source
-					}
-					if err != nil {
-						return err
-					}
-					objectPath := strings.TrimPrefix(pathStr, dir)
-					objectPath = strings.TrimPrefix(objectPath, "/")
+					objectPath := strings.TrimPrefix(pathStr, "/")
 					remotePath = strings.TrimPrefix(remotePath, "/")
 					remoteFilePath := path.Join(remotePath, objectPath)
 
@@ -132,7 +121,7 @@ func uploadFile(ctx context.Context, client *storage.Client, bucket string, obje
 		return result
 	}
 
-	log.Printf("Blob %s uploaded.\n", object)
+	log.Printf("Blob %s uploaded to %s", localFile, object)
 	return result
 }
 

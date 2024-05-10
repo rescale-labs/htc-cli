@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"google.golang.org/api/iterator"
 	"io"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -142,19 +141,17 @@ func downloadFile(ctx context.Context, client *storage.Client, bucket string, ob
 		return result
 	}
 
-	log.Printf("Blob %v downloaded to local file %v\n", object, localFile)
 	return result
 }
 
-func getLocalDestination(objectName string, remotePath string, destinationDir string) string {
+func getLocalDestination(objectName string, remotePath string, destination string) string {
 	objectPath := strings.TrimPrefix(objectName, remotePath)
 	objectPath = strings.TrimPrefix(objectPath, "/")
-	destinationDir = strings.TrimSuffix(destinationDir, "/")
-	destinationPath := path.Join(destinationDir, objectPath)
+	destination = strings.TrimSuffix(destination, "/")
+	destinationPath := path.Join(destination, objectPath)
 	// this check is to support downloading a single remote object, not just a path
 	if objectName == remotePath {
-		_, file := filepath.Split(objectName)
-		destinationPath = path.Join(destinationPath, file)
+		destinationPath = destination
 	}
 	return destinationPath
 }
