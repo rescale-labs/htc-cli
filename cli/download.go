@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"google.golang.org/api/iterator"
 	"io"
+	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -66,6 +67,10 @@ func downloadObjects(ctx context.Context, client *storage.Client, bucket, remote
 			for _, object := range remoteObjects {
 				destinationFilePath := getLocalDestination(object.Name, remotePath, destinationDir)
 				jobs <- TransferResult{object.Name, destinationFilePath, nil}
+				// if we are only downloading a single file we can break out of this loop
+				if object.Name == remotePath {
+					break
+				}
 			}
 
 			if nextPageToken == "" {
@@ -80,6 +85,7 @@ func downloadObjects(ctx context.Context, client *storage.Client, bucket, remote
 
 	for result := range results {
 		if result.err != nil {
+			log.Printf("Result = %v", result.err)
 			failedDownloads = append(failedDownloads, result.source)
 		}
 	}
@@ -145,7 +151,12 @@ func downloadFile(ctx context.Context, client *storage.Client, bucket string, ob
 }
 
 func getLocalDestination(objectName string, remotePath string, destination string) string {
-	objectPath := strings.TrimPrefix(objectName, remotePath)
+	// this is if we cut based on an object file
+	objectPath := strings.TrimPrefix(objectName, remotePath[:strings.LastIndex(remotePath, "/")])
+	// this is if we want to instead cut based on a directory
+	if objectName != remotePath {
+		objectPath = strings.TrimPrefix(objectName, remotePath)
+	}
 	objectPath = strings.TrimPrefix(objectPath, "/")
 	destination = strings.TrimSuffix(destination, "/")
 	destinationPath := path.Join(destination, objectPath)
