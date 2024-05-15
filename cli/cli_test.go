@@ -22,8 +22,8 @@ func TestParseArgs(t *testing.T) {
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			transferOpts := ParseArgs(test.input[1:])
-			if transferOpts.err != test.expectedErr {
+			transferOpts, err := ParseArgs(test.input[1:])
+			if err != test.expectedErr {
 				t.Errorf("Actual error did not equal expected error")
 			}
 			if transferOpts.sourcePath != test.expectedSrc {
@@ -58,7 +58,7 @@ func TestTransfer(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			transfer := &TransferOptions{test.src, test.dest, 10, nil}
+			transfer := &TransferOptions{test.src, test.dest, 10}
 			err = transfer.Transfer(context.Background())
 			if err != nil {
 				t.Errorf("Error transfering file %s", err)

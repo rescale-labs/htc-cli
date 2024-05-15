@@ -11,11 +11,14 @@ func main() {
 	if len(os.Args) < 2 {
 		cli.Usage()
 	}
-	transferOpts := cli.ParseArgs(os.Args[2:])
+	transferOpts, err := cli.ParseArgs(os.Args[2:])
+	if err != nil {
+		log.Fatalf("error parsing arguments %v", err)
+	}
 
 	ctx := context.Background()
-	err := transferOpts.Transfer(ctx)
+	err = transferOpts.Transfer(ctx)
 	if err != nil {
-		log.Fatalf("error running command %s", err)
+		log.Fatalf("error running command %v", err)
 	}
 }
