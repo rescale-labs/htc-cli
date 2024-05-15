@@ -24,7 +24,7 @@ func ParseBucket(bucketPath string) (string, string, error) {
 	return match[1], strings.TrimRight(match[2], "/"), nil
 }
 
-func ParseArgs(args []string) (TransferOptions, error) {
+func ParseArgs(args []string) (Transfer, error) {
 	help := flag.Bool("h", false, "help message")
 	cmd := flag.NewFlagSet("cp", flag.ContinueOnError)
 	parallel := cmd.Int("p", 10, "Number of parallel transfers")
@@ -32,7 +32,7 @@ func ParseArgs(args []string) (TransferOptions, error) {
 	err := cmd.Parse(args)
 
 	if err != nil {
-		return TransferOptions{"", "", 0}, errors.New("error parsing args")
+		return Transfer{"", "", 0}, errors.New("error parsing args")
 	}
 
 	if *help || len(cmd.Args()) != 2 {
@@ -41,7 +41,7 @@ func ParseArgs(args []string) (TransferOptions, error) {
 
 	src := cmd.Arg(0)
 	dest := cmd.Arg(1)
-	return TransferOptions{src, dest, *parallel}, nil
+	return Transfer{src, dest, *parallel}, nil
 }
 
 func Usage() {
@@ -91,7 +91,7 @@ func getGoogleCredentials() (string, error) {
 	return credentials, nil
 }
 
-type TransferOptions struct {
+type Transfer struct {
 	sourcePath      string
 	destinationPath string
 	parallelization int

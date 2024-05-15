@@ -72,7 +72,7 @@ binary: format
 
 .PHONY: test
 test:
-	go test && cd cli && go test
+	go test && go test ./cli
 
 .PHONY: clean
 clean:

@@ -19,9 +19,9 @@ import (
 // Download iterates over remote objects from a csp to download into a destination directory
 // An error is returned if there was a failure listing or downloading files
 // The local destination path is created if it does not exist
-func Download(ctx context.Context, client *storage.Client, transferOptions *TransferOptions) error {
-	src := transferOptions.sourcePath
-	dest := transferOptions.destinationPath
+func Download(ctx context.Context, client *storage.Client, transfer *Transfer) error {
+	src := transfer.sourcePath
+	dest := transfer.destinationPath
 	bucket, remotePath, err := ParseBucket(src)
 	if err != nil {
 		return err
@@ -33,10 +33,10 @@ func Download(ctx context.Context, client *storage.Client, transferOptions *Tran
 		return err
 	}
 
-	return downloadObjects(ctx, client, bucket, remotePath, dest, transferOptions)
+	return downloadObjects(ctx, client, bucket, remotePath, dest, transfer)
 }
 
-func downloadObjects(ctx context.Context, client *storage.Client, bucket, remotePath, destinationDir string, options *TransferOptions) error {
+func downloadObjects(ctx context.Context, client *storage.Client, bucket, remotePath, destinationDir string, transfer *Transfer) error {
 	var failedDownloads []string
 
 	jobs := make(chan TransferResult)
@@ -44,7 +44,7 @@ func downloadObjects(ctx context.Context, client *storage.Client, bucket, remote
 	pageError := make(chan error)
 	wg := sync.WaitGroup{}
 
-	numWorkers := options.parallelization
+	numWorkers := transfer.parallelization
 
 	for w := 0; w < numWorkers; w++ {
 		wg.Add(1)

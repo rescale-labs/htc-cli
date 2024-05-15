@@ -58,7 +58,7 @@ func TestTransfer(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			transfer := &TransferOptions{test.src, test.dest, 10}
+			transfer := &Transfer{test.src, test.dest, 10}
 			err = transfer.Transfer(context.Background())
 			if err != nil {
 				t.Errorf("Error transfering file %s", err)

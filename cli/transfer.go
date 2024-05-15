@@ -21,30 +21,30 @@ type TransferFile interface {
 	Transfer(ctx context.Context) error
 }
 
-func (transferOptions *TransferOptions) Transfer(ctx context.Context) error {
-	if strings.HasPrefix(transferOptions.sourcePath, "gs://") {
+func (transfer *Transfer) Transfer(ctx context.Context) error {
+	if strings.HasPrefix(transfer.sourcePath, "gs://") {
 		client, err := GetGoogleClient(ctx)
 		if err != nil {
 			return err
 		}
 		defer client.Close()
-		return Download(ctx, client, transferOptions)
-	} else if strings.HasPrefix(transferOptions.destinationPath, "gs://") {
+		return Download(ctx, client, transfer)
+	} else if strings.HasPrefix(transfer.destinationPath, "gs://") {
 		client, err := GetGoogleClient(ctx)
 		if err != nil {
 			return err
 		}
 		defer client.Close()
-		return Upload(ctx, client, transferOptions)
+		return Upload(ctx, client, transfer)
 	} else {
-		return localTransfer(transferOptions)
+		return localTransfer(transfer)
 	}
 }
 
-func localTransfer(transferOptions *TransferOptions) error {
+func localTransfer(transfer *Transfer) error {
 	var failedCopies []string
-	src := transferOptions.sourcePath
-	dest := transferOptions.destinationPath
+	src := transfer.sourcePath
+	dest := transfer.destinationPath
 
 	stat, err := os.Stat(src)
 	if stat.IsDir() {

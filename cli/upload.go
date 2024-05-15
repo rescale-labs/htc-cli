@@ -17,9 +17,9 @@ import (
 
 // Upload iterates over local paths to upload as a remote object
 // An error is returned if there was a failure uploading
-func Upload(ctx context.Context, client *storage.Client, transferOptions *TransferOptions) error {
-	src := transferOptions.sourcePath
-	dest := transferOptions.destinationPath
+func Upload(ctx context.Context, client *storage.Client, transfer *Transfer) error {
+	src := transfer.sourcePath
+	dest := transfer.destinationPath
 	bucket, path, err := ParseBucket(dest)
 	if err != nil {
 		return err
@@ -31,7 +31,7 @@ func Upload(ctx context.Context, client *storage.Client, transferOptions *Transf
 	}
 
 	if stat.IsDir() {
-		return uploadDirectory(ctx, client, bucket, path, src, transferOptions)
+		return uploadDirectory(ctx, client, bucket, path, src, transfer)
 	} else if stat.Mode().IsRegular() {
 		upload := uploadFile(ctx, client, bucket, fmt.Sprintf("%s/%s", path, stat.Name()), src)
 		return upload.err
@@ -40,7 +40,7 @@ func Upload(ctx context.Context, client *storage.Client, transferOptions *Transf
 	}
 }
 
-func uploadDirectory(ctx context.Context, client *storage.Client, bucket, remotePath, localPath string, options *TransferOptions) error {
+func uploadDirectory(ctx context.Context, client *storage.Client, bucket, remotePath, localPath string, transfer *Transfer) error {
 	var failedUploads []string
 
 	jobs := make(chan TransferResult)
@@ -48,7 +48,7 @@ func uploadDirectory(ctx context.Context, client *storage.Client, bucket, remote
 	walkError := make(chan error)
 	wg := sync.WaitGroup{}
 
-	numWorkers := options.parallelization
+	numWorkers := transfer.parallelization
 
 	for w := 0; w < numWorkers; w++ {
 		wg.Add(1)
