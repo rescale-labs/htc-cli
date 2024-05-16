@@ -13,7 +13,7 @@ func main() {
 	}
 	transferOpts, err := cli.ParseArgs(os.Args[2:])
 	if err != nil {
-		log.Fatalf("error parsing arguments %v", err)
+		cli.Usage()
 	}
 
 	ctx := context.Background()

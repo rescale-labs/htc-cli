@@ -36,7 +36,7 @@ func ParseArgs(args []string) (Transfer, error) {
 	}
 
 	if *help || len(cmd.Args()) != 2 {
-		Usage()
+		return Transfer{"", "", 0}, errors.New("user chose help or not enough args")
 	}
 
 	src := cmd.Arg(0)
