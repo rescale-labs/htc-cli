@@ -35,7 +35,7 @@ func ParseArgs(args []string) (Transfer, error) {
 		return Transfer{[]string{""}, "", 0}, errors.New("error parsing args")
 	}
 
-	if *help || len(cmd.Args()) != 2 {
+	if *help || len(cmd.Args()) < 2 {
 		return Transfer{[]string{""}, "", 0}, errors.New("user chose help or not enough args")
 	}
 
