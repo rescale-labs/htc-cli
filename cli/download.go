@@ -19,7 +19,9 @@ import (
 // Download iterates over remote objects from a csp to download into a destination directory
 // An error is returned if there was a failure listing or downloading files
 // The local destination path is created if it does not exist
-func Download(ctx context.Context, client *storage.Client, src string, dest string) error {
+func Download(ctx context.Context, client *storage.Client, transfer *Transfer) error {
+	src := transfer.sourcePath
+	dest := transfer.destinationPath
 	bucket, remotePath, err := ParseBucket(src)
 	if err != nil {
 		return err
@@ -31,18 +33,18 @@ func Download(ctx context.Context, client *storage.Client, src string, dest stri
 		return err
 	}
 
-	return downloadObjects(ctx, client, bucket, remotePath, dest)
+	return downloadObjects(ctx, client, bucket, remotePath, dest, transfer)
 }
 
-func downloadObjects(ctx context.Context, client *storage.Client, bucket, remotePath, destinationDir string) error {
+func downloadObjects(ctx context.Context, client *storage.Client, bucket, remotePath, destinationDir string, transfer *Transfer) error {
 	var failedDownloads []string
 
-	jobs := make(chan TransferObject)
-	results := make(chan TransferObject)
+	jobs := make(chan TransferResult)
+	results := make(chan TransferResult)
 	pageError := make(chan error)
 	wg := sync.WaitGroup{}
 
-	const numWorkers = 10
+	numWorkers := transfer.parallelization
 
 	for w := 0; w < numWorkers; w++ {
 		wg.Add(1)
@@ -64,7 +66,7 @@ func downloadObjects(ctx context.Context, client *storage.Client, bucket, remote
 
 			for _, object := range remoteObjects {
 				destinationFilePath := getLocalDestination(object.Name, remotePath, destinationDir)
-				jobs <- TransferObject{object.Name, destinationFilePath, nil}
+				jobs <- TransferResult{object.Name, destinationFilePath, nil}
 			}
 
 			if nextPageToken == "" {
@@ -98,8 +100,8 @@ func downloadObjects(ctx context.Context, client *storage.Client, bucket, remote
 	return nil
 }
 
-func downloadFile(ctx context.Context, client *storage.Client, bucket string, object string, localFile string) (result TransferObject) {
-	result = TransferObject{localFile, object, nil}
+func downloadFile(ctx context.Context, client *storage.Client, bucket string, object string, localFile string) (result TransferResult) {
+	result = TransferResult{localFile, object, nil}
 	destinationDirectory := filepath.Dir(localFile)
 	err := os.MkdirAll(destinationDirectory, 0755)
 	if err != nil {
@@ -157,7 +159,7 @@ func getLocalDestination(objectName string, remotePath string, destinationDir st
 	return destinationPath
 }
 
-func downloadWorker(ctx context.Context, client *storage.Client, bucket string, jobs <-chan TransferObject, results chan<- TransferObject, wg *sync.WaitGroup) {
+func downloadWorker(ctx context.Context, client *storage.Client, bucket string, jobs <-chan TransferResult, results chan<- TransferResult, wg *sync.WaitGroup) {
 	for job := range jobs {
 		results <- downloadFile(ctx, client, bucket, job.source, job.destination)
 	}

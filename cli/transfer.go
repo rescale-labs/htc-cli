@@ -17,36 +17,34 @@ type TransferPath struct {
 	dest string
 }
 
-func NewTransfer(src string, dest string) *TransferPath {
-	return &TransferPath{src, dest}
-}
-
 type TransferFile interface {
 	Transfer(ctx context.Context) error
 }
 
-func (transfer *TransferPath) Transfer(ctx context.Context) error {
-	if strings.HasPrefix(transfer.src, "gs://") {
+func (transfer *Transfer) Transfer(ctx context.Context) error {
+	if strings.HasPrefix(transfer.sourcePath, "gs://") {
 		client, err := GetGoogleClient(ctx)
 		if err != nil {
 			return err
 		}
 		defer client.Close()
-		return Download(ctx, client, transfer.src, transfer.dest)
-	} else if strings.HasPrefix(transfer.dest, "gs://") {
+		return Download(ctx, client, transfer)
+	} else if strings.HasPrefix(transfer.destinationPath, "gs://") {
 		client, err := GetGoogleClient(ctx)
 		if err != nil {
 			return err
 		}
 		defer client.Close()
-		return Upload(ctx, client, transfer.src, transfer.dest)
+		return Upload(ctx, client, transfer)
 	} else {
-		return localTransfer(transfer.src, transfer.dest)
+		return localTransfer(transfer)
 	}
 }
 
-func localTransfer(src string, dest string) error {
+func localTransfer(transfer *Transfer) error {
 	var failedCopies []string
+	src := transfer.sourcePath
+	dest := transfer.destinationPath
 
 	stat, err := os.Stat(src)
 	if stat.IsDir() {
@@ -101,4 +99,10 @@ func copyFile(src, dest string) error {
 
 	log.Printf("File %s copied to %s.\n", src, dest)
 	return err
+}
+
+type TransferResult struct {
+	source      string
+	destination string
+	err         error
 }
