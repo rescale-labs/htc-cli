@@ -19,8 +19,4 @@ jobs:
       - name: Build
         run: go build -v ./...
       - name: Test with the Go CLI
-<<<<<<< HEAD
         run: make test
-=======
-        run: go test && cd cli && go test
->>>>>>> 55d053d (adding parallelization option and fixing tests)
