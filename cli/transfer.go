@@ -22,14 +22,14 @@ type TransferFile interface {
 }
 
 func (transfer *Transfer) Transfer(ctx context.Context) error {
-	if strings.HasPrefix(transfer.sourcePaths[0], "gs://") {
+	if strings.HasPrefix(transfer.sources[0], "gs://") {
 		client, err := GetGoogleClient(ctx)
 		if err != nil {
 			return err
 		}
 		defer client.Close()
 		return Download(ctx, client, transfer)
-	} else if strings.HasPrefix(transfer.destinationPath, "gs://") {
+	} else if strings.HasPrefix(transfer.destination, "gs://") {
 		client, err := GetGoogleClient(ctx)
 		if err != nil {
 			return err
@@ -43,8 +43,8 @@ func (transfer *Transfer) Transfer(ctx context.Context) error {
 
 func localTransfer(transfer *Transfer) error {
 	var failedCopies []string
-	src := transfer.sourcePaths[0]
-	dest := transfer.destinationPath
+	src := transfer.sources[0]
+	dest := transfer.destination
 
 	stat, err := os.Stat(src)
 	if stat.IsDir() {
@@ -68,7 +68,7 @@ func localTransfer(transfer *Transfer) error {
 			return errors.New(fmt.Sprintf("The following files failed to copy: %s", pathNames))
 		}
 	} else {
-		for _, filename := range transfer.sourcePaths {
+		for _, filename := range transfer.sources {
 			copyFile(filename, dest)
 		}
 	}

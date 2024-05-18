@@ -89,8 +89,10 @@ func getGoogleCredentials() (string, error) {
 	return credentials, nil
 }
 
+// Transfer is a struct for the parsed command line args sources can be a path, list of paths (wildcards) or a remote object
+// destination can be a path or remote path and parallelization is the amount of goroutine workers when transferring (default is 10)
 type Transfer struct {
-	sourcePaths     []string
-	destinationPath string
+	sources         []string
+	destination     string
 	parallelization int
 }

@@ -20,8 +20,8 @@ import (
 // An error is returned if there was a failure listing or downloading files
 // The local destination path is created if it does not exist
 func Download(ctx context.Context, client *storage.Client, transfer *Transfer) error {
-	src := transfer.sourcePaths[0]
-	dest := transfer.destinationPath
+	src := transfer.sources[0]
+	dest := transfer.destination
 	bucket, remotePath, err := ParseBucket(src)
 	if err != nil {
 		return err
