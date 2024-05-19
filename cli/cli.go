@@ -32,16 +32,14 @@ func ParseArgs(args []string) (Transfer, error) {
 	err := cmd.Parse(args)
 
 	if err != nil {
-		return Transfer{"", "", 0}, errors.New("error parsing args")
+		return Transfer{[]string{""}, "", 0}, errors.New("error parsing args")
 	}
 
-	if *help || len(cmd.Args()) != 2 {
-		return Transfer{"", "", 0}, errors.New("user chose help or not enough args")
+	if *help || len(cmd.Args()) < 2 {
+		return Transfer{[]string{""}, "", 0}, errors.New("user chose help or not enough args")
 	}
 
-	src := cmd.Arg(0)
-	dest := cmd.Arg(1)
-	return Transfer{src, dest, *parallel}, nil
+	return Transfer{cmd.Args()[:len(cmd.Args())-1], cmd.Args()[len(cmd.Args())-1], *parallel}, nil
 }
 
 func Usage() {
@@ -91,8 +89,10 @@ func getGoogleCredentials() (string, error) {
 	return credentials, nil
 }
 
+// Transfer is a struct for the parsed command line args sources can be a path, list of paths (wildcards) or a remote object
+// destination can be a path or remote path and parallelization is the amount of goroutine workers when transferring (default is 10)
 type Transfer struct {
-	sourcePath      string
-	destinationPath string
+	sources         []string
+	destination     string
 	parallelization int
 }

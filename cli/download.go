@@ -20,8 +20,8 @@ import (
 // An error is returned if there was a failure listing or downloading files
 // The local destination path is created if it does not exist
 func Download(ctx context.Context, client *storage.Client, transfer *Transfer) error {
-	src := transfer.sourcePath
-	dest := transfer.destinationPath
+	src := transfer.sources[0]
+	dest := transfer.destination
 	bucket, remotePath, err := ParseBucket(src)
 	if err != nil {
 		return err
@@ -67,6 +67,10 @@ func downloadObjects(ctx context.Context, client *storage.Client, bucket, remote
 			for _, object := range remoteObjects {
 				destinationFilePath := getLocalDestination(object.Name, remotePath, destinationDir)
 				jobs <- TransferResult{object.Name, destinationFilePath, nil}
+				// if we are only downloading a single file we can break out of this loop
+				if object.Name == remotePath {
+					break
+				}
 			}
 
 			if nextPageToken == "" {
@@ -81,6 +85,7 @@ func downloadObjects(ctx context.Context, client *storage.Client, bucket, remote
 
 	for result := range results {
 		if result.err != nil {
+			log.Printf("Result = %v", result.err)
 			failedDownloads = append(failedDownloads, result.source)
 		}
 	}
@@ -110,7 +115,7 @@ func downloadFile(ctx context.Context, client *storage.Client, bucket string, ob
 	}
 
 	// TODO: reduce default timeout and make it configurable
-	workerCtx, cancel := context.WithTimeout(ctx, time.Hour)
+	workerCtx, cancel := context.WithTimeout(ctx, time.Minute*20)
 	defer cancel()
 
 	filePtr, err := os.Create(localFile)
@@ -142,19 +147,22 @@ func downloadFile(ctx context.Context, client *storage.Client, bucket string, ob
 		return result
 	}
 
-	log.Printf("Blob %v downloaded to local file %v\n", object, localFile)
 	return result
 }
 
-func getLocalDestination(objectName string, remotePath string, destinationDir string) string {
-	objectPath := strings.TrimPrefix(objectName, remotePath)
+func getLocalDestination(objectName string, remotePath string, destination string) string {
+	// this is if we cut based on an object file
+	objectPath := strings.TrimPrefix(objectName, remotePath[:strings.LastIndex(remotePath, "/")])
+	// this is if we want to instead cut based on a directory
+	if objectName != remotePath {
+		objectPath = strings.TrimPrefix(objectName, remotePath)
+	}
 	objectPath = strings.TrimPrefix(objectPath, "/")
-	destinationDir = strings.TrimSuffix(destinationDir, "/")
-	destinationPath := path.Join(destinationDir, objectPath)
+	destination = strings.TrimSuffix(destination, "/")
+	destinationPath := path.Join(destination, objectPath)
 	// this check is to support downloading a single remote object, not just a path
 	if objectName == remotePath {
-		_, file := filepath.Split(objectName)
-		destinationPath = path.Join(destinationPath, file)
+		destinationPath = destination
 	}
 	return destinationPath
 }

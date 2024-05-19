@@ -1,7 +1,7 @@
 DOCKER := $(shell if which podman >/dev/null 2>/dev/null; then echo podman; else echo docker; fi)
 BUILD := build
 DIST_ARCH := $(shell if [ "$$(uname -m)" = "x86_64" ]; then echo amd64; else echo arm64; fi)
-VERSION := 0.0.1
+VERSION := 0.0.2
 DIST_TGZ := $(BUILD)/htccli-$(VERSION)-$(DIST_ARCH).tar.gz
 
 BUILD_OPTS := --platform linux/$(DIST_ARCH)
