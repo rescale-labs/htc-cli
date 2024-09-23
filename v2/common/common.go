@@ -69,8 +69,8 @@ func getBearerToken(c *oapi.Client) (*oapi.HTCToken, error) {
 		return r, nil
 
 	case *oapi.OAuth2ErrorResponse:
-		return nil, fmt.Errorf("Login failed: error=%w description=%s",
-			r.GetError(), r.GetErrorDescription())
+		return nil, fmt.Errorf("Login failed: error=%s description=%s",
+			r.GetError().Value, r.GetErrorDescription().Value)
 	}
 	return nil, fmt.Errorf("Login failed: unknown response.")
 }
@@ -81,7 +81,7 @@ func updateBearerToken(c *oapi.Client, config *config.Config) error {
 	if err != nil {
 		return fmt.Errorf("updateBearerToken: %w", err)
 	}
-	log.Printf("Bearer token: ExpiresIn=%d", t.GetExpiresIn())
+	log.Printf("Bearer token: ExpiresIn=%d", t.GetExpiresIn().Value)
 	config.SetToken(t, start)
 	return nil
 }

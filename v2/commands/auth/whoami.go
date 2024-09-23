@@ -28,7 +28,7 @@ func WhoAmI(cmd *cobra.Command, args []string) error {
 		return runner.PrintResult(res, os.Stdout)
 		// return nil
 	case *oapi.OAuth2ErrorResponse:
-		return fmt.Errorf("auth error: %s", res)
+		return fmt.Errorf("auth error: %s", res.GetError().Value)
 	}
 
 	return fmt.Errorf("Unknown response type: %s", res)

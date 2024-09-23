@@ -39,6 +39,10 @@ $(BUILD)/htccli.linux-arm64: $(GO_SOURCES)
 		GOARCH=arm64 \
 		go build -o $@
 
+
+.PHONY: build
+build: $(GO_LINUX_BINARIES)
+
 .PHONY: image
 image: $(GO_LINUX_BINARIES)
 	@$(DOCKER) manifest rm $(IMAGE_NAME):$(VERSION) || true
