@@ -1,0 +1,88 @@
+# Soon
+
+* CRUD and view for all limits
+* Tests!
+* CRUD for tasks and (modulo delete) projects
+* Run a job
+* Check job status
+* Get job logs
+* Print env vars expected in usage.
+* Check for RESCALE_API_KEY when getting/updating token and return
+  UsageError when empty.
+* Universal OS X binaries: [GitHub - randall77/makefat: A tool for making fat OSX binaries (a portable lipo)](https://github.com/randall77/makefat)
+* merge in upload/download from htccli
+* scope out htcctl functionality to implement here
+
+# Later
+
+* All the methods:
+    ```
+    enkictl --help
+    Please enable `enable-htc-api` for your user to fetch bearer
+    Unknown option: '--help'
+    Usage: enkictl [-o=<outputFormat>] [COMMAND]
+      -o, --output=<outputFormat>
+             json, yaml
+    Commands:
+      help                    Displays help information about the specified command
+      get
+        health
+          ready               Get readiness of HTC
+        auth
+          jwt                 Get Roles, Claim, Subject for current bearer token
+          me                  Make a who am I call
+          token               Get Bearer token for further authentication
+        regions               Region commands
+          health              Region health command
+        projects              Project commands
+        registry
+          images              Get project images
+          token               Get token for authentication to repo
+        tasks                 Task commands
+        jobs                  Jobs commands
+        job-details
+          events              Get events of a job
+          logs                Get logs of a job
+        summary               Summary statistics for task
+        storage               Storage commands
+          presigned-url
+          token
+          tokens
+        infra                 Only Admin can access those to check BYO workspaces
+                                infra
+          ecr-replication     Get rule to replicate across ECR regions
+          event-rules         Get rules in EventBridge
+          job-queues          Get job queues
+          compute-env         Get compute environment
+          update-compute-env  Get launchTemplates
+        metrics               Metrics commands
+      create
+        project               Create project
+        task                  Create task
+        batch                 Submit batch of jobs
+        registry              Create registry repo
+          repo                Create registry repo
+        infra                 Only Superuser can access those to create
+                                infrastructure
+          compute-env         Create compute environment in BYO region
+          ecr-replication     Create rule to replicate across ECR regions
+          event-rule          Create rule in EventBridge
+          job-queues          Create job queues
+          update-compute-env  Create compute environment in BYO region
+      delete
+        registry              Delete image from project registry
+        task                  Delete task from project
+      cancel
+        jobs                  Cancel submitted jobs
+      completion              bash/zsh completion:  source <(enkictl completion)
+      config
+        set                   Change configuration in config file
+          new                 Create new config entry
+          baseuri             Set baseuri
+          current-config      Set current configuration
+        get                   Get current active configuration
+        delete                Delete config entry from config file
+    ```
+* Eventually support project deletion along the lines of
+  https://rescale.atlassian.net/browse/ENK-2095 ?
+* Show the last job run in a task/project/workspace.

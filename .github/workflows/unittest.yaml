@@ -11,12 +11,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.20'
+          go-version: '1.23'
       - name: Install dependencies
         run: go get .
       - name: Build
-        run: go build -v ./...
+        run: make build
       - name: Test with the Go CLI
         run: make test
+      - name: Build v2
+        run: make -C v2 build
+      - name: Test v2
+        run: make -C v2 test
