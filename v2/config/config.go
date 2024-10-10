@@ -154,7 +154,7 @@ func NewConfig(dirPath, apiKey, apiUrl, outputFormat string) (*Config, error) {
 	}
 
 	if c.OutputFormat == "" {
-		c.OutputFormat = "yaml"
+		c.OutputFormat = "json"
 	}
 	switch c.OutputFormat {
 	case "json", "yaml":

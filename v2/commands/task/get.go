@@ -1,4 +1,4 @@
-package project
+package task
 
 import (
 	"context"
@@ -11,37 +11,40 @@ import (
 
 	oapi "github.com/rescale/htc-storage-cli/v2/api/_oas"
 	"github.com/rescale/htc-storage-cli/v2/common"
+	"github.com/rescale/htc-storage-cli/v2/config"
 )
 
 const pageSize = 500
 
-func getProjects(ctx context.Context, c *oapi.Client, pageIndex string) (*oapi.HTCProjectsResponse, error) {
-	log.Printf("HtcProjectsGet: pageIndex=%s pageSize=%d", pageIndex, pageSize)
-	res, err := c.HtcProjectsGet(ctx, oapi.HtcProjectsGetParams{
-		OnlyMyProjects: oapi.NewOptBool(false),
-		PageIndex:      oapi.NewOptString(pageIndex),
-		PageSize:       oapi.NewOptInt32(pageSize),
+func getTasks(ctx context.Context, c *oapi.Client, projectId string, pageIndex string) (*oapi.HTCTasksResponse, error) {
+	log.Printf("HtcProjectsProjectIdTasksGet: pageIndex=%s pageSize=%d", pageIndex, pageSize)
+	res, err := c.HtcProjectsProjectIdTasksGet(ctx, oapi.HtcProjectsProjectIdTasksGetParams{
+		ProjectId: projectId,
+		PageIndex: oapi.NewOptString(pageIndex),
+		PageSize:  oapi.NewOptInt32(pageSize),
 	})
 	if err != nil {
 		return nil, err
 	}
-
 	switch res := res.(type) {
-	case *oapi.HTCProjectsResponse:
+	case *oapi.HTCTasksResponse:
 		return res, nil
-		// runner.PrintResult(res.Items, os.Stdout)
-	case *oapi.HtcProjectsGetForbidden,
-		*oapi.HtcProjectsGetUnauthorized:
+	case *oapi.HtcProjectsProjectIdTasksGetForbidden,
+		*oapi.HtcProjectsProjectIdTasksGetUnauthorized:
 		return nil, fmt.Errorf("forbidden: %s", res)
 	}
-
 	return nil, fmt.Errorf("Unknown response type: %s", res)
 }
 
 func Get(cmd *cobra.Command, args []string) error {
 	limit, err := cmd.Flags().GetInt("limit")
 	if err != nil {
-		return fmt.Errorf("Error setting limit: %w", err)
+		return config.UsageErrorf("Error setting limit: %w", err)
+	}
+
+	projectId, err := cmd.Flags().GetString("project-id")
+	if err != nil {
+		return config.UsageErrorf("Error setting project ID: %w", err)
 	}
 
 	runner, err := common.NewRunner(cmd)
@@ -53,15 +56,15 @@ func Get(cmd *cobra.Command, args []string) error {
 	}
 
 	ctx := context.Background()
-	var items []oapi.HTCProject
+	var items []oapi.HTCTask
 	var pageIndex string
 	for {
-		res, err := getProjects(ctx, runner.Client, pageIndex)
+		res, err := getTasks(ctx, runner.Client, projectId, pageIndex)
 		if err != nil {
 			return err
 		}
 		items = append(items, res.Items...)
-		if limit > 0 && len(items) > limit {
+		if len(items) > limit {
 			items = items[:limit]
 			break
 		}
@@ -77,10 +80,10 @@ func Get(cmd *cobra.Command, args []string) error {
 var GetCmd = &cobra.Command{
 	Use:   "get",
 	Short: "Returns HTC projects in a workspace",
-	// Long:
-	Run: common.WrapRunE(Get),
+	Run:   common.WrapRunE(Get),
 }
 
 func init() {
 	GetCmd.Flags().IntP("limit", "l", 0, "Limit response to N items")
+	GetCmd.Flags().String("project-id", "", "HTC project ID")
 }
