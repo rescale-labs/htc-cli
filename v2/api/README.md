@@ -25,11 +25,10 @@ To patch the swagger file, you will need `jsonnet`.
 
 ## Generating the client
 
-To generate the client code, run:
+From the parent directory, run:
 
 ```
-./update-swagger.sh
-go generate ./...
+make oapi
 ```
 
 And commit the updated files into the repo. Note that the above does 3
@@ -40,15 +39,16 @@ things:
    that it works for our needs.
 3. Generates the code in `_oas` using [ogen](https://ogen.dev/docs/intro).
 
-ogen-go/ogen has nice instrumentation for traces and timing, even if it
-also creates a bunch of server code. So, we're going there first.
-
 ## Other options for OpenAPI codegen.
+
+ogen-go/ogen has nice instrumentation for traces and timing, even if it
+also creates a bunch of server code. So, we're going there first. But
+other things looked at follow.
 
 * go-swagger (OpenAPI 2.0 only)
 * oapi-codegen (works!)
 
-## go-swagger
+### go-swagger
 
 go-swagger only supports OpenAPI 2.0
 

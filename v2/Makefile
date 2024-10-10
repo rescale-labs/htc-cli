@@ -28,9 +28,18 @@ $(BUILD)/htc: $(GO_SOURCES)
 	@mkdir -p $(dir $@)
 	go build -o $@ ./cmd/htc
 
+# Updates oapi generated code.
+.PHONY: oapi
+oapi:
+	api/update-swagger.sh
+	go generate ./api/...
+
 .PHONY: build
 build: $(BUILD)/htc
 
 .PHONY: test
 test:
 	go test ./...
+
+godoc:
+	godoc -http=localhost:6060
