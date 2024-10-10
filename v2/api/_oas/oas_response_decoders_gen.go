@@ -1544,7 +1544,7 @@ func decodeHtcProjectsProjectIdTasksGetResponse(resp *http.Response) (res HtcPro
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response HtcProjectsProjectIdTasksGetOKApplicationJSON
+			var response HTCTasksResponse
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1560,6 +1560,15 @@ func decodeHtcProjectsProjectIdTasksGetResponse(resp *http.Response) (res HtcPro
 					Err:         err,
 				}
 				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
 			}
 			return &response, nil
 		default:

@@ -2658,10 +2658,10 @@ func (s *HTCRetryStrategy) SetMaxRetries(val OptInt32) {
 
 // Ref: #/components/schemas/HTCTask
 type HTCTask struct {
-	ArchivedAt      OptDateTime               `json:"archivedAt"`
+	ArchivedAt      OptNilDateTime            `json:"archivedAt"`
 	CreatedAt       OptDateTime               `json:"createdAt"`
 	CreatedBy       OptString                 `json:"createdBy"`
-	DeletedAt       OptDateTime               `json:"deletedAt"`
+	DeletedAt       OptNilDateTime            `json:"deletedAt"`
 	LastActiveAt    OptDateTime               `json:"lastActiveAt"`
 	LifecycleStatus OptHTCTaskLifecycleStatus `json:"lifecycleStatus"`
 	ProjectId       OptString                 `json:"projectId"`
@@ -2673,7 +2673,7 @@ type HTCTask struct {
 }
 
 // GetArchivedAt returns the value of ArchivedAt.
-func (s *HTCTask) GetArchivedAt() OptDateTime {
+func (s *HTCTask) GetArchivedAt() OptNilDateTime {
 	return s.ArchivedAt
 }
 
@@ -2688,7 +2688,7 @@ func (s *HTCTask) GetCreatedBy() OptString {
 }
 
 // GetDeletedAt returns the value of DeletedAt.
-func (s *HTCTask) GetDeletedAt() OptDateTime {
+func (s *HTCTask) GetDeletedAt() OptNilDateTime {
 	return s.DeletedAt
 }
 
@@ -2733,7 +2733,7 @@ func (s *HTCTask) GetWorkspaceId() OptString {
 }
 
 // SetArchivedAt sets the value of ArchivedAt.
-func (s *HTCTask) SetArchivedAt(val OptDateTime) {
+func (s *HTCTask) SetArchivedAt(val OptNilDateTime) {
 	s.ArchivedAt = val
 }
 
@@ -2748,7 +2748,7 @@ func (s *HTCTask) SetCreatedBy(val OptString) {
 }
 
 // SetDeletedAt sets the value of DeletedAt.
-func (s *HTCTask) SetDeletedAt(val OptDateTime) {
+func (s *HTCTask) SetDeletedAt(val OptNilDateTime) {
 	s.DeletedAt = val
 }
 
@@ -2906,6 +2906,34 @@ func (s *HTCTaskUpdateLifecycleStatus) UnmarshalText(data []byte) error {
 		return errors.Errorf("invalid value: %q", data)
 	}
 }
+
+// Ref: #/components/schemas/HTCTasksResponse
+type HTCTasksResponse struct {
+	Items []HTCTask `json:"items"`
+	Next  OptURI    `json:"next"`
+}
+
+// GetItems returns the value of Items.
+func (s *HTCTasksResponse) GetItems() []HTCTask {
+	return s.Items
+}
+
+// GetNext returns the value of Next.
+func (s *HTCTasksResponse) GetNext() OptURI {
+	return s.Next
+}
+
+// SetItems sets the value of Items.
+func (s *HTCTasksResponse) SetItems(val []HTCTask) {
+	s.Items = val
+}
+
+// SetNext sets the value of Next.
+func (s *HTCTasksResponse) SetNext(val OptURI) {
+	s.Next = val
+}
+
+func (*HTCTasksResponse) htcProjectsProjectIdTasksGetRes() {}
 
 // Ref: #/components/schemas/HTCToken
 type HTCToken struct {
@@ -3369,10 +3397,6 @@ func (*HtcProjectsProjectIdTaskRetentionPolicyPutUnauthorized) htcProjectsProjec
 type HtcProjectsProjectIdTasksGetForbidden struct{}
 
 func (*HtcProjectsProjectIdTasksGetForbidden) htcProjectsProjectIdTasksGetRes() {}
-
-type HtcProjectsProjectIdTasksGetOKApplicationJSON jx.Raw
-
-func (*HtcProjectsProjectIdTasksGetOKApplicationJSON) htcProjectsProjectIdTasksGetRes() {}
 
 // HtcProjectsProjectIdTasksGetUnauthorized is response for HtcProjectsProjectIdTasksGet operation.
 type HtcProjectsProjectIdTasksGetUnauthorized struct{}
@@ -6213,6 +6237,69 @@ func (o OptKey) Get() (v Key, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptKey) Or(d Key) Key {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilDateTime returns new OptNilDateTime with value set to v.
+func NewOptNilDateTime(v time.Time) OptNilDateTime {
+	return OptNilDateTime{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilDateTime is optional nullable time.Time.
+type OptNilDateTime struct {
+	Value time.Time
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilDateTime was set.
+func (o OptNilDateTime) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilDateTime) Reset() {
+	var v time.Time
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilDateTime) SetTo(v time.Time) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilDateTime) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilDateTime) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v time.Time
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilDateTime) Get() (v time.Time, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilDateTime) Or(d time.Time) time.Time {
 	if v, ok := o.Get(); ok {
 		return v
 	}
