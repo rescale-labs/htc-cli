@@ -42,4 +42,6 @@ test:
 	go test ./...
 
 godoc:
+	@echo "view oapi docs on: http://localhost:6060/pkg/github.com/rescale/htc-storage-cli/v2/api/_oas/"
+	@echo
 	godoc -http=localhost:6060
