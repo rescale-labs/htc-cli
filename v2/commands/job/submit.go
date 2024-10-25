@@ -2,12 +2,12 @@ package job
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"time"
 
-	"github.com/go-faster/yaml"
 	"github.com/spf13/cobra"
 
 	oapi "github.com/rescale/htc-storage-cli/v2/api/_oas"
@@ -27,27 +27,29 @@ func submit(ctx context.Context, c *oapi.Client,
 		return nil, err
 	}
 
-	// switch res := res.(type) {
+	switch res := res.(type) {
 	// case *oapi.HTCProjectsResponse:
 	// 	return res, nil
 	// 	// runner.PrintResult(res.Items, os.Stdout)
 	// case *oapi.HtcProjectsGetForbidden,
 	// 	*oapi.HtcProjectsGetUnauthorized:
 	// 	return nil, fmt.Errorf("forbidden: %s", res)
-	// }
+	case *oapi.HTCRequestError:
+		return nil, fmt.Errorf("%s: %s", res.ErrorDescription.Value, res.Message.Value)
+	}
 
 	return nil, fmt.Errorf("Unknown response type: %s", res)
 }
 
 func Submit(cmd *cobra.Command, args []string) error {
-	projectId, err := cmd.Flags().GetString("project-id")
+	runner, err := common.NewRunnerWithToken(cmd, time.Now())
 	if err != nil {
-		return fmt.Errorf("Error setting project id: %w", err)
+		return err
 	}
 
-	taskId, err := cmd.Flags().GetString("task-id")
-	if err != nil {
-		return fmt.Errorf("Error setting task id: %w", err)
+	p := common.IDParams{RequireProjectId: true, RequireTaskId: true}
+	if err := runner.GetIds(&p); err != nil {
+		return err
 	}
 
 	group, err := cmd.Flags().GetString("group")
@@ -62,7 +64,8 @@ func Submit(cmd *cobra.Command, args []string) error {
 	if args[0] == "-" {
 		r = os.Stdin
 	} else {
-		r, err := os.Open(args[0])
+		var err error
+		r, err = os.Open(args[0])
 		if err != nil {
 			return fmt.Errorf("Error opening %s: %w", err)
 		}
@@ -71,58 +74,28 @@ func Submit(cmd *cobra.Command, args []string) error {
 
 	req := submitRequest{
 		params: oapi.HtcProjectsProjectIdTasksTaskIdJobsBatchPostParams{
-			ProjectId: projectId,
-			TaskId:    taskId,
+			ProjectId: p.ProjectId,
+			TaskId:    p.TaskId,
 			Group:     oapi.NewOptString(group),
 		},
 	}
-	decoder := yaml.NewDecoder(r)
-	if err := decoder.Decode(&req.batch); err != nil {
-		return fmt.Errorf("Error parsing %s: %w", args[0], err)
+
+	dec := json.NewDecoder(r)
+	if err := dec.Decode(&req.batch); err != nil {
+		return fmt.Errorf("Error parsing %s: %v", args[0], err)
 	}
 
-	runner, err := common.NewRunner(cmd)
-	if err != nil {
-		return err
-	}
-	if err := runner.UpdateToken(time.Now()); err != nil {
-		return err
-	}
-
-	// log.Printf("submit: projectId=%s taskId=%s", projectId, taskId)
-
-	return nil
 	ctx := context.Background()
 	res, err := submit(ctx, runner.Client, &req)
 	if err != nil {
-		return fmt.Errorf("Error on job submission: %w", err)
+		return fmt.Errorf("Error on job submission: %v", err)
 	}
 	log.Printf("res: %#v", res)
 	return nil
-
-	// var items []oapi.HTCProject
-	// var pageIndex string
-	// for {
-	// 	res, err := getProjects(ctx, runner.Client, pageIndex)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	items = append(items, res.Items...)
-	// 	if len(items) > limit {
-	// 		items = items[:limit]
-	// 		break
-	// 	}
-
-	// 	pageIndex = res.Next.Value.Query().Get("pageIndex")
-	// 	if pageIndex == "" {
-	// 		break
-	// 	}
-	// }
-	// return runner.PrintResult(items, os.Stdout)
 }
 
 var SubmitCmd = &cobra.Command{
-	Use:   "submit JOB_BATCH_YAML",
+	Use:   "submit JOB_BATCH_JSON",
 	Args:  cobra.ExactArgs(1),
 	Short: "Submits jobs for a given task and project",
 	// Long:

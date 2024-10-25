@@ -17,7 +17,7 @@ import (
 const pageSize = 500
 
 func getTasks(ctx context.Context, c *oapi.Client, projectId string, pageIndex string) (*oapi.HTCTasksResponse, error) {
-	log.Printf("HtcProjectsProjectIdTasksGet: pageIndex=%s pageSize=%d", pageIndex, pageSize)
+	log.Printf("HtcProjectsProjectIdTasksGet: projectId=%s pageIndex=%s pageSize=%d", projectId, pageIndex, pageSize)
 	res, err := c.HtcProjectsProjectIdTasksGet(ctx, oapi.HtcProjectsProjectIdTasksGetParams{
 		ProjectId: projectId,
 		PageIndex: oapi.NewOptString(pageIndex),
@@ -37,21 +37,18 @@ func getTasks(ctx context.Context, c *oapi.Client, projectId string, pageIndex s
 }
 
 func Get(cmd *cobra.Command, args []string) error {
+	runner, err := common.NewRunnerWithToken(cmd, time.Now())
+	if err != nil {
+		return err
+	}
+
 	limit, err := cmd.Flags().GetInt("limit")
 	if err != nil {
 		return config.UsageErrorf("Error setting limit: %w", err)
 	}
 
-	projectId, err := cmd.Flags().GetString("project-id")
-	if err != nil {
-		return config.UsageErrorf("Error setting project ID: %w", err)
-	}
-
-	runner, err := common.NewRunner(cmd)
-	if err != nil {
-		return err
-	}
-	if err := runner.UpdateToken(time.Now()); err != nil {
+	p := common.IDParams{RequireProjectId: true}
+	if err := runner.GetIds(&p); err != nil {
 		return err
 	}
 
@@ -59,12 +56,12 @@ func Get(cmd *cobra.Command, args []string) error {
 	var items []oapi.HTCTask
 	var pageIndex string
 	for {
-		res, err := getTasks(ctx, runner.Client, projectId, pageIndex)
+		res, err := getTasks(ctx, runner.Client, p.ProjectId, pageIndex)
 		if err != nil {
 			return err
 		}
 		items = append(items, res.Items...)
-		if len(items) > limit {
+		if limit > 0 && len(items) > limit {
 			items = items[:limit]
 			break
 		}
@@ -74,12 +71,13 @@ func Get(cmd *cobra.Command, args []string) error {
 			break
 		}
 	}
+	log.Printf("items: %#v", items)
 	return runner.PrintResult(items, os.Stdout)
 }
 
 var GetCmd = &cobra.Command{
 	Use:   "get",
-	Short: "Returns HTC projects in a workspace",
+	Short: "Returns HTC tasks in a given project.",
 	Run:   common.WrapRunE(Get),
 }
 

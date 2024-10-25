@@ -1073,6 +1073,12 @@ func (s *HTCComputeEnvironmentDerived) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.Swap.Set {
+			e.FieldStart("swap")
+			s.Swap.Encode(e)
+		}
+	}
+	{
 		if s.VCPUs.Set {
 			e.FieldStart("vCPUs")
 			s.VCPUs.Encode(e)
@@ -1080,10 +1086,11 @@ func (s *HTCComputeEnvironmentDerived) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfHTCComputeEnvironmentDerived = [3]string{
+var jsonFieldsNameOfHTCComputeEnvironmentDerived = [4]string{
 	0: "architecture",
 	1: "memory",
-	2: "vCPUs",
+	2: "swap",
+	3: "vCPUs",
 }
 
 // Decode decodes HTCComputeEnvironmentDerived from json.
@@ -1113,6 +1120,16 @@ func (s *HTCComputeEnvironmentDerived) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"memory\"")
+			}
+		case "swap":
+			if err := func() error {
+				s.Swap.Reset()
+				if err := s.Swap.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"swap\"")
 			}
 		case "vCPUs":
 			if err := func() error {
@@ -1298,6 +1315,8 @@ func (s *HTCComputeEnvironmentRegion) Decode(d *jx.Decoder) error {
 		*s = HTCComputeEnvironmentRegionAZUREUSWEST2
 	case HTCComputeEnvironmentRegionAZUREUSEAST2:
 		*s = HTCComputeEnvironmentRegionAZUREUSEAST2
+	case HTCComputeEnvironmentRegionAZUREUSSOUTHCENTRAL:
+		*s = HTCComputeEnvironmentRegionAZUREUSSOUTHCENTRAL
 	case HTCComputeEnvironmentRegionAZUREEUNORTH:
 		*s = HTCComputeEnvironmentRegionAZUREEUNORTH
 	case HTCComputeEnvironmentRegionRCICELAND1:
@@ -3611,6 +3630,56 @@ func (s *HTCProject) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes HTCProjectDimensions as json.
+func (s HTCProjectDimensions) Encode(e *jx.Encoder) {
+	unwrapped := []HTCComputeEnvironment(s)
+
+	e.ArrStart()
+	for _, elem := range unwrapped {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes HTCProjectDimensions from json.
+func (s *HTCProjectDimensions) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode HTCProjectDimensions to nil")
+	}
+	var unwrapped []HTCComputeEnvironment
+	if err := func() error {
+		unwrapped = make([]HTCComputeEnvironment, 0)
+		if err := d.Arr(func(d *jx.Decoder) error {
+			var elem HTCComputeEnvironment
+			if err := elem.Decode(d); err != nil {
+				return err
+			}
+			unwrapped = append(unwrapped, elem)
+			return nil
+		}); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = HTCProjectDimensions(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s HTCProjectDimensions) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *HTCProjectDimensions) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode implements json.Marshaler.
 func (s *HTCProjectLimit) Encode(e *jx.Encoder) {
 	e.ObjStart()
@@ -4343,6 +4412,8 @@ func (s *HTCRegionAdminSettingsRegion) Decode(d *jx.Decoder) error {
 		*s = HTCRegionAdminSettingsRegionAZUREUSWEST2
 	case HTCRegionAdminSettingsRegionAZUREUSEAST2:
 		*s = HTCRegionAdminSettingsRegionAZUREUSEAST2
+	case HTCRegionAdminSettingsRegionAZUREUSSOUTHCENTRAL:
+		*s = HTCRegionAdminSettingsRegionAZUREUSSOUTHCENTRAL
 	case HTCRegionAdminSettingsRegionAZUREEUNORTH:
 		*s = HTCRegionAdminSettingsRegionAZUREEUNORTH
 	case HTCRegionAdminSettingsRegionRCICELAND1:
@@ -4748,6 +4819,103 @@ func (s *HTCRepository) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *HTCRepository) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *HTCRequestError) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *HTCRequestError) encodeFields(e *jx.Encoder) {
+	{
+		if s.ErrorDescription.Set {
+			e.FieldStart("errorDescription")
+			s.ErrorDescription.Encode(e)
+		}
+	}
+	{
+		if s.ErrorType.Set {
+			e.FieldStart("errorType")
+			s.ErrorType.Encode(e)
+		}
+	}
+	{
+		if s.Message.Set {
+			e.FieldStart("message")
+			s.Message.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfHTCRequestError = [3]string{
+	0: "errorDescription",
+	1: "errorType",
+	2: "message",
+}
+
+// Decode decodes HTCRequestError from json.
+func (s *HTCRequestError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode HTCRequestError to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "errorDescription":
+			if err := func() error {
+				s.ErrorDescription.Reset()
+				if err := s.ErrorDescription.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"errorDescription\"")
+			}
+		case "errorType":
+			if err := func() error {
+				s.ErrorType.Reset()
+				if err := s.ErrorType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"errorType\"")
+			}
+		case "message":
+			if err := func() error {
+				s.Message.Reset()
+				if err := s.Message.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"message\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode HTCRequestError")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *HTCRequestError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *HTCRequestError) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -5669,52 +5837,82 @@ func (s *HTCWorkspaceLimit) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes HtcProjectsProjectIdDimensionsGetOKApplicationJSON as json.
-func (s HtcProjectsProjectIdDimensionsGetOKApplicationJSON) Encode(e *jx.Encoder) {
-	unwrapped := []HTCComputeEnvironment(s)
-
-	e.ArrStart()
-	for _, elem := range unwrapped {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
+// Encode implements json.Marshaler.
+func (s *HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
 }
 
-// Decode decodes HtcProjectsProjectIdDimensionsGetOKApplicationJSON from json.
-func (s *HtcProjectsProjectIdDimensionsGetOKApplicationJSON) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode HtcProjectsProjectIdDimensionsGetOKApplicationJSON to nil")
+// encodeFields encodes fields.
+func (s *HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound) encodeFields(e *jx.Encoder) {
+	{
+		if s.ErrorDescription.Set {
+			e.FieldStart("errorDescription")
+			s.ErrorDescription.Encode(e)
+		}
 	}
-	var unwrapped []HTCComputeEnvironment
-	if err := func() error {
-		unwrapped = make([]HTCComputeEnvironment, 0)
-		if err := d.Arr(func(d *jx.Decoder) error {
-			var elem HTCComputeEnvironment
-			if err := elem.Decode(d); err != nil {
-				return err
+	{
+		if s.ErrorType.Set {
+			e.FieldStart("errorType")
+			s.ErrorType.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfHtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound = [2]string{
+	0: "errorDescription",
+	1: "errorType",
+}
+
+// Decode decodes HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound from json.
+func (s *HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "errorDescription":
+			if err := func() error {
+				s.ErrorDescription.Reset()
+				if err := s.ErrorDescription.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"errorDescription\"")
 			}
-			unwrapped = append(unwrapped, elem)
-			return nil
-		}); err != nil {
-			return err
+		case "errorType":
+			if err := func() error {
+				s.ErrorType.Reset()
+				if err := s.ErrorType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"errorType\"")
+			}
+		default:
+			return d.Skip()
 		}
 		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
+	}); err != nil {
+		return errors.Wrap(err, "decode HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound")
 	}
-	*s = HtcProjectsProjectIdDimensionsGetOKApplicationJSON(unwrapped)
+
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s HtcProjectsProjectIdDimensionsGetOKApplicationJSON) MarshalJSON() ([]byte, error) {
+func (s *HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *HtcProjectsProjectIdDimensionsGetOKApplicationJSON) UnmarshalJSON(data []byte) error {
+func (s *HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -6786,251 +6984,6 @@ func (s JobPriority) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *JobPriority) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *JobStatusSummary) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *JobStatusSummary) encodeFields(e *jx.Encoder) {
-	{
-		if s.Group.Set {
-			e.FieldStart("group")
-			s.Group.Encode(e)
-		}
-	}
-	{
-		if s.JobStatuses.Set {
-			e.FieldStart("jobStatuses")
-			s.JobStatuses.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfJobStatusSummary = [2]string{
-	0: "group",
-	1: "jobStatuses",
-}
-
-// Decode decodes JobStatusSummary from json.
-func (s *JobStatusSummary) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode JobStatusSummary to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "group":
-			if err := func() error {
-				s.Group.Reset()
-				if err := s.Group.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"group\"")
-			}
-		case "jobStatuses":
-			if err := func() error {
-				s.JobStatuses.Reset()
-				if err := s.JobStatuses.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"jobStatuses\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode JobStatusSummary")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *JobStatusSummary) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *JobStatusSummary) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *JobStatusSummaryJobStatuses) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *JobStatusSummaryJobStatuses) encodeFields(e *jx.Encoder) {
-	{
-		if s.FAILED.Set {
-			e.FieldStart("FAILED")
-			s.FAILED.Encode(e)
-		}
-	}
-	{
-		if s.RUNNABLE.Set {
-			e.FieldStart("RUNNABLE")
-			s.RUNNABLE.Encode(e)
-		}
-	}
-	{
-		if s.RUNNING.Set {
-			e.FieldStart("RUNNING")
-			s.RUNNING.Encode(e)
-		}
-	}
-	{
-		if s.STARTING.Set {
-			e.FieldStart("STARTING")
-			s.STARTING.Encode(e)
-		}
-	}
-	{
-		if s.SUBMITTEDTOPROVIDER.Set {
-			e.FieldStart("SUBMITTED_TO_PROVIDER")
-			s.SUBMITTEDTOPROVIDER.Encode(e)
-		}
-	}
-	{
-		if s.SUBMITTEDTORESCALE.Set {
-			e.FieldStart("SUBMITTED_TO_RESCALE")
-			s.SUBMITTEDTORESCALE.Encode(e)
-		}
-	}
-	{
-		if s.SUCCEEDED.Set {
-			e.FieldStart("SUCCEEDED")
-			s.SUCCEEDED.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfJobStatusSummaryJobStatuses = [7]string{
-	0: "FAILED",
-	1: "RUNNABLE",
-	2: "RUNNING",
-	3: "STARTING",
-	4: "SUBMITTED_TO_PROVIDER",
-	5: "SUBMITTED_TO_RESCALE",
-	6: "SUCCEEDED",
-}
-
-// Decode decodes JobStatusSummaryJobStatuses from json.
-func (s *JobStatusSummaryJobStatuses) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode JobStatusSummaryJobStatuses to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "FAILED":
-			if err := func() error {
-				s.FAILED.Reset()
-				if err := s.FAILED.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"FAILED\"")
-			}
-		case "RUNNABLE":
-			if err := func() error {
-				s.RUNNABLE.Reset()
-				if err := s.RUNNABLE.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RUNNABLE\"")
-			}
-		case "RUNNING":
-			if err := func() error {
-				s.RUNNING.Reset()
-				if err := s.RUNNING.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RUNNING\"")
-			}
-		case "STARTING":
-			if err := func() error {
-				s.STARTING.Reset()
-				if err := s.STARTING.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"STARTING\"")
-			}
-		case "SUBMITTED_TO_PROVIDER":
-			if err := func() error {
-				s.SUBMITTEDTOPROVIDER.Reset()
-				if err := s.SUBMITTEDTOPROVIDER.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"SUBMITTED_TO_PROVIDER\"")
-			}
-		case "SUBMITTED_TO_RESCALE":
-			if err := func() error {
-				s.SUBMITTEDTORESCALE.Reset()
-				if err := s.SUBMITTEDTORESCALE.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"SUBMITTED_TO_RESCALE\"")
-			}
-		case "SUCCEEDED":
-			if err := func() error {
-				s.SUCCEEDED.Reset()
-				if err := s.SUCCEEDED.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"SUCCEEDED\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode JobStatusSummaryJobStatuses")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *JobStatusSummaryJobStatuses) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *JobStatusSummaryJobStatuses) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -8814,41 +8767,6 @@ func (s *OptInstant) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes int as json.
-func (o OptInt) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Int(int(o.Value))
-}
-
-// Decode decodes int from json.
-func (o *OptInt) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptInt to nil")
-	}
-	o.Set = true
-	v, err := d.Int()
-	if err != nil {
-		return err
-	}
-	o.Value = int(v)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptInt) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptInt) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes int32 as json.
 func (o OptInt32) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -8981,39 +8899,6 @@ func (s OptJobPriority) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptJobPriority) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes JobStatusSummaryJobStatuses as json.
-func (o OptJobStatusSummaryJobStatuses) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes JobStatusSummaryJobStatuses from json.
-func (o *OptJobStatusSummaryJobStatuses) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptJobStatusSummaryJobStatuses to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptJobStatusSummaryJobStatuses) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptJobStatusSummaryJobStatuses) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -10773,6 +10658,8 @@ func (s *RescaleRegion) Decode(d *jx.Decoder) error {
 		*s = RescaleRegionAZUREUSWEST2
 	case RescaleRegionAZUREUSEAST2:
 		*s = RescaleRegionAZUREUSEAST2
+	case RescaleRegionAZUREUSSOUTHCENTRAL:
+		*s = RescaleRegionAZUREUSSOUTHCENTRAL
 	case RescaleRegionAZUREEUNORTH:
 		*s = RescaleRegionAZUREEUNORTH
 	case RescaleRegionRCICELAND1:

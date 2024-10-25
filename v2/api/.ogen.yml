@@ -1,0 +1,5 @@
+generator:
+  ignore_not_implemented: ["non-primitive enum"]
+  features:
+    disable:
+      - "ogen/otel"

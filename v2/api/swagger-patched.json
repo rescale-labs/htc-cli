@@ -74,6 +74,10 @@
                   "format": "double",
                   "type": "number"
                },
+               "swap": {
+                  "description": "If swap is enabled for the node pool. Only for GCP",
+                  "type": "boolean"
+               },
                "vCPUs": {
                   "description": "The number of virtual CPU cores allocated to the environment.",
                   "format": "int32",
@@ -719,6 +723,12 @@
             ],
             "type": "object"
          },
+         "HTCProjectDimensions": {
+            "items": {
+               "$ref": "#/components/schemas/HTCComputeEnvironment"
+            },
+            "type": "array"
+         },
          "HTCProjectLimit": {
             "properties": {
                "createdAt": {
@@ -931,6 +941,20 @@
                "workspaceId": {
                   "example": "04-8473942",
                   "readOnly": true,
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "HTCRequestError": {
+            "properties": {
+               "errorDescription": {
+                  "type": "string"
+               },
+               "errorType": {
+                  "type": "string"
+               },
+               "message": {
                   "type": "string"
                }
             },
@@ -1584,6 +1608,7 @@
                "NGC_ENOCH_1",
                "AZURE_US_WEST_2",
                "AZURE_US_EAST_2",
+               "AZURE_US_SOUTHCENTRAL",
                "AZURE_EU_NORTH",
                "RC_ICELAND_1",
                "UNASSIGNED"
@@ -1734,7 +1759,9 @@
                "GCP_EU_WEST_2",
                "GCP_EU_WEST_3",
                "GCP_EU_WEST_4",
-               "GCP_CA_CENTRAL_1"
+               "GCP_CA_CENTRAL_1",
+               "AZURE_US_WEST_2",
+               "AZURE_US_SOUTHCENTRAL"
             ],
             "type": "string"
          },
@@ -1869,7 +1896,7 @@
       }
    },
    "info": {
-      "description": "### Changelog\n#### 2024-09-10\n- Added additional validation for the HTCJobDefinition during job submission. (ENK-2155)\n#### 2024-09-09\n- Added additional metrics for vCPU scheduling. (ENK-2039)\n#### 2024-08-26\n- Added additional metrics for swap and disk usage. (ENK-2023, ENK-2044, ENK-2045, ENK-2120)\n#### 2024-08-19\n- Added support for jobs in GCP to use the experimental real swap feature for workspaces where swap infrastructure has been configured. The amount of swap provided is approximately equal to the memory requested by the job. This feature can be enabled by setting the experimental.kubernetesSwap field to true in the Job submit request (ENK-2065)\n#### 2024-08-14\n- Updated job cancellation to correctly update job status. (ENK-2069)\n#### 2024-08-09\n- Updated the response from `/htc/gcp/clusters/{workspaceId}` to include the cluster's autoscaling profile and subnetwork name. (ENK-2042)\n#### 2024-07-22\n- Fixed issue where jobs in multi-region projects were all getting routed to a single region instead of being spread out\n#### 2024-07-18\n- Added htc_job_limit_vcpus metric to response from /htc/metrics\n#### 2024-07-08\n- Allow workspace and organization admin to cancel jobs, view job logs and view job events\n#### 2024-04-23\n- Workspaces can now also be configured with a task retention policy which governs the auto-archival and auto-deletion of tasks. The project task retention policy is prioritized.\n#### 2024-03-01\n- Projects can now be configured with a task retention policy which governs the auto-archival and auto-deletion of tasks.\n- The API now supports manual archival of tasks.\n#### 2024-01-31\n- Added pagination support for GET /htc/projects/{projectId}/tasks/{taskId}/groups endpoint.\n#### 2024-01-26\n- Added workspace dimensions endpoint to enable viewing of predefined computing environment options for a workspace.\n- Added project dimensions endpoints to enable inspection of a project's current computing environment configuration as well as facilitate customization and adjustment of a project's computing environment settings.\n#### 2023-09-25\n- Introduced new `/limits` API endpoints for resource limit management at workspace and project levels.\n- If limits are set for both workspace and project, jobs within the project may be throttled based on resource consumption across either.\n#### 2023-06-20\n- Do not allow jobs submission to deleted tasks \n#### 2023-05-05\n- Fixed issue where jobs would be stuck in running despite completing successfully \n#### 2023-04-20\n- Added clearer error messages for jobs that failed because they exceeded disk space limits \n#### 2023-04-06\n- Added support for validating HTC Bearer tokens using JWKs \n#### 2023-03-07\n- Added support for adding user-defined claims to job bearer tokens during job submission\n- Limited the scope of API endpoints that job bearer tokens are allowed to access \n#### 2023-01-10\n- Added support for extending an existing project with additional regions.\n- Note: this does not currently consolidate images and objects in storage to new regions.\n#### 2022-11-30\n- Updated maxSwap minimum value to 0.\n- If maxSwap is 0 it will not be set in the job definition.\n#### 2022-11-23\n- Changed maxDiskGb field to maxDiskGiB. Fix GCP to use MiB and GiB instead of MB and GB to be consistent with AWS.  \n#### 2022-11-21\n- Updated job submit request body to allow maxDiskGb to be optionally set by the user for GCP only. \n#### 2022-11-18\n- Updated job submit request body to include only maxSwap to be optionally set by user. See HTCJobDefinition model for more details.\n- maxSwap defaults to 2000MB if no value is provided.\n- maxSwap is currently only supported on AWS.\n#### 2022-10-17\n- Added endpoint to return group names associated with a task.\n#### 2022-08-01\n - Added validation for system environment variables during job submission.\n#### 2022-07-25\n - Added support for image tags on GCP. Images pushed to ECR with a tag will be replicated with the tag attached to GCP, and can be submitted in the same way as AWS\n- Resolved bug where log lines were duplicated several times.\n#### 2022-07-08\n - Added validation for image name during job submission\n#### 2022-06-30\n - Added capability to run AARCH64 jobs (specified on the job definition endpoint) on <em>GCP_US_CENTRAL_1</em> and <em>GCP_EU_WEST_4</em> for all users.\n- Added capability to run jobs in GCP region <em>GCP_US_CENTRAL_1</em> for all users.\n#### 2022-06-23\n - Added capability to run jobs in GCP region <em>GCP_EU_WEST_4</em> for all users. This is set during project creation.",
+      "description": "### Changelog\n#### 2024-10-15\n- Fixed an issue where non-existent images would incorrectly return a PENDING status instead of a 404 response when checking image availability across cloud providers. (ENK-1139)\n#### 2024-10-07\n- Added improvements and optimizations for GCP image validation on job submit. (ENK-2158)\n#### 2024-10-02\n- Added improvements and optimizations for processing job submit requests in limited projects and workspaces. (ENK-1844)\n#### 2024-09-10\n- Added additional validation for the HTCJobDefinition during job submission. (ENK-2155)\n#### 2024-09-09\n- Added additional metrics for vCPU scheduling. (ENK-2039)\n#### 2024-08-26\n- Added additional metrics for swap and disk usage. (ENK-2023, ENK-2044, ENK-2045, ENK-2120)\n#### 2024-08-19\n- Added support for jobs in GCP to use the experimental real swap feature for workspaces where swap infrastructure has been configured. The amount of swap provided is approximately equal to the memory requested by the job. This feature can be enabled by setting the experimental.kubernetesSwap field to true in the Job submit request (ENK-2065)\n#### 2024-08-14\n- Updated job cancellation to correctly update job status. (ENK-2069)\n#### 2024-08-09\n- Updated the response from `/htc/gcp/clusters/{workspaceId}` to include the cluster's autoscaling profile and subnetwork name. (ENK-2042)\n#### 2024-07-22\n- Fixed issue where jobs in multi-region projects were all getting routed to a single region instead of being spread out\n#### 2024-07-18\n- Added htc_job_limit_vcpus metric to response from /htc/metrics\n#### 2024-07-08\n- Allow workspace and organization admin to cancel jobs, view job logs and view job events\n#### 2024-04-23\n- Workspaces can now also be configured with a task retention policy which governs the auto-archival and auto-deletion of tasks. The project task retention policy is prioritized.\n#### 2024-03-01\n- Projects can now be configured with a task retention policy which governs the auto-archival and auto-deletion of tasks.\n- The API now supports manual archival of tasks.\n#### 2024-01-31\n- Added pagination support for GET /htc/projects/{projectId}/tasks/{taskId}/groups endpoint.\n#### 2024-01-26\n- Added workspace dimensions endpoint to enable viewing of predefined computing environment options for a workspace.\n- Added project dimensions endpoints to enable inspection of a project's current computing environment configuration as well as facilitate customization and adjustment of a project's computing environment settings.\n#### 2023-09-25\n- Introduced new `/limits` API endpoints for resource limit management at workspace and project levels.\n- If limits are set for both workspace and project, jobs within the project may be throttled based on resource consumption across either.\n#### 2023-06-20\n- Do not allow jobs submission to deleted tasks \n#### 2023-05-05\n- Fixed issue where jobs would be stuck in running despite completing successfully \n#### 2023-04-20\n- Added clearer error messages for jobs that failed because they exceeded disk space limits \n#### 2023-04-06\n- Added support for validating HTC Bearer tokens using JWKs \n#### 2023-03-07\n- Added support for adding user-defined claims to job bearer tokens during job submission\n- Limited the scope of API endpoints that job bearer tokens are allowed to access \n#### 2023-01-10\n- Added support for extending an existing project with additional regions.\n- Note: this does not currently consolidate images and objects in storage to new regions.\n#### 2022-11-30\n- Updated maxSwap minimum value to 0.\n- If maxSwap is 0 it will not be set in the job definition.\n#### 2022-11-23\n- Changed maxDiskGb field to maxDiskGiB. Fix GCP to use MiB and GiB instead of MB and GB to be consistent with AWS.  \n#### 2022-11-21\n- Updated job submit request body to allow maxDiskGb to be optionally set by the user for GCP only. \n#### 2022-11-18\n- Updated job submit request body to include only maxSwap to be optionally set by user. See HTCJobDefinition model for more details.\n- maxSwap defaults to 2000MB if no value is provided.\n- maxSwap is currently only supported on AWS.\n#### 2022-10-17\n- Added endpoint to return group names associated with a task.\n#### 2022-08-01\n - Added validation for system environment variables during job submission.\n#### 2022-07-25\n - Added support for image tags on GCP. Images pushed to ECR with a tag will be replicated with the tag attached to GCP, and can be submitted in the same way as AWS\n- Resolved bug where log lines were duplicated several times.\n#### 2022-07-08\n - Added validation for image name during job submission\n#### 2022-06-30\n - Added capability to run AARCH64 jobs (specified on the job definition endpoint) on <em>GCP_US_CENTRAL_1</em> and <em>GCP_EU_WEST_4</em> for all users.\n- Added capability to run jobs in GCP region <em>GCP_US_CENTRAL_1</em> for all users.\n#### 2022-06-23\n - Added capability to run jobs in GCP region <em>GCP_EU_WEST_4</em> for all users. This is set during project creation.",
       "title": "Rescale HTC API",
       "version": "Beta V1"
    },
@@ -2345,7 +2372,7 @@
       },
       "/htc/projects/{projectId}/container-registry/images/{imageName}": {
          "get": {
-            "description": "This endpoint will get the status of an image by name",
+            "description": "Retrieves the current status of an image across cloud providers. The status indicates whether the image is ready for use or still being processed. Returns READY when the image is available in all cloud providers, PENDING while the image is being replicated, and a 404 if the image does not exist.",
             "parameters": [
                {
                   "in": "path",
@@ -2373,13 +2400,35 @@
                         }
                      }
                   },
-                  "description": "Ok"
+                  "description": "Successfully retrieved image status"
                },
                "401": {
                   "description": "Not Authorized"
                },
                "403": {
                   "description": "Not Allowed"
+               },
+               "404": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "example": {
+                              "error": "IMAGE_UNAVAILABLE",
+                              "message": "Image my-app:latest is unavailable. Please check the image name. If the image was pushed recently, try again at a later time"
+                           },
+                           "properties": {
+                              "errorDescription": {
+                                 "type": "string"
+                              },
+                              "errorType": {
+                                 "type": "string"
+                              }
+                           },
+                           "type": "object"
+                        }
+                     }
+                  },
+                  "description": "Image not found in registry"
                }
             },
             "security": [
@@ -2387,7 +2436,7 @@
                   "SecurityScheme": [ ]
                }
             ],
-            "summary": "Get Image",
+            "summary": "Get image status",
             "tags": [
                "Container Registry Resource"
             ]
@@ -2506,10 +2555,7 @@
                   "content": {
                      "application/json": {
                         "schema": {
-                           "items": {
-                              "$ref": "#/components/schemas/HTCComputeEnvironment"
-                           },
-                           "type": "array"
+                           "$ref": "#/components/schemas/HTCProjectDimensions"
                         }
                      }
                   },
@@ -3853,6 +3899,15 @@
                      }
                   },
                   "description": "Ok"
+               },
+               "400": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCRequestError"
+                        }
+                     }
+                  }
                },
                "401": {
                   "description": "Not Authorized"

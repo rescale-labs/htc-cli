@@ -87,8 +87,9 @@ func updateBearerToken(c *oapi.Client, config *config.Config) error {
 }
 
 type Runner struct {
-	Config *config.Config
-	Client *oapi.Client
+	Client  *oapi.Client
+	Command *cobra.Command
+	Config  *config.Config
 }
 
 func NewRunner(cmd *cobra.Command) (*Runner, error) {
@@ -106,13 +107,17 @@ func NewRunner(cmd *cobra.Command) (*Runner, error) {
 		return nil, fmt.Errorf("API client initialization failed: %w", err)
 	}
 	return &Runner{
-		Config: cnf,
-		Client: c,
+		Client:  c,
+		Command: cmd,
+		Config:  cnf,
 	}, nil
 }
 
 func (r *Runner) UpdateToken(now time.Time) error {
 	if r.Config.NeedsToken(time.Now()) {
+		if r.Config.ApiKey == "" {
+			return fmt.Errorf("Needed a current bearer token, but unable to get one. Please set RESCALE_API_KEY and retry.")
+		}
 		return r.RenewToken()
 	}
 	return nil
@@ -128,7 +133,8 @@ func (r *Runner) RenewToken() error {
 	return nil
 }
 
-// Returns a new runner with an up to date JTW token.
+// Returns a new runner with an up to date JWT token.
+// Use this for any command except those related to auth.
 func NewRunnerWithToken(cmd *cobra.Command, now time.Time) (*Runner, error) {
 	runner, err := NewRunner(cmd)
 	if err != nil {
@@ -140,9 +146,69 @@ func NewRunnerWithToken(cmd *cobra.Command, now time.Time) (*Runner, error) {
 	return runner, nil
 }
 
+type IDParams struct {
+	ProjectId string
+	TaskId    string
+	JobId     string
+
+	RequireProjectId bool
+	RequireTaskId    bool
+	RequireJobId     bool
+}
+
+func (r *Runner) GetIds(p *IDParams) error {
+	var errors []error
+	if p.RequireProjectId {
+		projectId, err := r.Command.Flags().GetString("project-id")
+		if err != nil {
+			errors = append(errors,
+				config.UsageErrorf("Error setting project ID: %w", err))
+		} else if projectId == "" {
+			errors = append(errors,
+				config.UsageErrorf("Error: missing project ID."))
+		} else {
+			p.ProjectId = projectId
+		}
+	}
+
+	if p.RequireTaskId {
+		taskId, err := r.Command.Flags().GetString("task-id")
+		if err != nil {
+			errors = append(errors,
+				config.UsageErrorf("Error setting task ID: %w", err))
+		} else if taskId == "" {
+			errors = append(errors,
+				config.UsageErrorf("Error: missing task ID."))
+		} else {
+			p.TaskId = taskId
+		}
+	}
+
+	if len(errors) == 1 {
+		return errors[0]
+	} else if len(errors) > 0 {
+		var words []string
+		var args []interface{}
+		for _, err := range errors {
+			words = append(words, "%w")
+			args = append(args, err)
+		}
+		msg := "Errors:\n" + strings.Join(words, "\n  * ")
+		return config.UsageErrorf(msg, args...)
+	}
+
+	return nil
+}
+
 func (r *Runner) PrintResult(res interface{}, w io.Writer) error {
 	switch r.Config.OutputFormat {
 	case "yaml":
+		// NB: YAML encoding doesn't work properly for ogen's OptString,
+		// OptInt, etc. types, and there's not an easy way to fix that
+		// without us adding code to the same package as what we
+		// generate. (Though, I guess that'd be OK to do. We probably
+		// have to do the same eventually anyway for plain text output
+		// of various entities.)
 		e := yaml.NewEncoder(w)
 		defer e.Close()
 		return e.Encode(res)

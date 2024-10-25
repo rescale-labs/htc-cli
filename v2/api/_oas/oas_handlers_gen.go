@@ -5,19 +5,15 @@ package _oas
 import (
 	"context"
 	"net/http"
-	"time"
 
 	"github.com/go-faster/errors"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
-	"go.opentelemetry.io/otel/metric"
-	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
-	"go.opentelemetry.io/otel/trace"
 
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/middleware"
 	"github.com/ogen-go/ogen/ogenerrors"
 )
+
+func recordError(string, error) {}
 
 // handleAuthTokenGetRequest handles GET /auth/token operation.
 //
@@ -25,41 +21,9 @@ import (
 //
 // GET /auth/token
 func (s *Server) handleAuthTokenGetRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/auth/token"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "AuthTokenGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "AuthTokenGet",
@@ -150,7 +114,7 @@ func (s *Server) handleAuthTokenGetRequest(args [0]string, argsEscaped bool, w h
 		return
 	}
 
-	if err := encodeAuthTokenGetResponse(response, w, span); err != nil {
+	if err := encodeAuthTokenGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -165,41 +129,9 @@ func (s *Server) handleAuthTokenGetRequest(args [0]string, argsEscaped bool, w h
 //
 // GET /auth/token/whoami
 func (s *Server) handleAuthTokenWhoamiGetRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/auth/token/whoami"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "AuthTokenWhoamiGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "AuthTokenWhoamiGet",
@@ -290,7 +222,7 @@ func (s *Server) handleAuthTokenWhoamiGetRequest(args [0]string, argsEscaped boo
 		return
 	}
 
-	if err := encodeAuthTokenWhoamiGetResponse(response, w, span); err != nil {
+	if err := encodeAuthTokenWhoamiGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -305,41 +237,9 @@ func (s *Server) handleAuthTokenWhoamiGetRequest(args [0]string, argsEscaped boo
 //
 // GET /auth/whoami
 func (s *Server) handleAuthWhoamiGetRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/auth/whoami"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "AuthWhoamiGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "AuthWhoamiGet",
@@ -430,7 +330,7 @@ func (s *Server) handleAuthWhoamiGetRequest(args [0]string, argsEscaped bool, w 
 		return
 	}
 
-	if err := encodeAuthWhoamiGetResponse(response, w, span); err != nil {
+	if err := encodeAuthWhoamiGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -446,41 +346,9 @@ func (s *Server) handleAuthWhoamiGetRequest(args [0]string, argsEscaped bool, w 
 //
 // GET /htc/gcp/clusters/{workspaceId}
 func (s *Server) handleHtcGcpClustersWorkspaceIdGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/gcp/clusters/{workspaceId}"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcGcpClustersWorkspaceIdGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcGcpClustersWorkspaceIdGet",
@@ -586,7 +454,7 @@ func (s *Server) handleHtcGcpClustersWorkspaceIdGetRequest(args [1]string, argsE
 		return
 	}
 
-	if err := encodeHtcGcpClustersWorkspaceIdGetResponse(response, w, span); err != nil {
+	if err := encodeHtcGcpClustersWorkspaceIdGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -601,41 +469,9 @@ func (s *Server) handleHtcGcpClustersWorkspaceIdGetRequest(args [1]string, argsE
 //
 // GET /htc/metrics
 func (s *Server) handleHtcMetricsGetRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/metrics"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcMetricsGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcMetricsGet",
@@ -741,7 +577,7 @@ func (s *Server) handleHtcMetricsGetRequest(args [0]string, argsEscaped bool, w 
 		return
 	}
 
-	if err := encodeHtcMetricsGetResponse(response, w, span); err != nil {
+	if err := encodeHtcMetricsGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -756,41 +592,9 @@ func (s *Server) handleHtcMetricsGetRequest(args [0]string, argsEscaped bool, w 
 //
 // GET /htc/projects
 func (s *Server) handleHtcProjectsGetRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsGet",
@@ -904,7 +708,7 @@ func (s *Server) handleHtcProjectsGetRequest(args [0]string, argsEscaped bool, w
 		return
 	}
 
-	if err := encodeHtcProjectsGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -920,41 +724,9 @@ func (s *Server) handleHtcProjectsGetRequest(args [0]string, argsEscaped bool, w
 //
 // POST /htc/projects
 func (s *Server) handleHtcProjectsPostRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/htc/projects"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsPost",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsPost",
@@ -1060,7 +832,7 @@ func (s *Server) handleHtcProjectsPostRequest(args [0]string, argsEscaped bool, 
 		return
 	}
 
-	if err := encodeHtcProjectsPostResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsPostResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -1075,41 +847,9 @@ func (s *Server) handleHtcProjectsPostRequest(args [0]string, argsEscaped bool, 
 //
 // GET /htc/projects/{projectId}/container-registry/images
 func (s *Server) handleHtcProjectsProjectIdContainerRegistryImagesGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/container-registry/images"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdContainerRegistryImagesGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdContainerRegistryImagesGet",
@@ -1215,7 +955,7 @@ func (s *Server) handleHtcProjectsProjectIdContainerRegistryImagesGetRequest(arg
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdContainerRegistryImagesGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdContainerRegistryImagesGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -1226,45 +966,16 @@ func (s *Server) handleHtcProjectsProjectIdContainerRegistryImagesGetRequest(arg
 
 // handleHtcProjectsProjectIdContainerRegistryImagesImageNameGetRequest handles GET /htc/projects/{projectId}/container-registry/images/{imageName} operation.
 //
-// This endpoint will get the status of an image by name.
+// Retrieves the current status of an image across cloud providers. The status indicates whether the
+// image is ready for use or still being processed. Returns READY when the image is available in all
+// cloud providers, PENDING while the image is being replicated, and a 404 if the image does not
+// exist.
 //
 // GET /htc/projects/{projectId}/container-registry/images/{imageName}
 func (s *Server) handleHtcProjectsProjectIdContainerRegistryImagesImageNameGetRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/container-registry/images/{imageName}"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdContainerRegistryImagesImageNameGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdContainerRegistryImagesImageNameGet",
@@ -1331,7 +1042,7 @@ func (s *Server) handleHtcProjectsProjectIdContainerRegistryImagesImageNameGetRe
 		mreq := middleware.Request{
 			Context:          ctx,
 			OperationName:    "HtcProjectsProjectIdContainerRegistryImagesImageNameGet",
-			OperationSummary: "Get Image",
+			OperationSummary: "Get image status",
 			OperationID:      "",
 			Body:             nil,
 			Params: middleware.Parameters{
@@ -1374,7 +1085,7 @@ func (s *Server) handleHtcProjectsProjectIdContainerRegistryImagesImageNameGetRe
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdContainerRegistryImagesImageNameGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdContainerRegistryImagesImageNameGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -1395,41 +1106,9 @@ func (s *Server) handleHtcProjectsProjectIdContainerRegistryImagesImageNameGetRe
 //
 // POST /htc/projects/{projectId}/container-registry/repo/{repoName}
 func (s *Server) handleHtcProjectsProjectIdContainerRegistryRepoRepoNamePostRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/container-registry/repo/{repoName}"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdContainerRegistryRepoRepoNamePost",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdContainerRegistryRepoRepoNamePost",
@@ -1539,7 +1218,7 @@ func (s *Server) handleHtcProjectsProjectIdContainerRegistryRepoRepoNamePostRequ
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdContainerRegistryRepoRepoNamePostResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdContainerRegistryRepoRepoNamePostResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -1557,41 +1236,9 @@ func (s *Server) handleHtcProjectsProjectIdContainerRegistryRepoRepoNamePostRequ
 //
 // GET /htc/projects/{projectId}/container-registry/token
 func (s *Server) handleHtcProjectsProjectIdContainerRegistryTokenGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/container-registry/token"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdContainerRegistryTokenGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdContainerRegistryTokenGet",
@@ -1697,7 +1344,7 @@ func (s *Server) handleHtcProjectsProjectIdContainerRegistryTokenGetRequest(args
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdContainerRegistryTokenGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdContainerRegistryTokenGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -1722,41 +1369,9 @@ func (s *Server) handleHtcProjectsProjectIdContainerRegistryTokenGetRequest(args
 //
 // GET /htc/projects/{projectId}/dimensions
 func (s *Server) handleHtcProjectsProjectIdDimensionsGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/dimensions"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdDimensionsGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdDimensionsGet",
@@ -1862,7 +1477,7 @@ func (s *Server) handleHtcProjectsProjectIdDimensionsGetRequest(args [1]string, 
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdDimensionsGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdDimensionsGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -1888,41 +1503,9 @@ func (s *Server) handleHtcProjectsProjectIdDimensionsGetRequest(args [1]string, 
 //
 // PUT /htc/projects/{projectId}/dimensions
 func (s *Server) handleHtcProjectsProjectIdDimensionsPutRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("PUT"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/dimensions"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdDimensionsPut",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdDimensionsPut",
@@ -2043,7 +1626,7 @@ func (s *Server) handleHtcProjectsProjectIdDimensionsPutRequest(args [1]string, 
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdDimensionsPutResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdDimensionsPutResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -2058,41 +1641,9 @@ func (s *Server) handleHtcProjectsProjectIdDimensionsPutRequest(args [1]string, 
 //
 // GET /htc/projects/{projectId}
 func (s *Server) handleHtcProjectsProjectIdGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdGet",
@@ -2198,7 +1749,7 @@ func (s *Server) handleHtcProjectsProjectIdGetRequest(args [1]string, argsEscape
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -2214,41 +1765,9 @@ func (s *Server) handleHtcProjectsProjectIdGetRequest(args [1]string, argsEscape
 //
 // DELETE /htc/projects/{projectId}/limits
 func (s *Server) handleHtcProjectsProjectIdLimitsDeleteRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("DELETE"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/limits"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdLimitsDelete",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdLimitsDelete",
@@ -2354,7 +1873,7 @@ func (s *Server) handleHtcProjectsProjectIdLimitsDeleteRequest(args [1]string, a
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdLimitsDeleteResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdLimitsDeleteResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -2371,41 +1890,9 @@ func (s *Server) handleHtcProjectsProjectIdLimitsDeleteRequest(args [1]string, a
 //
 // GET /htc/projects/{projectId}/limits
 func (s *Server) handleHtcProjectsProjectIdLimitsGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/limits"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdLimitsGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdLimitsGet",
@@ -2511,7 +1998,7 @@ func (s *Server) handleHtcProjectsProjectIdLimitsGetRequest(args [1]string, args
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdLimitsGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdLimitsGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -2526,41 +2013,9 @@ func (s *Server) handleHtcProjectsProjectIdLimitsGetRequest(args [1]string, args
 //
 // DELETE /htc/projects/{projectId}/limits/{id}
 func (s *Server) handleHtcProjectsProjectIdLimitsIDDeleteRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("DELETE"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/limits/{id}"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdLimitsIDDelete",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdLimitsIDDelete",
@@ -2670,7 +2125,7 @@ func (s *Server) handleHtcProjectsProjectIdLimitsIDDeleteRequest(args [2]string,
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdLimitsIDDeleteResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdLimitsIDDeleteResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -2685,41 +2140,9 @@ func (s *Server) handleHtcProjectsProjectIdLimitsIDDeleteRequest(args [2]string,
 //
 // GET /htc/projects/{projectId}/limits/{id}
 func (s *Server) handleHtcProjectsProjectIdLimitsIDGetRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/limits/{id}"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdLimitsIDGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdLimitsIDGet",
@@ -2829,7 +2252,7 @@ func (s *Server) handleHtcProjectsProjectIdLimitsIDGetRequest(args [2]string, ar
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdLimitsIDGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdLimitsIDGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -2846,41 +2269,9 @@ func (s *Server) handleHtcProjectsProjectIdLimitsIDGetRequest(args [2]string, ar
 //
 // PATCH /htc/projects/{projectId}/limits/{id}
 func (s *Server) handleHtcProjectsProjectIdLimitsIDPatchRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("PATCH"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/limits/{id}"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdLimitsIDPatch",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdLimitsIDPatch",
@@ -3005,7 +2396,7 @@ func (s *Server) handleHtcProjectsProjectIdLimitsIDPatchRequest(args [2]string, 
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdLimitsIDPatchResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdLimitsIDPatchResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -3025,41 +2416,9 @@ func (s *Server) handleHtcProjectsProjectIdLimitsIDPatchRequest(args [2]string, 
 //
 // POST /htc/projects/{projectId}/limits
 func (s *Server) handleHtcProjectsProjectIdLimitsPostRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/limits"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdLimitsPost",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdLimitsPost",
@@ -3180,7 +2539,7 @@ func (s *Server) handleHtcProjectsProjectIdLimitsPostRequest(args [1]string, arg
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdLimitsPostResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdLimitsPostResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -3195,41 +2554,9 @@ func (s *Server) handleHtcProjectsProjectIdLimitsPostRequest(args [1]string, arg
 //
 // PATCH /htc/projects/{projectId}
 func (s *Server) handleHtcProjectsProjectIdPatchRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("PATCH"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdPatch",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdPatch",
@@ -3350,7 +2677,7 @@ func (s *Server) handleHtcProjectsProjectIdPatchRequest(args [1]string, argsEsca
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdPatchResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdPatchResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -3365,41 +2692,9 @@ func (s *Server) handleHtcProjectsProjectIdPatchRequest(args [1]string, argsEsca
 //
 // GET /htc/projects/{projectId}/storage/presigned-url
 func (s *Server) handleHtcProjectsProjectIdStoragePresignedURLGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/storage/presigned-url"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdStoragePresignedURLGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdStoragePresignedURLGet",
@@ -3509,7 +2804,7 @@ func (s *Server) handleHtcProjectsProjectIdStoragePresignedURLGetRequest(args [1
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdStoragePresignedURLGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdStoragePresignedURLGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -3524,41 +2819,9 @@ func (s *Server) handleHtcProjectsProjectIdStoragePresignedURLGetRequest(args [1
 //
 // GET /htc/projects/{projectId}/storage/token
 func (s *Server) handleHtcProjectsProjectIdStorageTokenGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/storage/token"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdStorageTokenGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdStorageTokenGet",
@@ -3664,7 +2927,7 @@ func (s *Server) handleHtcProjectsProjectIdStorageTokenGetRequest(args [1]string
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdStorageTokenGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdStorageTokenGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -3679,41 +2942,9 @@ func (s *Server) handleHtcProjectsProjectIdStorageTokenGetRequest(args [1]string
 //
 // GET /htc/projects/{projectId}/storage/token/{region}
 func (s *Server) handleHtcProjectsProjectIdStorageTokenRegionGetRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/storage/token/{region}"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdStorageTokenRegionGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdStorageTokenRegionGet",
@@ -3823,7 +3054,7 @@ func (s *Server) handleHtcProjectsProjectIdStorageTokenRegionGetRequest(args [2]
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdStorageTokenRegionGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdStorageTokenRegionGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -3838,41 +3069,9 @@ func (s *Server) handleHtcProjectsProjectIdStorageTokenRegionGetRequest(args [2]
 //
 // GET /htc/projects/{projectId}/storage/tokens
 func (s *Server) handleHtcProjectsProjectIdStorageTokensGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/storage/tokens"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdStorageTokensGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdStorageTokensGet",
@@ -3978,7 +3177,7 @@ func (s *Server) handleHtcProjectsProjectIdStorageTokensGetRequest(args [1]strin
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdStorageTokensGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdStorageTokensGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -3997,41 +3196,9 @@ func (s *Server) handleHtcProjectsProjectIdStorageTokensGetRequest(args [1]strin
 //
 // DELETE /htc/projects/{projectId}/task-retention-policy
 func (s *Server) handleHtcProjectsProjectIdTaskRetentionPolicyDeleteRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("DELETE"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/task-retention-policy"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTaskRetentionPolicyDelete",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTaskRetentionPolicyDelete",
@@ -4137,7 +3304,7 @@ func (s *Server) handleHtcProjectsProjectIdTaskRetentionPolicyDeleteRequest(args
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTaskRetentionPolicyDeleteResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTaskRetentionPolicyDeleteResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -4168,41 +3335,9 @@ func (s *Server) handleHtcProjectsProjectIdTaskRetentionPolicyDeleteRequest(args
 //
 // GET /htc/projects/{projectId}/task-retention-policy
 func (s *Server) handleHtcProjectsProjectIdTaskRetentionPolicyGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/task-retention-policy"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTaskRetentionPolicyGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTaskRetentionPolicyGet",
@@ -4308,7 +3443,7 @@ func (s *Server) handleHtcProjectsProjectIdTaskRetentionPolicyGetRequest(args [1
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTaskRetentionPolicyGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTaskRetentionPolicyGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -4337,41 +3472,9 @@ func (s *Server) handleHtcProjectsProjectIdTaskRetentionPolicyGetRequest(args [1
 //
 // PUT /htc/projects/{projectId}/task-retention-policy
 func (s *Server) handleHtcProjectsProjectIdTaskRetentionPolicyPutRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("PUT"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/task-retention-policy"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTaskRetentionPolicyPut",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTaskRetentionPolicyPut",
@@ -4492,7 +3595,7 @@ func (s *Server) handleHtcProjectsProjectIdTaskRetentionPolicyPutRequest(args [1
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTaskRetentionPolicyPutResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTaskRetentionPolicyPutResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -4507,41 +3610,9 @@ func (s *Server) handleHtcProjectsProjectIdTaskRetentionPolicyPutRequest(args [1
 //
 // GET /htc/projects/{projectId}/tasks
 func (s *Server) handleHtcProjectsProjectIdTasksGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/tasks"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTasksGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTasksGet",
@@ -4655,7 +3726,7 @@ func (s *Server) handleHtcProjectsProjectIdTasksGetRequest(args [1]string, argsE
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTasksGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTasksGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -4670,41 +3741,9 @@ func (s *Server) handleHtcProjectsProjectIdTasksGetRequest(args [1]string, argsE
 //
 // POST /htc/projects/{projectId}/tasks
 func (s *Server) handleHtcProjectsProjectIdTasksPostRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/tasks"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTasksPost",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTasksPost",
@@ -4825,7 +3864,7 @@ func (s *Server) handleHtcProjectsProjectIdTasksPostRequest(args [1]string, args
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTasksPostResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTasksPostResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -4840,41 +3879,9 @@ func (s *Server) handleHtcProjectsProjectIdTasksPostRequest(args [1]string, args
 //
 // DELETE /htc/projects/{projectId}/tasks/{taskId}
 func (s *Server) handleHtcProjectsProjectIdTasksTaskIdDeleteRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("DELETE"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/tasks/{taskId}"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTasksTaskIdDelete",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTasksTaskIdDelete",
@@ -4984,7 +3991,7 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdDeleteRequest(args [2]stri
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTasksTaskIdDeleteResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTasksTaskIdDeleteResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -4999,41 +4006,9 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdDeleteRequest(args [2]stri
 //
 // GET /htc/projects/{projectId}/tasks/{taskId}
 func (s *Server) handleHtcProjectsProjectIdTasksTaskIdGetRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/tasks/{taskId}"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTasksTaskIdGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTasksTaskIdGet",
@@ -5143,7 +4118,7 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdGetRequest(args [2]string,
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTasksTaskIdGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTasksTaskIdGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -5158,41 +4133,9 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdGetRequest(args [2]string,
 //
 // GET /htc/projects/{projectId}/tasks/{taskId}/group-summary-statistics
 func (s *Server) handleHtcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGetRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/tasks/{taskId}/group-summary-statistics"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGet",
@@ -5314,7 +4257,7 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGetR
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -5329,41 +4272,9 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGetR
 //
 // GET /htc/projects/{projectId}/tasks/{taskId}/groups
 func (s *Server) handleHtcProjectsProjectIdTasksTaskIdGroupsGetRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/tasks/{taskId}/groups"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTasksTaskIdGroupsGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTasksTaskIdGroupsGet",
@@ -5481,7 +4392,7 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdGroupsGetRequest(args [2]s
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTasksTaskIdGroupsGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTasksTaskIdGroupsGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -5496,41 +4407,9 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdGroupsGetRequest(args [2]s
 //
 // POST /htc/projects/{projectId}/tasks/{taskId}/jobs/batch
 func (s *Server) handleHtcProjectsProjectIdTasksTaskIdJobsBatchPostRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/tasks/{taskId}/jobs/batch"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTasksTaskIdJobsBatchPost",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTasksTaskIdJobsBatchPost",
@@ -5659,7 +4538,7 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdJobsBatchPostRequest(args 
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTasksTaskIdJobsBatchPostResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTasksTaskIdJobsBatchPostResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -5675,41 +4554,9 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdJobsBatchPostRequest(args 
 //
 // POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel
 func (s *Server) handleHtcProjectsProjectIdTasksTaskIdJobsCancelPostRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/tasks/{taskId}/jobs/cancel"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTasksTaskIdJobsCancelPost",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTasksTaskIdJobsCancelPost",
@@ -5823,7 +4670,7 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdJobsCancelPostRequest(args
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTasksTaskIdJobsCancelPostResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTasksTaskIdJobsCancelPostResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -5838,41 +4685,9 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdJobsCancelPostRequest(args
 //
 // GET /htc/projects/{projectId}/tasks/{taskId}/jobs
 func (s *Server) handleHtcProjectsProjectIdTasksTaskIdJobsGetRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/tasks/{taskId}/jobs"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTasksTaskIdJobsGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTasksTaskIdJobsGet",
@@ -6006,7 +4821,7 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdJobsGetRequest(args [2]str
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTasksTaskIdJobsGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTasksTaskIdJobsGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -6021,41 +4836,9 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdJobsGetRequest(args [2]str
 //
 // GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events
 func (s *Server) handleHtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRequest(args [3]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet",
@@ -6177,7 +4960,7 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRequest(
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -6192,41 +4975,9 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRequest(
 //
 // GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}
 func (s *Server) handleHtcProjectsProjectIdTasksTaskIdJobsJobIdGetRequest(args [3]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTasksTaskIdJobsJobIdGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTasksTaskIdJobsJobIdGet",
@@ -6340,7 +5091,7 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdJobsJobIdGetRequest(args [
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -6355,41 +5106,9 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdJobsJobIdGetRequest(args [
 //
 // GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/logs
 func (s *Server) handleHtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetRequest(args [3]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/logs"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGet",
@@ -6511,7 +5230,7 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetRequest(ar
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -6541,41 +5260,9 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetRequest(ar
 //
 // PATCH /htc/projects/{projectId}/tasks/{taskId}
 func (s *Server) handleHtcProjectsProjectIdTasksTaskIdPatchRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("PATCH"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/tasks/{taskId}"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTasksTaskIdPatch",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTasksTaskIdPatch",
@@ -6700,7 +5387,7 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdPatchRequest(args [2]strin
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTasksTaskIdPatchResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTasksTaskIdPatchResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -6715,41 +5402,9 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdPatchRequest(args [2]strin
 //
 // GET /htc/projects/{projectId}/tasks/{taskId}/storage/presigned-url
 func (s *Server) handleHtcProjectsProjectIdTasksTaskIdStoragePresignedURLGetRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/tasks/{taskId}/storage/presigned-url"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTasksTaskIdStoragePresignedURLGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTasksTaskIdStoragePresignedURLGet",
@@ -6863,7 +5518,7 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdStoragePresignedURLGetRequ
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTasksTaskIdStoragePresignedURLGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTasksTaskIdStoragePresignedURLGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -6878,41 +5533,9 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdStoragePresignedURLGetRequ
 //
 // GET /htc/projects/{projectId}/tasks/{taskId}/storage/regional-storage
 func (s *Server) handleHtcProjectsProjectIdTasksTaskIdStorageRegionalStorageGetRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/tasks/{taskId}/storage/regional-storage"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTasksTaskIdStorageRegionalStorageGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTasksTaskIdStorageRegionalStorageGet",
@@ -7022,7 +5645,7 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdStorageRegionalStorageGetR
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTasksTaskIdStorageRegionalStorageGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTasksTaskIdStorageRegionalStorageGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -7037,41 +5660,9 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdStorageRegionalStorageGetR
 //
 // GET /htc/projects/{projectId}/tasks/{taskId}/storage/token
 func (s *Server) handleHtcProjectsProjectIdTasksTaskIdStorageTokenGetRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/tasks/{taskId}/storage/token"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTasksTaskIdStorageTokenGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTasksTaskIdStorageTokenGet",
@@ -7181,7 +5772,7 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdStorageTokenGetRequest(arg
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTasksTaskIdStorageTokenGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTasksTaskIdStorageTokenGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -7196,41 +5787,9 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdStorageTokenGetRequest(arg
 //
 // GET /htc/projects/{projectId}/tasks/{taskId}/storage/token/{region}
 func (s *Server) handleHtcProjectsProjectIdTasksTaskIdStorageTokenRegionGetRequest(args [3]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/tasks/{taskId}/storage/token/{region}"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTasksTaskIdStorageTokenRegionGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTasksTaskIdStorageTokenRegionGet",
@@ -7344,7 +5903,7 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdStorageTokenRegionGetReque
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTasksTaskIdStorageTokenRegionGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTasksTaskIdStorageTokenRegionGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -7359,41 +5918,9 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdStorageTokenRegionGetReque
 //
 // GET /htc/projects/{projectId}/tasks/{taskId}/storage/tokens
 func (s *Server) handleHtcProjectsProjectIdTasksTaskIdStorageTokensGetRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/tasks/{taskId}/storage/tokens"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTasksTaskIdStorageTokensGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcProjectsProjectIdTasksTaskIdStorageTokensGet",
@@ -7503,166 +6030,7 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdStorageTokensGetRequest(ar
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdTasksTaskIdStorageTokensGetResponse(response, w, span); err != nil {
-		defer recordError("EncodeResponse", err)
-		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
-			s.cfg.ErrorHandler(ctx, w, r, err)
-		}
-		return
-	}
-}
-
-// handleHtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetRequest handles GET /htc/projects/{projectId}/tasks/{taskId}/summary-statistics operation.
-//
-// This endpoint will get task summary statistics.
-//
-// GET /htc/projects/{projectId}/tasks/{taskId}/summary-statistics
-func (s *Server) handleHtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/projects/{projectId}/tasks/{taskId}/summary-statistics"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
-
-	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
-		err          error
-		opErrContext = ogenerrors.OperationContext{
-			Name: "HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGet",
-			ID:   "",
-		}
-	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securitySecurityScheme(ctx, "HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGet", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "SecurityScheme",
-					Err:              err,
-				}
-				defer recordError("Security:SecurityScheme", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
-	params, err := decodeHtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	var response HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetRes
-	if m := s.cfg.Middleware; m != nil {
-		mreq := middleware.Request{
-			Context:          ctx,
-			OperationName:    "HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGet",
-			OperationSummary: "Get Task Summary Statistics",
-			OperationID:      "",
-			Body:             nil,
-			Params: middleware.Parameters{
-				{
-					Name: "projectId",
-					In:   "path",
-				}: params.ProjectId,
-				{
-					Name: "taskId",
-					In:   "path",
-				}: params.TaskId,
-			},
-			Raw: r,
-		}
-
-		type (
-			Request  = struct{}
-			Params   = HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetParams
-			Response = HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetRes
-		)
-		response, err = middleware.HookMiddleware[
-			Request,
-			Params,
-			Response,
-		](
-			m,
-			mreq,
-			unpackHtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetParams,
-			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGet(ctx, params)
-				return response, err
-			},
-		)
-	} else {
-		response, err = s.h.HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGet(ctx, params)
-	}
-	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	if err := encodeHtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetResponse(response, w, span); err != nil {
+	if err := encodeHtcProjectsProjectIdTasksTaskIdStorageTokensGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -7677,41 +6045,9 @@ func (s *Server) handleHtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetReques
 //
 // GET /htc/regions
 func (s *Server) handleHtcRegionsGetRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/regions"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcRegionsGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcRegionsGet",
@@ -7821,7 +6157,7 @@ func (s *Server) handleHtcRegionsGetRequest(args [0]string, argsEscaped bool, w 
 		return
 	}
 
-	if err := encodeHtcRegionsGetResponse(response, w, span); err != nil {
+	if err := encodeHtcRegionsGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -7836,41 +6172,9 @@ func (s *Server) handleHtcRegionsGetRequest(args [0]string, argsEscaped bool, w 
 //
 // GET /htc/regions/{region}
 func (s *Server) handleHtcRegionsRegionGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/regions/{region}"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcRegionsRegionGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcRegionsRegionGet",
@@ -7976,7 +6280,7 @@ func (s *Server) handleHtcRegionsRegionGetRequest(args [1]string, argsEscaped bo
 		return
 	}
 
-	if err := encodeHtcRegionsRegionGetResponse(response, w, span); err != nil {
+	if err := encodeHtcRegionsRegionGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -7991,41 +6295,9 @@ func (s *Server) handleHtcRegionsRegionGetRequest(args [1]string, argsEscaped bo
 //
 // GET /htc/storage
 func (s *Server) handleHtcStorageGetRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/storage"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcStorageGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcStorageGet",
@@ -8116,7 +6388,7 @@ func (s *Server) handleHtcStorageGetRequest(args [0]string, argsEscaped bool, w 
 		return
 	}
 
-	if err := encodeHtcStorageGetResponse(response, w, span); err != nil {
+	if err := encodeHtcStorageGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -8131,41 +6403,9 @@ func (s *Server) handleHtcStorageGetRequest(args [0]string, argsEscaped bool, w 
 //
 // GET /htc/storage/region/{region}
 func (s *Server) handleHtcStorageRegionRegionGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/storage/region/{region}"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcStorageRegionRegionGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcStorageRegionRegionGet",
@@ -8271,7 +6511,7 @@ func (s *Server) handleHtcStorageRegionRegionGetRequest(args [1]string, argsEsca
 		return
 	}
 
-	if err := encodeHtcStorageRegionRegionGetResponse(response, w, span); err != nil {
+	if err := encodeHtcStorageRegionRegionGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -8293,41 +6533,9 @@ func (s *Server) handleHtcStorageRegionRegionGetRequest(args [1]string, argsEsca
 //
 // GET /htc/workspaces/{workspaceId}/dimensions
 func (s *Server) handleHtcWorkspacesWorkspaceIdDimensionsGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/workspaces/{workspaceId}/dimensions"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcWorkspacesWorkspaceIdDimensionsGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcWorkspacesWorkspaceIdDimensionsGet",
@@ -8433,7 +6641,7 @@ func (s *Server) handleHtcWorkspacesWorkspaceIdDimensionsGetRequest(args [1]stri
 		return
 	}
 
-	if err := encodeHtcWorkspacesWorkspaceIdDimensionsGetResponse(response, w, span); err != nil {
+	if err := encodeHtcWorkspacesWorkspaceIdDimensionsGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -8448,41 +6656,9 @@ func (s *Server) handleHtcWorkspacesWorkspaceIdDimensionsGetRequest(args [1]stri
 //
 // GET /htc/workspaces/{workspaceId}/limits
 func (s *Server) handleHtcWorkspacesWorkspaceIdLimitsGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/workspaces/{workspaceId}/limits"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcWorkspacesWorkspaceIdLimitsGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcWorkspacesWorkspaceIdLimitsGet",
@@ -8588,7 +6764,7 @@ func (s *Server) handleHtcWorkspacesWorkspaceIdLimitsGetRequest(args [1]string, 
 		return
 	}
 
-	if err := encodeHtcWorkspacesWorkspaceIdLimitsGetResponse(response, w, span); err != nil {
+	if err := encodeHtcWorkspacesWorkspaceIdLimitsGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -8615,41 +6791,9 @@ func (s *Server) handleHtcWorkspacesWorkspaceIdLimitsGetRequest(args [1]string, 
 //
 // GET /htc/workspaces/{workspaceId}/task-retention-policy
 func (s *Server) handleHtcWorkspacesWorkspaceIdTaskRetentionPolicyGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/htc/workspaces/{workspaceId}/task-retention-policy"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcWorkspacesWorkspaceIdTaskRetentionPolicyGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcWorkspacesWorkspaceIdTaskRetentionPolicyGet",
@@ -8755,7 +6899,7 @@ func (s *Server) handleHtcWorkspacesWorkspaceIdTaskRetentionPolicyGetRequest(arg
 		return
 	}
 
-	if err := encodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyGetResponse(response, w, span); err != nil {
+	if err := encodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -8785,41 +6929,9 @@ func (s *Server) handleHtcWorkspacesWorkspaceIdTaskRetentionPolicyGetRequest(arg
 //
 // PUT /htc/workspaces/{workspaceId}/task-retention-policy
 func (s *Server) handleHtcWorkspacesWorkspaceIdTaskRetentionPolicyPutRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("PUT"),
-		semconv.HTTPRouteKey.String("/htc/workspaces/{workspaceId}/task-retention-policy"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "HtcWorkspacesWorkspaceIdTaskRetentionPolicyPut",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "HtcWorkspacesWorkspaceIdTaskRetentionPolicyPut",
@@ -8940,7 +7052,7 @@ func (s *Server) handleHtcWorkspacesWorkspaceIdTaskRetentionPolicyPutRequest(arg
 		return
 	}
 
-	if err := encodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyPutResponse(response, w, span); err != nil {
+	if err := encodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyPutResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -8955,41 +7067,9 @@ func (s *Server) handleHtcWorkspacesWorkspaceIdTaskRetentionPolicyPutRequest(arg
 //
 // POST /oauth2/token
 func (s *Server) handleOAuth2TokenPostRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/oauth2/token"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "OAuth2TokenPost",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err error
 	)
 
@@ -9032,7 +7112,7 @@ func (s *Server) handleOAuth2TokenPostRequest(args [0]string, argsEscaped bool, 
 		return
 	}
 
-	if err := encodeOAuth2TokenPostResponse(response, w, span); err != nil {
+	if err := encodeOAuth2TokenPostResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -9047,41 +7127,9 @@ func (s *Server) handleOAuth2TokenPostRequest(args [0]string, argsEscaped bool, 
 //
 // GET /.well-known/jwks.json
 func (s *Server) handleWellKnownJwksJSONGetRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/.well-known/jwks.json"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "WellKnownJwksJSONGet",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
+	ctx := r.Context()
 
 	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
 		err error
 	)
 
@@ -9124,7 +7172,7 @@ func (s *Server) handleWellKnownJwksJSONGetRequest(args [0]string, argsEscaped b
 		return
 	}
 
-	if err := encodeWellKnownJwksJSONGetResponse(response, w, span); err != nil {
+	if err := encodeWellKnownJwksJSONGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)

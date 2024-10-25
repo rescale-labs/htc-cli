@@ -50,6 +50,19 @@ local patches = {
         },
       },
     },
+    '/htc/projects/{projectId}/dimensions'+: {
+      get+: {
+        responses+: {
+          '200'+: {
+            content+: {
+              'application/json'+: {
+                schema: { '$ref': '#/components/schemas/HTCProjectDimensions' },
+              },
+            },
+          },
+        },
+      },
+    },
     '/htc/projects/{projectId}/limits'+: {
       get+: {
         responses+: {
@@ -78,9 +91,30 @@ local patches = {
         },
       },
     },
+    '/htc/projects/{projectId}/tasks/{taskId}/jobs/batch'+: {
+      post+: {
+        responses+: {
+          '400': {
+            content: {
+              'application/json': {
+                schema: { '$ref': '#/components/schemas/HTCRequestError' },
+              },
+            },
+          },
+        },
+      },
+    },
   },
   components+: {
     schemas+: {
+      HTCRequestError: {
+        type: 'object',
+        properties: {
+          errorType: { type: 'string' },
+          errorDescription: { type: 'string' },
+          message: { type: 'string' },
+        },
+      },
       HTCTokenPayload: { type: 'string' },
       // They said it was only ever a string! But this isn't always
       // true.
@@ -90,6 +124,12 @@ local patches = {
             nullable: true,
           },
         },
+      },
+      HTCProjectDimensions: {
+        items: {
+          '$ref': '#/components/schemas/HTCComputeEnvironment',
+        },
+        type: 'array',
       },
       HTCProjectLimits: {
         items: {

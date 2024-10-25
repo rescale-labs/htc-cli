@@ -58,6 +58,7 @@ func init() {
 	projectCmd := &cobra.Command{
 		Use: "project",
 	}
+	projectCmd.AddCommand(project.DimensionsCmd)
 	projectCmd.AddCommand(project.GetCmd)
 	projectCmd.AddCommand(project.LimitsCmd)
 	RootCmd.AddCommand(projectCmd)
@@ -66,6 +67,7 @@ func init() {
 	taskCmd := &cobra.Command{
 		Use: "task",
 	}
+	taskCmd.AddCommand(task.CreateCmd)
 	taskCmd.AddCommand(task.GetCmd)
 	RootCmd.AddCommand(taskCmd)
 

@@ -60,7 +60,10 @@ type Handler interface {
 	HtcProjectsProjectIdContainerRegistryImagesGet(ctx context.Context, params HtcProjectsProjectIdContainerRegistryImagesGetParams) (HtcProjectsProjectIdContainerRegistryImagesGetRes, error)
 	// HtcProjectsProjectIdContainerRegistryImagesImageNameGet implements GET /htc/projects/{projectId}/container-registry/images/{imageName} operation.
 	//
-	// This endpoint will get the status of an image by name.
+	// Retrieves the current status of an image across cloud providers. The status indicates whether the
+	// image is ready for use or still being processed. Returns READY when the image is available in all
+	// cloud providers, PENDING while the image is being replicated, and a 404 if the image does not
+	// exist.
 	//
 	// GET /htc/projects/{projectId}/container-registry/images/{imageName}
 	HtcProjectsProjectIdContainerRegistryImagesImageNameGet(ctx context.Context, params HtcProjectsProjectIdContainerRegistryImagesImageNameGetParams) (HtcProjectsProjectIdContainerRegistryImagesImageNameGetRes, error)
@@ -369,12 +372,6 @@ type Handler interface {
 	//
 	// GET /htc/projects/{projectId}/tasks/{taskId}/storage/tokens
 	HtcProjectsProjectIdTasksTaskIdStorageTokensGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdStorageTokensGetParams) (HtcProjectsProjectIdTasksTaskIdStorageTokensGetRes, error)
-	// HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGet implements GET /htc/projects/{projectId}/tasks/{taskId}/summary-statistics operation.
-	//
-	// This endpoint will get task summary statistics.
-	//
-	// GET /htc/projects/{projectId}/tasks/{taskId}/summary-statistics
-	HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetParams) (HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetRes, error)
 	// HtcRegionsGet implements GET /htc/regions operation.
 	//
 	// This endpoint will get HTC region settings for all regions.
