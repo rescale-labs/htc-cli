@@ -955,6 +955,7 @@
                         "$ref": "#/components/schemas/Instant"
                      }
                   ],
+                  "nullable": true,
                   "readOnly": true,
                   "type": "string"
                },
@@ -978,6 +979,7 @@
                         "$ref": "#/components/schemas/Instant"
                      }
                   ],
+                  "nullable": true,
                   "readOnly": true,
                   "type": "string"
                },
@@ -1050,6 +1052,22 @@
             "required": [
                "lifecycleStatus"
             ],
+            "type": "object"
+         },
+         "HTCTasksResponse": {
+            "properties": {
+               "items": {
+                  "items": {
+                     "$ref": "#/components/schemas/HTCTask"
+                  },
+                  "type": "array"
+               },
+               "next": {
+                  "example": "https://page2.com",
+                  "format": "uri",
+                  "type": "string"
+               }
+            },
             "type": "object"
          },
          "HTCToken": {
@@ -3188,19 +3206,7 @@
                   "content": {
                      "application/json": {
                         "schema": {
-                           "properties": {
-                              "items": {
-                                 "items": {
-                                    "$ref": "#/components/schemas/HTCTask"
-                                 },
-                                 "type": "array"
-                              },
-                              "next": {
-                                 "example": "https://page2.com",
-                                 "format": "uri",
-                                 "type": "string"
-                              }
-                           }
+                           "$ref": "#/components/schemas/HTCTasksResponse"
                         }
                      }
                   },

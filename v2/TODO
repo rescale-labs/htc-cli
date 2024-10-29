@@ -13,6 +13,16 @@
 * merge in upload/download from htccli
 * scope out htcctl functionality to implement here
 
+* YAML encoder doesn't handle OptString, etc properly, e.g.:
+  ```
+  $ go run cmd/htc/main.go  task get --project-id e8dee146-5606-407e-8e51-3f28070ece6e -l 1  -o yaml
+  2024/09/25 13:03:40 HtcProjectsProjectIdTasksGet: pageIndex= pageSize=500
+  -   archivedat:
+          value: 0001-01-01T00:00:00Z
+          set: true
+          "null": true
+  ```
+
 # Later
 
 * All the methods:

@@ -63,6 +63,21 @@ local patches = {
         },
       },
     },
+    '/htc/projects/{projectId}/tasks'+: {
+      get+: {
+        responses+: {
+          '200'+: {
+            content+: {
+              'application/json'+: {
+                schema: { '$ref':
+                  '#/components/schemas/HTCTasksResponse' },
+
+              },
+            },
+          },
+        },
+      },
+    },
   },
   components+: {
     schemas+: {
@@ -97,7 +112,32 @@ local patches = {
             example: 'https://page2.com',
           },
         },
-
+      },
+      HTCTask+: {
+        properties+: {
+          archivedAt+: {
+            nullable: true,
+          },
+          deletedAt+: {
+            nullable: true,
+          },
+        },
+      },
+      HTCTasksResponse: {
+        type: 'object',
+        properties: {
+          items: {
+            type: 'array',
+            items: {
+              '$ref': '#/components/schemas/HTCTask',
+            },
+          },
+          next: {
+            format: 'uri',
+            type: 'string',
+            example: 'https://page2.com',
+          },
+        },
       },
     },
   },

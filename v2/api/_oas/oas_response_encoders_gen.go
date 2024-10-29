@@ -927,7 +927,7 @@ func encodeHtcProjectsProjectIdTaskRetentionPolicyPutResponse(response HtcProjec
 
 func encodeHtcProjectsProjectIdTasksGetResponse(response HtcProjectsProjectIdTasksGetRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *HtcProjectsProjectIdTasksGetOKApplicationJSON:
+	case *HTCTasksResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
