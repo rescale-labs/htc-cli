@@ -1906,7 +1906,7 @@ func decodeHtcProjectsProjectIdTasksTaskIdJobsBatchPostResponse(resp *http.Respo
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response HtcProjectsProjectIdTasksTaskIdJobsBatchPostOKApplicationJSON
+			var response HTCJobSubmitRequests
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err

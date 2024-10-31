@@ -1783,6 +1783,10 @@ func (s *HTCJobSubmitRequest) SetWorkspaceId(val OptString) {
 	s.WorkspaceId = val
 }
 
+type HTCJobSubmitRequests []HTCJobSubmitRequest
+
+func (*HTCJobSubmitRequests) htcProjectsProjectIdTasksTaskIdJobsBatchPostRes() {}
+
 // Ref: #/components/schemas/HTCLimitCreate
 type HTCLimitCreate struct {
 	ModifierRole ModifierRole `json:"modifierRole"`
@@ -3750,11 +3754,6 @@ func (*HtcProjectsProjectIdTasksTaskIdGroupsGetUnauthorized) htcProjectsProjectI
 type HtcProjectsProjectIdTasksTaskIdJobsBatchPostForbidden struct{}
 
 func (*HtcProjectsProjectIdTasksTaskIdJobsBatchPostForbidden) htcProjectsProjectIdTasksTaskIdJobsBatchPostRes() {
-}
-
-type HtcProjectsProjectIdTasksTaskIdJobsBatchPostOKApplicationJSON []HTCJobSubmitRequest
-
-func (*HtcProjectsProjectIdTasksTaskIdJobsBatchPostOKApplicationJSON) htcProjectsProjectIdTasksTaskIdJobsBatchPostRes() {
 }
 
 // HtcProjectsProjectIdTasksTaskIdJobsBatchPostUnauthorized is response for HtcProjectsProjectIdTasksTaskIdJobsBatchPost operation.

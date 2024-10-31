@@ -1028,7 +1028,7 @@ func encodeHtcProjectsProjectIdTasksTaskIdGroupsGetResponse(response HtcProjects
 
 func encodeHtcProjectsProjectIdTasksTaskIdJobsBatchPostResponse(response HtcProjectsProjectIdTasksTaskIdJobsBatchPostRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
-	case *HtcProjectsProjectIdTasksTaskIdJobsBatchPostOKApplicationJSON:
+	case *HTCJobSubmitRequests:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 

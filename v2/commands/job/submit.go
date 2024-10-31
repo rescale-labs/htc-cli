@@ -20,7 +20,7 @@ type submitRequest struct {
 }
 
 func submit(ctx context.Context, c *oapi.Client,
-	r *submitRequest) (*oapi.HtcProjectsProjectIdTasksTaskIdJobsBatchPostRes, error) {
+	r *submitRequest) (*oapi.HTCJobSubmitRequests, error) {
 
 	res, err := c.HtcProjectsProjectIdTasksTaskIdJobsBatchPost(ctx, r.batch, r.params)
 	if err != nil {
@@ -28,12 +28,8 @@ func submit(ctx context.Context, c *oapi.Client,
 	}
 
 	switch res := res.(type) {
-	// case *oapi.HTCProjectsResponse:
-	// 	return res, nil
-	// 	// runner.PrintResult(res.Items, os.Stdout)
-	// case *oapi.HtcProjectsGetForbidden,
-	// 	*oapi.HtcProjectsGetUnauthorized:
-	// 	return nil, fmt.Errorf("forbidden: %s", res)
+	case *oapi.HTCJobSubmitRequests:
+		return res, nil
 	case *oapi.HTCRequestError:
 		return nil, fmt.Errorf("%s: %s", res.ErrorDescription.Value, res.Message.Value)
 	}

@@ -2973,6 +2973,56 @@ func (s *HTCJobSubmitRequest) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes HTCJobSubmitRequests as json.
+func (s HTCJobSubmitRequests) Encode(e *jx.Encoder) {
+	unwrapped := []HTCJobSubmitRequest(s)
+
+	e.ArrStart()
+	for _, elem := range unwrapped {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes HTCJobSubmitRequests from json.
+func (s *HTCJobSubmitRequests) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode HTCJobSubmitRequests to nil")
+	}
+	var unwrapped []HTCJobSubmitRequest
+	if err := func() error {
+		unwrapped = make([]HTCJobSubmitRequest, 0)
+		if err := d.Arr(func(d *jx.Decoder) error {
+			var elem HTCJobSubmitRequest
+			if err := elem.Decode(d); err != nil {
+				return err
+			}
+			unwrapped = append(unwrapped, elem)
+			return nil
+		}); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = HTCJobSubmitRequests(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s HTCJobSubmitRequests) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *HTCJobSubmitRequests) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode implements json.Marshaler.
 func (s *HTCLimitCreate) Encode(e *jx.Encoder) {
 	e.ObjStart()
@@ -6383,56 +6433,6 @@ func (s HtcProjectsProjectIdTasksTaskIdGroupsGetOKApplicationJSON) MarshalJSON()
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *HtcProjectsProjectIdTasksTaskIdGroupsGetOKApplicationJSON) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes HtcProjectsProjectIdTasksTaskIdJobsBatchPostOKApplicationJSON as json.
-func (s HtcProjectsProjectIdTasksTaskIdJobsBatchPostOKApplicationJSON) Encode(e *jx.Encoder) {
-	unwrapped := []HTCJobSubmitRequest(s)
-
-	e.ArrStart()
-	for _, elem := range unwrapped {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes HtcProjectsProjectIdTasksTaskIdJobsBatchPostOKApplicationJSON from json.
-func (s *HtcProjectsProjectIdTasksTaskIdJobsBatchPostOKApplicationJSON) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode HtcProjectsProjectIdTasksTaskIdJobsBatchPostOKApplicationJSON to nil")
-	}
-	var unwrapped []HTCJobSubmitRequest
-	if err := func() error {
-		unwrapped = make([]HTCJobSubmitRequest, 0)
-		if err := d.Arr(func(d *jx.Decoder) error {
-			var elem HTCJobSubmitRequest
-			if err := elem.Decode(d); err != nil {
-				return err
-			}
-			unwrapped = append(unwrapped, elem)
-			return nil
-		}); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = HtcProjectsProjectIdTasksTaskIdJobsBatchPostOKApplicationJSON(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s HtcProjectsProjectIdTasksTaskIdJobsBatchPostOKApplicationJSON) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *HtcProjectsProjectIdTasksTaskIdJobsBatchPostOKApplicationJSON) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

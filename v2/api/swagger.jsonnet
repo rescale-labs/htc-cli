@@ -94,6 +94,14 @@ local patches = {
     '/htc/projects/{projectId}/tasks/{taskId}/jobs/batch'+: {
       post+: {
         responses+: {
+          '200'+: {
+            content+: {
+              'application/json'+: {
+                schema: { '$ref':
+                  '#/components/schemas/HTCJobSubmitRequests' },
+              },
+            },
+          },
           '400': {
             content: {
               'application/json': {
@@ -107,20 +115,17 @@ local patches = {
   },
   components+: {
     schemas+: {
-      HTCRequestError: {
-        type: 'object',
-        properties: {
-          errorType: { type: 'string' },
-          errorDescription: { type: 'string' },
-          message: { type: 'string' },
+      HTCJobSubmitRequests: {
+        items: {
+          '$ref': '#/components/schemas/HTCJobSubmitRequest',
         },
+        type: 'array',
       },
-      HTCTokenPayload: { type: 'string' },
-      // They said it was only ever a string! But this isn't always
-      // true.
       HTCProject+: {
         properties+: {
           organizationCode+: {
+            // The docs said it was only ever a string! But sometimes
+            // it's null and then we fail at runtime :-(
             nullable: true,
           },
         },
@@ -153,6 +158,14 @@ local patches = {
           },
         },
       },
+      HTCRequestError: {  // Catchall for many HTC error responses
+        type: 'object',
+        properties: {
+          errorType: { type: 'string' },
+          errorDescription: { type: 'string' },
+          message: { type: 'string' },
+        },
+      },
       HTCTask+: {
         properties+: {
           archivedAt+: {
@@ -179,6 +192,7 @@ local patches = {
           },
         },
       },
+      HTCTokenPayload: { type: 'string' },
     },
   },
 };
