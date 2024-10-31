@@ -8,19 +8,16 @@ import (
 
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
-	"go.opentelemetry.io/otel/codes"
-	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ogen-go/ogen/conv"
 	"github.com/ogen-go/ogen/uri"
 )
 
-func encodeAuthTokenGetResponse(response AuthTokenGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeAuthTokenGetResponse(response AuthTokenGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCToken:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -33,7 +30,6 @@ func encodeAuthTokenGetResponse(response AuthTokenGetRes, w http.ResponseWriter,
 	case *OAuth2ErrorResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -48,12 +44,11 @@ func encodeAuthTokenGetResponse(response AuthTokenGetRes, w http.ResponseWriter,
 	}
 }
 
-func encodeAuthTokenWhoamiGetResponse(response AuthTokenWhoamiGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeAuthTokenWhoamiGetResponse(response AuthTokenWhoamiGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCTokenPayload:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -66,7 +61,6 @@ func encodeAuthTokenWhoamiGetResponse(response AuthTokenWhoamiGetRes, w http.Res
 	case *OAuth2ErrorResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -78,7 +72,6 @@ func encodeAuthTokenWhoamiGetResponse(response AuthTokenWhoamiGetRes, w http.Res
 
 	case *AuthTokenWhoamiGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -87,12 +80,11 @@ func encodeAuthTokenWhoamiGetResponse(response AuthTokenWhoamiGetRes, w http.Res
 	}
 }
 
-func encodeAuthWhoamiGetResponse(response AuthWhoamiGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeAuthWhoamiGetResponse(response AuthWhoamiGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *WhoAmI:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -105,7 +97,6 @@ func encodeAuthWhoamiGetResponse(response AuthWhoamiGetRes, w http.ResponseWrite
 	case *OAuth2ErrorResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -120,12 +111,11 @@ func encodeAuthWhoamiGetResponse(response AuthWhoamiGetRes, w http.ResponseWrite
 	}
 }
 
-func encodeHtcGcpClustersWorkspaceIdGetResponse(response HtcGcpClustersWorkspaceIdGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcGcpClustersWorkspaceIdGetResponse(response HtcGcpClustersWorkspaceIdGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCClusterStatusResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -137,20 +127,17 @@ func encodeHtcGcpClustersWorkspaceIdGetResponse(response HtcGcpClustersWorkspace
 
 	case *HtcGcpClustersWorkspaceIdGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcGcpClustersWorkspaceIdGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
 	case *OAuth2ErrorResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
-		span.SetStatus(codes.Error, http.StatusText(404))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -165,12 +152,11 @@ func encodeHtcGcpClustersWorkspaceIdGetResponse(response HtcGcpClustersWorkspace
 	}
 }
 
-func encodeHtcMetricsGetResponse(response HtcMetricsGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcMetricsGetResponse(response HtcMetricsGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HtcMetricsGetOK:
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		writer := w
 		if _, err := io.Copy(writer, response); err != nil {
@@ -181,13 +167,11 @@ func encodeHtcMetricsGetResponse(response HtcMetricsGetRes, w http.ResponseWrite
 
 	case *HtcMetricsGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcMetricsGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -196,12 +180,11 @@ func encodeHtcMetricsGetResponse(response HtcMetricsGetRes, w http.ResponseWrite
 	}
 }
 
-func encodeHtcProjectsGetResponse(response HtcProjectsGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsGetResponse(response HtcProjectsGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCProjectsResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -213,13 +196,11 @@ func encodeHtcProjectsGetResponse(response HtcProjectsGetRes, w http.ResponseWri
 
 	case *HtcProjectsGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -228,12 +209,11 @@ func encodeHtcProjectsGetResponse(response HtcProjectsGetRes, w http.ResponseWri
 	}
 }
 
-func encodeHtcProjectsPostResponse(response HtcProjectsPostRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsPostResponse(response HtcProjectsPostRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCProject:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -245,13 +225,11 @@ func encodeHtcProjectsPostResponse(response HtcProjectsPostRes, w http.ResponseW
 
 	case *HtcProjectsPostUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsPostForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -260,12 +238,11 @@ func encodeHtcProjectsPostResponse(response HtcProjectsPostRes, w http.ResponseW
 	}
 }
 
-func encodeHtcProjectsProjectIdContainerRegistryImagesGetResponse(response HtcProjectsProjectIdContainerRegistryImagesGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdContainerRegistryImagesGetResponse(response HtcProjectsProjectIdContainerRegistryImagesGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCImages:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -277,13 +254,11 @@ func encodeHtcProjectsProjectIdContainerRegistryImagesGetResponse(response HtcPr
 
 	case *HtcProjectsProjectIdContainerRegistryImagesGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdContainerRegistryImagesGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -292,12 +267,11 @@ func encodeHtcProjectsProjectIdContainerRegistryImagesGetResponse(response HtcPr
 	}
 }
 
-func encodeHtcProjectsProjectIdContainerRegistryImagesImageNameGetResponse(response HtcProjectsProjectIdContainerRegistryImagesImageNameGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdContainerRegistryImagesImageNameGetResponse(response HtcProjectsProjectIdContainerRegistryImagesImageNameGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCImageStatus:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -309,13 +283,23 @@ func encodeHtcProjectsProjectIdContainerRegistryImagesImageNameGetResponse(respo
 
 	case *HtcProjectsProjectIdContainerRegistryImagesImageNameGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdContainerRegistryImagesImageNameGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
+
+		return nil
+
+	case *HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
 
 		return nil
 
@@ -324,12 +308,11 @@ func encodeHtcProjectsProjectIdContainerRegistryImagesImageNameGetResponse(respo
 	}
 }
 
-func encodeHtcProjectsProjectIdContainerRegistryRepoRepoNamePostResponse(response HtcProjectsProjectIdContainerRegistryRepoRepoNamePostRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdContainerRegistryRepoRepoNamePostResponse(response HtcProjectsProjectIdContainerRegistryRepoRepoNamePostRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCRepository:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -341,13 +324,11 @@ func encodeHtcProjectsProjectIdContainerRegistryRepoRepoNamePostResponse(respons
 
 	case *HtcProjectsProjectIdContainerRegistryRepoRepoNamePostUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdContainerRegistryRepoRepoNamePostForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -356,7 +337,7 @@ func encodeHtcProjectsProjectIdContainerRegistryRepoRepoNamePostResponse(respons
 	}
 }
 
-func encodeHtcProjectsProjectIdContainerRegistryTokenGetResponse(response HtcProjectsProjectIdContainerRegistryTokenGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdContainerRegistryTokenGetResponse(response HtcProjectsProjectIdContainerRegistryTokenGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HtcProjectsProjectIdContainerRegistryTokenGetOKHeaders:
 		// Encoding response headers.
@@ -376,7 +357,6 @@ func encodeHtcProjectsProjectIdContainerRegistryTokenGetResponse(response HtcPro
 			}
 		}
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		writer := w
 		if _, err := io.Copy(writer, response.Response); err != nil {
@@ -387,13 +367,11 @@ func encodeHtcProjectsProjectIdContainerRegistryTokenGetResponse(response HtcPro
 
 	case *HtcProjectsProjectIdContainerRegistryTokenGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdContainerRegistryTokenGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -402,12 +380,11 @@ func encodeHtcProjectsProjectIdContainerRegistryTokenGetResponse(response HtcPro
 	}
 }
 
-func encodeHtcProjectsProjectIdDimensionsGetResponse(response HtcProjectsProjectIdDimensionsGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdDimensionsGetResponse(response HtcProjectsProjectIdDimensionsGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
-	case *HtcProjectsProjectIdDimensionsGetOKApplicationJSON:
+	case *HTCProjectDimensions:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -419,13 +396,11 @@ func encodeHtcProjectsProjectIdDimensionsGetResponse(response HtcProjectsProject
 
 	case *HtcProjectsProjectIdDimensionsGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdDimensionsGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -434,12 +409,11 @@ func encodeHtcProjectsProjectIdDimensionsGetResponse(response HtcProjectsProject
 	}
 }
 
-func encodeHtcProjectsProjectIdDimensionsPutResponse(response HtcProjectsProjectIdDimensionsPutRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdDimensionsPutResponse(response HtcProjectsProjectIdDimensionsPutRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HtcProjectsProjectIdDimensionsPutCreatedApplicationJSON:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(201)
-		span.SetStatus(codes.Ok, http.StatusText(201))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -451,13 +425,11 @@ func encodeHtcProjectsProjectIdDimensionsPutResponse(response HtcProjectsProject
 
 	case *HtcProjectsProjectIdDimensionsPutUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdDimensionsPutForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -466,12 +438,11 @@ func encodeHtcProjectsProjectIdDimensionsPutResponse(response HtcProjectsProject
 	}
 }
 
-func encodeHtcProjectsProjectIdGetResponse(response HtcProjectsProjectIdGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdGetResponse(response HtcProjectsProjectIdGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCProject:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -483,13 +454,11 @@ func encodeHtcProjectsProjectIdGetResponse(response HtcProjectsProjectIdGetRes, 
 
 	case *HtcProjectsProjectIdGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -498,23 +467,20 @@ func encodeHtcProjectsProjectIdGetResponse(response HtcProjectsProjectIdGetRes, 
 	}
 }
 
-func encodeHtcProjectsProjectIdLimitsDeleteResponse(response HtcProjectsProjectIdLimitsDeleteRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdLimitsDeleteResponse(response HtcProjectsProjectIdLimitsDeleteRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HtcProjectsProjectIdLimitsDeleteNoContent:
 		w.WriteHeader(204)
-		span.SetStatus(codes.Ok, http.StatusText(204))
 
 		return nil
 
 	case *HtcProjectsProjectIdLimitsDeleteUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdLimitsDeleteForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -523,12 +489,11 @@ func encodeHtcProjectsProjectIdLimitsDeleteResponse(response HtcProjectsProjectI
 	}
 }
 
-func encodeHtcProjectsProjectIdLimitsGetResponse(response HtcProjectsProjectIdLimitsGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdLimitsGetResponse(response HtcProjectsProjectIdLimitsGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCProjectLimits:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -540,13 +505,11 @@ func encodeHtcProjectsProjectIdLimitsGetResponse(response HtcProjectsProjectIdLi
 
 	case *HtcProjectsProjectIdLimitsGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdLimitsGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -555,23 +518,20 @@ func encodeHtcProjectsProjectIdLimitsGetResponse(response HtcProjectsProjectIdLi
 	}
 }
 
-func encodeHtcProjectsProjectIdLimitsIDDeleteResponse(response HtcProjectsProjectIdLimitsIDDeleteRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdLimitsIDDeleteResponse(response HtcProjectsProjectIdLimitsIDDeleteRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HtcProjectsProjectIdLimitsIDDeleteNoContent:
 		w.WriteHeader(204)
-		span.SetStatus(codes.Ok, http.StatusText(204))
 
 		return nil
 
 	case *HtcProjectsProjectIdLimitsIDDeleteUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdLimitsIDDeleteForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -580,12 +540,11 @@ func encodeHtcProjectsProjectIdLimitsIDDeleteResponse(response HtcProjectsProjec
 	}
 }
 
-func encodeHtcProjectsProjectIdLimitsIDGetResponse(response HtcProjectsProjectIdLimitsIDGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdLimitsIDGetResponse(response HtcProjectsProjectIdLimitsIDGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCProjectLimit:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -597,13 +556,11 @@ func encodeHtcProjectsProjectIdLimitsIDGetResponse(response HtcProjectsProjectId
 
 	case *HtcProjectsProjectIdLimitsIDGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdLimitsIDGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -612,12 +569,11 @@ func encodeHtcProjectsProjectIdLimitsIDGetResponse(response HtcProjectsProjectId
 	}
 }
 
-func encodeHtcProjectsProjectIdLimitsIDPatchResponse(response HtcProjectsProjectIdLimitsIDPatchRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdLimitsIDPatchResponse(response HtcProjectsProjectIdLimitsIDPatchRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCProjectLimit:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -629,13 +585,11 @@ func encodeHtcProjectsProjectIdLimitsIDPatchResponse(response HtcProjectsProject
 
 	case *HtcProjectsProjectIdLimitsIDPatchUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdLimitsIDPatchForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -644,12 +598,11 @@ func encodeHtcProjectsProjectIdLimitsIDPatchResponse(response HtcProjectsProject
 	}
 }
 
-func encodeHtcProjectsProjectIdLimitsPostResponse(response HtcProjectsProjectIdLimitsPostRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdLimitsPostResponse(response HtcProjectsProjectIdLimitsPostRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCProjectLimit:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(201)
-		span.SetStatus(codes.Ok, http.StatusText(201))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -661,13 +614,11 @@ func encodeHtcProjectsProjectIdLimitsPostResponse(response HtcProjectsProjectIdL
 
 	case *HtcProjectsProjectIdLimitsPostUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdLimitsPostForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -676,12 +627,11 @@ func encodeHtcProjectsProjectIdLimitsPostResponse(response HtcProjectsProjectIdL
 	}
 }
 
-func encodeHtcProjectsProjectIdPatchResponse(response HtcProjectsProjectIdPatchRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdPatchResponse(response HtcProjectsProjectIdPatchRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCProject:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -693,13 +643,11 @@ func encodeHtcProjectsProjectIdPatchResponse(response HtcProjectsProjectIdPatchR
 
 	case *HtcProjectsProjectIdPatchUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdPatchForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -708,12 +656,11 @@ func encodeHtcProjectsProjectIdPatchResponse(response HtcProjectsProjectIdPatchR
 	}
 }
 
-func encodeHtcProjectsProjectIdStoragePresignedURLGetResponse(response HtcProjectsProjectIdStoragePresignedURLGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdStoragePresignedURLGetResponse(response HtcProjectsProjectIdStoragePresignedURLGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *PresignedPutUrlResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -725,13 +672,11 @@ func encodeHtcProjectsProjectIdStoragePresignedURLGetResponse(response HtcProjec
 
 	case *HtcProjectsProjectIdStoragePresignedURLGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdStoragePresignedURLGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -740,12 +685,11 @@ func encodeHtcProjectsProjectIdStoragePresignedURLGetResponse(response HtcProjec
 	}
 }
 
-func encodeHtcProjectsProjectIdStorageTokenGetResponse(response HtcProjectsProjectIdStorageTokenGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdStorageTokenGetResponse(response HtcProjectsProjectIdStorageTokenGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *StorageAccessToken:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -757,13 +701,11 @@ func encodeHtcProjectsProjectIdStorageTokenGetResponse(response HtcProjectsProje
 
 	case *HtcProjectsProjectIdStorageTokenGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdStorageTokenGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -772,12 +714,11 @@ func encodeHtcProjectsProjectIdStorageTokenGetResponse(response HtcProjectsProje
 	}
 }
 
-func encodeHtcProjectsProjectIdStorageTokenRegionGetResponse(response HtcProjectsProjectIdStorageTokenRegionGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdStorageTokenRegionGetResponse(response HtcProjectsProjectIdStorageTokenRegionGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *StorageAccessToken:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -789,13 +730,11 @@ func encodeHtcProjectsProjectIdStorageTokenRegionGetResponse(response HtcProject
 
 	case *HtcProjectsProjectIdStorageTokenRegionGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdStorageTokenRegionGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -804,12 +743,11 @@ func encodeHtcProjectsProjectIdStorageTokenRegionGetResponse(response HtcProject
 	}
 }
 
-func encodeHtcProjectsProjectIdStorageTokensGetResponse(response HtcProjectsProjectIdStorageTokensGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdStorageTokensGetResponse(response HtcProjectsProjectIdStorageTokensGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *StorageAccessTokens:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -821,13 +759,11 @@ func encodeHtcProjectsProjectIdStorageTokensGetResponse(response HtcProjectsProj
 
 	case *HtcProjectsProjectIdStorageTokensGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdStorageTokensGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -836,23 +772,20 @@ func encodeHtcProjectsProjectIdStorageTokensGetResponse(response HtcProjectsProj
 	}
 }
 
-func encodeHtcProjectsProjectIdTaskRetentionPolicyDeleteResponse(response HtcProjectsProjectIdTaskRetentionPolicyDeleteRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTaskRetentionPolicyDeleteResponse(response HtcProjectsProjectIdTaskRetentionPolicyDeleteRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HtcProjectsProjectIdTaskRetentionPolicyDeleteNoContent:
 		w.WriteHeader(204)
-		span.SetStatus(codes.Ok, http.StatusText(204))
 
 		return nil
 
 	case *HtcProjectsProjectIdTaskRetentionPolicyDeleteUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTaskRetentionPolicyDeleteForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -861,12 +794,11 @@ func encodeHtcProjectsProjectIdTaskRetentionPolicyDeleteResponse(response HtcPro
 	}
 }
 
-func encodeHtcProjectsProjectIdTaskRetentionPolicyGetResponse(response HtcProjectsProjectIdTaskRetentionPolicyGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTaskRetentionPolicyGetResponse(response HtcProjectsProjectIdTaskRetentionPolicyGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *TaskRetentionPolicy:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -878,13 +810,11 @@ func encodeHtcProjectsProjectIdTaskRetentionPolicyGetResponse(response HtcProjec
 
 	case *HtcProjectsProjectIdTaskRetentionPolicyGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTaskRetentionPolicyGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -893,12 +823,11 @@ func encodeHtcProjectsProjectIdTaskRetentionPolicyGetResponse(response HtcProjec
 	}
 }
 
-func encodeHtcProjectsProjectIdTaskRetentionPolicyPutResponse(response HtcProjectsProjectIdTaskRetentionPolicyPutRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTaskRetentionPolicyPutResponse(response HtcProjectsProjectIdTaskRetentionPolicyPutRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *TaskRetentionPolicy:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(201)
-		span.SetStatus(codes.Ok, http.StatusText(201))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -910,13 +839,11 @@ func encodeHtcProjectsProjectIdTaskRetentionPolicyPutResponse(response HtcProjec
 
 	case *HtcProjectsProjectIdTaskRetentionPolicyPutUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTaskRetentionPolicyPutForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -925,12 +852,11 @@ func encodeHtcProjectsProjectIdTaskRetentionPolicyPutResponse(response HtcProjec
 	}
 }
 
-func encodeHtcProjectsProjectIdTasksGetResponse(response HtcProjectsProjectIdTasksGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTasksGetResponse(response HtcProjectsProjectIdTasksGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCTasksResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -942,13 +868,11 @@ func encodeHtcProjectsProjectIdTasksGetResponse(response HtcProjectsProjectIdTas
 
 	case *HtcProjectsProjectIdTasksGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTasksGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -957,12 +881,11 @@ func encodeHtcProjectsProjectIdTasksGetResponse(response HtcProjectsProjectIdTas
 	}
 }
 
-func encodeHtcProjectsProjectIdTasksPostResponse(response HtcProjectsProjectIdTasksPostRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTasksPostResponse(response HtcProjectsProjectIdTasksPostRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCTask:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -974,13 +897,11 @@ func encodeHtcProjectsProjectIdTasksPostResponse(response HtcProjectsProjectIdTa
 
 	case *HtcProjectsProjectIdTasksPostUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTasksPostForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -989,12 +910,11 @@ func encodeHtcProjectsProjectIdTasksPostResponse(response HtcProjectsProjectIdTa
 	}
 }
 
-func encodeHtcProjectsProjectIdTasksTaskIdDeleteResponse(response HtcProjectsProjectIdTasksTaskIdDeleteRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTasksTaskIdDeleteResponse(response HtcProjectsProjectIdTasksTaskIdDeleteRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HtcProjectsProjectIdTasksTaskIdDeleteOK:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1006,13 +926,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdDeleteResponse(response HtcProjectsPro
 
 	case *HtcProjectsProjectIdTasksTaskIdDeleteUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdDeleteForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1021,12 +939,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdDeleteResponse(response HtcProjectsPro
 	}
 }
 
-func encodeHtcProjectsProjectIdTasksTaskIdGetResponse(response HtcProjectsProjectIdTasksTaskIdGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTasksTaskIdGetResponse(response HtcProjectsProjectIdTasksTaskIdGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCTask:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1038,13 +955,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdGetResponse(response HtcProjectsProjec
 
 	case *HtcProjectsProjectIdTasksTaskIdGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1053,12 +968,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdGetResponse(response HtcProjectsProjec
 	}
 }
 
-func encodeHtcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGetResponse(response HtcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGetResponse(response HtcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HtcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGetOKApplicationJSON:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1070,13 +984,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGetResponse(resp
 
 	case *HtcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1085,12 +997,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGetResponse(resp
 	}
 }
 
-func encodeHtcProjectsProjectIdTasksTaskIdGroupsGetResponse(response HtcProjectsProjectIdTasksTaskIdGroupsGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTasksTaskIdGroupsGetResponse(response HtcProjectsProjectIdTasksTaskIdGroupsGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HtcProjectsProjectIdTasksTaskIdGroupsGetOKApplicationJSON:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1102,13 +1013,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdGroupsGetResponse(response HtcProjects
 
 	case *HtcProjectsProjectIdTasksTaskIdGroupsGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdGroupsGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1117,12 +1026,23 @@ func encodeHtcProjectsProjectIdTasksTaskIdGroupsGetResponse(response HtcProjects
 	}
 }
 
-func encodeHtcProjectsProjectIdTasksTaskIdJobsBatchPostResponse(response HtcProjectsProjectIdTasksTaskIdJobsBatchPostRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTasksTaskIdJobsBatchPostResponse(response HtcProjectsProjectIdTasksTaskIdJobsBatchPostRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
-	case *HtcProjectsProjectIdTasksTaskIdJobsBatchPostOKApplicationJSON:
+	case *HTCJobSubmitRequests:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *HTCRequestError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(400)
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1134,13 +1054,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdJobsBatchPostResponse(response HtcProj
 
 	case *HtcProjectsProjectIdTasksTaskIdJobsBatchPostUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdJobsBatchPostForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1149,23 +1067,20 @@ func encodeHtcProjectsProjectIdTasksTaskIdJobsBatchPostResponse(response HtcProj
 	}
 }
 
-func encodeHtcProjectsProjectIdTasksTaskIdJobsCancelPostResponse(response HtcProjectsProjectIdTasksTaskIdJobsCancelPostRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTasksTaskIdJobsCancelPostResponse(response HtcProjectsProjectIdTasksTaskIdJobsCancelPostRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HtcProjectsProjectIdTasksTaskIdJobsCancelPostOK:
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdJobsCancelPostUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdJobsCancelPostForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1174,12 +1089,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdJobsCancelPostResponse(response HtcPro
 	}
 }
 
-func encodeHtcProjectsProjectIdTasksTaskIdJobsGetResponse(response HtcProjectsProjectIdTasksTaskIdJobsGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTasksTaskIdJobsGetResponse(response HtcProjectsProjectIdTasksTaskIdJobsGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HtcProjectsProjectIdTasksTaskIdJobsGetOKApplicationJSON:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1191,13 +1105,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdJobsGetResponse(response HtcProjectsPr
 
 	case *HtcProjectsProjectIdTasksTaskIdJobsGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdJobsGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1206,12 +1118,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdJobsGetResponse(response HtcProjectsPr
 	}
 }
 
-func encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetResponse(response HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetResponse(response HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetOKApplicationJSON:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1223,13 +1134,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetResponse(response Ht
 
 	case *HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1238,12 +1147,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetResponse(response Ht
 	}
 }
 
-func encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdGetResponse(response HtcProjectsProjectIdTasksTaskIdJobsJobIdGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdGetResponse(response HtcProjectsProjectIdTasksTaskIdJobsJobIdGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCJob:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1255,13 +1163,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdGetResponse(response HtcProje
 
 	case *HtcProjectsProjectIdTasksTaskIdJobsJobIdGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdJobsJobIdGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1270,12 +1176,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdGetResponse(response HtcProje
 	}
 }
 
-func encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetResponse(response HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetResponse(response HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetOKApplicationJSON:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1287,13 +1192,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetResponse(response HtcP
 
 	case *HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1302,12 +1205,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetResponse(response HtcP
 	}
 }
 
-func encodeHtcProjectsProjectIdTasksTaskIdPatchResponse(response HtcProjectsProjectIdTasksTaskIdPatchRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTasksTaskIdPatchResponse(response HtcProjectsProjectIdTasksTaskIdPatchRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCTask:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1319,13 +1221,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdPatchResponse(response HtcProjectsProj
 
 	case *HtcProjectsProjectIdTasksTaskIdPatchUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdPatchForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1334,12 +1234,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdPatchResponse(response HtcProjectsProj
 	}
 }
 
-func encodeHtcProjectsProjectIdTasksTaskIdStoragePresignedURLGetResponse(response HtcProjectsProjectIdTasksTaskIdStoragePresignedURLGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTasksTaskIdStoragePresignedURLGetResponse(response HtcProjectsProjectIdTasksTaskIdStoragePresignedURLGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *PresignedPutUrlResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1351,13 +1250,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdStoragePresignedURLGetResponse(respons
 
 	case *HtcProjectsProjectIdTasksTaskIdStoragePresignedURLGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdStoragePresignedURLGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1366,12 +1263,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdStoragePresignedURLGetResponse(respons
 	}
 }
 
-func encodeHtcProjectsProjectIdTasksTaskIdStorageRegionalStorageGetResponse(response HtcProjectsProjectIdTasksTaskIdStorageRegionalStorageGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTasksTaskIdStorageRegionalStorageGetResponse(response HtcProjectsProjectIdTasksTaskIdStorageRegionalStorageGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *RegionalStorageResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1383,13 +1279,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdStorageRegionalStorageGetResponse(resp
 
 	case *HtcProjectsProjectIdTasksTaskIdStorageRegionalStorageGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdStorageRegionalStorageGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1398,12 +1292,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdStorageRegionalStorageGetResponse(resp
 	}
 }
 
-func encodeHtcProjectsProjectIdTasksTaskIdStorageTokenGetResponse(response HtcProjectsProjectIdTasksTaskIdStorageTokenGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTasksTaskIdStorageTokenGetResponse(response HtcProjectsProjectIdTasksTaskIdStorageTokenGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *StorageAccessToken:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1415,13 +1308,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdStorageTokenGetResponse(response HtcPr
 
 	case *HtcProjectsProjectIdTasksTaskIdStorageTokenGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdStorageTokenGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1430,12 +1321,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdStorageTokenGetResponse(response HtcPr
 	}
 }
 
-func encodeHtcProjectsProjectIdTasksTaskIdStorageTokenRegionGetResponse(response HtcProjectsProjectIdTasksTaskIdStorageTokenRegionGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTasksTaskIdStorageTokenRegionGetResponse(response HtcProjectsProjectIdTasksTaskIdStorageTokenRegionGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *StorageAccessToken:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1447,13 +1337,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdStorageTokenRegionGetResponse(response
 
 	case *HtcProjectsProjectIdTasksTaskIdStorageTokenRegionGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdStorageTokenRegionGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1462,12 +1350,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdStorageTokenRegionGetResponse(response
 	}
 }
 
-func encodeHtcProjectsProjectIdTasksTaskIdStorageTokensGetResponse(response HtcProjectsProjectIdTasksTaskIdStorageTokensGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcProjectsProjectIdTasksTaskIdStorageTokensGetResponse(response HtcProjectsProjectIdTasksTaskIdStorageTokensGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *StorageAccessTokens:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1479,13 +1366,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdStorageTokensGetResponse(response HtcP
 
 	case *HtcProjectsProjectIdTasksTaskIdStorageTokensGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdStorageTokensGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1494,44 +1379,11 @@ func encodeHtcProjectsProjectIdTasksTaskIdStorageTokensGetResponse(response HtcP
 	}
 }
 
-func encodeHtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetResponse(response HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetRes, w http.ResponseWriter, span trace.Span) error {
-	switch response := response.(type) {
-	case *JobStatusSummary:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetUnauthorized:
-		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
-
-		return nil
-
-	case *HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetForbidden:
-		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeHtcRegionsGetResponse(response HtcRegionsGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcRegionsGetResponse(response HtcRegionsGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCInfraResource:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1543,20 +1395,17 @@ func encodeHtcRegionsGetResponse(response HtcRegionsGetRes, w http.ResponseWrite
 
 	case *HtcRegionsGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcRegionsGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
 	case *OAuth2ErrorResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
-		span.SetStatus(codes.Error, http.StatusText(404))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1571,12 +1420,11 @@ func encodeHtcRegionsGetResponse(response HtcRegionsGetRes, w http.ResponseWrite
 	}
 }
 
-func encodeHtcRegionsRegionGetResponse(response HtcRegionsRegionGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcRegionsRegionGetResponse(response HtcRegionsRegionGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCRegionAdminSettings:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1588,20 +1436,17 @@ func encodeHtcRegionsRegionGetResponse(response HtcRegionsRegionGetRes, w http.R
 
 	case *HtcRegionsRegionGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcRegionsRegionGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
 	case *OAuth2ErrorResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
-		span.SetStatus(codes.Error, http.StatusText(404))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1616,12 +1461,11 @@ func encodeHtcRegionsRegionGetResponse(response HtcRegionsRegionGetRes, w http.R
 	}
 }
 
-func encodeHtcStorageGetResponse(response HtcStorageGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcStorageGetResponse(response HtcStorageGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HtcStorageGetOKApplicationJSON:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1633,13 +1477,11 @@ func encodeHtcStorageGetResponse(response HtcStorageGetRes, w http.ResponseWrite
 
 	case *HtcStorageGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcStorageGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1648,12 +1490,11 @@ func encodeHtcStorageGetResponse(response HtcStorageGetRes, w http.ResponseWrite
 	}
 }
 
-func encodeHtcStorageRegionRegionGetResponse(response HtcStorageRegionRegionGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcStorageRegionRegionGetResponse(response HtcStorageRegionRegionGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *RegionStorageOption:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1665,13 +1506,11 @@ func encodeHtcStorageRegionRegionGetResponse(response HtcStorageRegionRegionGetR
 
 	case *HtcStorageRegionRegionGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcStorageRegionRegionGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1680,12 +1519,11 @@ func encodeHtcStorageRegionRegionGetResponse(response HtcStorageRegionRegionGetR
 	}
 }
 
-func encodeHtcWorkspacesWorkspaceIdDimensionsGetResponse(response HtcWorkspacesWorkspaceIdDimensionsGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcWorkspacesWorkspaceIdDimensionsGetResponse(response HtcWorkspacesWorkspaceIdDimensionsGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HtcWorkspacesWorkspaceIdDimensionsGetOKApplicationJSON:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1697,13 +1535,11 @@ func encodeHtcWorkspacesWorkspaceIdDimensionsGetResponse(response HtcWorkspacesW
 
 	case *HtcWorkspacesWorkspaceIdDimensionsGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcWorkspacesWorkspaceIdDimensionsGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1712,12 +1548,11 @@ func encodeHtcWorkspacesWorkspaceIdDimensionsGetResponse(response HtcWorkspacesW
 	}
 }
 
-func encodeHtcWorkspacesWorkspaceIdLimitsGetResponse(response HtcWorkspacesWorkspaceIdLimitsGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcWorkspacesWorkspaceIdLimitsGetResponse(response HtcWorkspacesWorkspaceIdLimitsGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCWorkspaceLimit:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1729,13 +1564,11 @@ func encodeHtcWorkspacesWorkspaceIdLimitsGetResponse(response HtcWorkspacesWorks
 
 	case *HtcWorkspacesWorkspaceIdLimitsGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcWorkspacesWorkspaceIdLimitsGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1744,12 +1577,11 @@ func encodeHtcWorkspacesWorkspaceIdLimitsGetResponse(response HtcWorkspacesWorks
 	}
 }
 
-func encodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyGetResponse(response HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyGetResponse(response HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *WorkspaceTaskRetentionPolicy:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1761,13 +1593,11 @@ func encodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyGetResponse(response HtcWo
 
 	case *HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1776,12 +1606,11 @@ func encodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyGetResponse(response HtcWo
 	}
 }
 
-func encodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyPutResponse(response HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutRes, w http.ResponseWriter, span trace.Span) error {
+func encodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyPutResponse(response HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *WorkspaceTaskRetentionPolicy:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(201)
-		span.SetStatus(codes.Ok, http.StatusText(201))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1793,13 +1622,11 @@ func encodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyPutResponse(response HtcWo
 
 	case *HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutUnauthorized:
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
 	case *HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutForbidden:
 		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
@@ -1808,12 +1635,11 @@ func encodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyPutResponse(response HtcWo
 	}
 }
 
-func encodeOAuth2TokenPostResponse(response OAuth2TokenPostRes, w http.ResponseWriter, span trace.Span) error {
+func encodeOAuth2TokenPostResponse(response OAuth2TokenPostRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *OAuth2Token:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1826,7 +1652,6 @@ func encodeOAuth2TokenPostResponse(response OAuth2TokenPostRes, w http.ResponseW
 	case *OAuth2ErrorResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
-		span.SetStatus(codes.Error, http.StatusText(400))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1841,12 +1666,11 @@ func encodeOAuth2TokenPostResponse(response OAuth2TokenPostRes, w http.ResponseW
 	}
 }
 
-func encodeWellKnownJwksJSONGetResponse(response WellKnownJwksJSONGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeWellKnownJwksJSONGetResponse(response WellKnownJwksJSONGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *JsonWebKeySet:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1859,7 +1683,6 @@ func encodeWellKnownJwksJSONGetResponse(response WellKnownJwksJSONGetRes, w http
 	case *OAuth2ErrorResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
 
 		e := new(jx.Encoder)
 		response.Encode(e)

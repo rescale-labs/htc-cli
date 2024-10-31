@@ -5,15 +5,10 @@ package _oas
 import (
 	"net/http"
 
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/trace"
-
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/middleware"
 	"github.com/ogen-go/ogen/ogenerrors"
 	"github.com/ogen-go/ogen/ogenregex"
-	"github.com/ogen-go/ogen/otelogen"
 )
 
 var regexMap = map[string]ogenregex.Regexp{
@@ -21,45 +16,15 @@ var regexMap = map[string]ogenregex.Regexp{
 	"(?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*(:[_a-zA-Z0-9]([\\-\\._a-zA-Z0-9])*)?":                                                                      ogenregex.MustCompile("(?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*(:[_a-zA-Z0-9]([\\-\\._a-zA-Z0-9])*)?"),
 	"^(?!.*AWS_BATCH_|RESCALE_PROJECT_ID|RESCALE_TASK_ID|RESCALE_JOB_ID|PROJECT_SHARED_FOLDER|TASK_SHARED_FOLDER|AWS_SESSION_TOKEN|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY).*": ogenregex.MustCompile("^(?!.*AWS_BATCH_|RESCALE_PROJECT_ID|RESCALE_TASK_ID|RESCALE_JOB_ID|PROJECT_SHARED_FOLDER|TASK_SHARED_FOLDER|AWS_SESSION_TOKEN|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY).*"),
 }
-var (
-	// Allocate option closure once.
-	clientSpanKind = trace.WithSpanKind(trace.SpanKindClient)
-	// Allocate option closure once.
-	serverSpanKind = trace.WithSpanKind(trace.SpanKindServer)
-)
 
 type (
 	optionFunc[C any] func(*C)
-	otelOptionFunc    func(*otelConfig)
 )
-
-type otelConfig struct {
-	TracerProvider trace.TracerProvider
-	Tracer         trace.Tracer
-	MeterProvider  metric.MeterProvider
-	Meter          metric.Meter
-}
-
-func (cfg *otelConfig) initOTEL() {
-	if cfg.TracerProvider == nil {
-		cfg.TracerProvider = otel.GetTracerProvider()
-	}
-	if cfg.MeterProvider == nil {
-		cfg.MeterProvider = otel.GetMeterProvider()
-	}
-	cfg.Tracer = cfg.TracerProvider.Tracer(otelogen.Name,
-		trace.WithInstrumentationVersion(otelogen.SemVersion()),
-	)
-	cfg.Meter = cfg.MeterProvider.Meter(otelogen.Name,
-		metric.WithInstrumentationVersion(otelogen.SemVersion()),
-	)
-}
 
 // ErrorHandler is error handler.
 type ErrorHandler = ogenerrors.ErrorHandler
 
 type serverConfig struct {
-	otelConfig
 	NotFound           http.HandlerFunc
 	MethodNotAllowed   func(w http.ResponseWriter, r *http.Request, allowed string)
 	ErrorHandler       ErrorHandler
@@ -77,12 +42,6 @@ var _ ServerOption = (optionFunc[serverConfig])(nil)
 
 func (o optionFunc[C]) applyServer(c *C) {
 	o(c)
-}
-
-var _ ServerOption = (otelOptionFunc)(nil)
-
-func (o otelOptionFunc) applyServer(c *serverConfig) {
-	o(&c.otelConfig)
 }
 
 func newServerConfig(opts ...ServerOption) serverConfig {
@@ -106,15 +65,11 @@ func newServerConfig(opts ...ServerOption) serverConfig {
 	for _, opt := range opts {
 		opt.applyServer(&cfg)
 	}
-	cfg.initOTEL()
 	return cfg
 }
 
 type baseServer struct {
-	cfg      serverConfig
-	requests metric.Int64Counter
-	errors   metric.Int64Counter
-	duration metric.Float64Histogram
+	cfg serverConfig
 }
 
 func (s baseServer) notFound(w http.ResponseWriter, r *http.Request) {
@@ -127,20 +82,10 @@ func (s baseServer) notAllowed(w http.ResponseWriter, r *http.Request, allowed s
 
 func (cfg serverConfig) baseServer() (s baseServer, err error) {
 	s = baseServer{cfg: cfg}
-	if s.requests, err = otelogen.ServerRequestCountCounter(s.cfg.Meter); err != nil {
-		return s, err
-	}
-	if s.errors, err = otelogen.ServerErrorsCountCounter(s.cfg.Meter); err != nil {
-		return s, err
-	}
-	if s.duration, err = otelogen.ServerDurationHistogram(s.cfg.Meter); err != nil {
-		return s, err
-	}
 	return s, nil
 }
 
 type clientConfig struct {
-	otelConfig
 	Client ht.Client
 }
 
@@ -155,12 +100,6 @@ func (o optionFunc[C]) applyClient(c *C) {
 	o(c)
 }
 
-var _ ClientOption = (otelOptionFunc)(nil)
-
-func (o otelOptionFunc) applyClient(c *clientConfig) {
-	o(&c.otelConfig)
-}
-
 func newClientConfig(opts ...ClientOption) clientConfig {
 	cfg := clientConfig{
 		Client: http.DefaultClient,
@@ -168,28 +107,15 @@ func newClientConfig(opts ...ClientOption) clientConfig {
 	for _, opt := range opts {
 		opt.applyClient(&cfg)
 	}
-	cfg.initOTEL()
 	return cfg
 }
 
 type baseClient struct {
-	cfg      clientConfig
-	requests metric.Int64Counter
-	errors   metric.Int64Counter
-	duration metric.Float64Histogram
+	cfg clientConfig
 }
 
 func (cfg clientConfig) baseClient() (c baseClient, err error) {
 	c = baseClient{cfg: cfg}
-	if c.requests, err = otelogen.ClientRequestCountCounter(c.cfg.Meter); err != nil {
-		return c, err
-	}
-	if c.errors, err = otelogen.ClientErrorsCountCounter(c.cfg.Meter); err != nil {
-		return c, err
-	}
-	if c.duration, err = otelogen.ClientDurationHistogram(c.cfg.Meter); err != nil {
-		return c, err
-	}
 	return c, nil
 }
 
@@ -197,28 +123,6 @@ func (cfg clientConfig) baseClient() (c baseClient, err error) {
 type Option interface {
 	ServerOption
 	ClientOption
-}
-
-// WithTracerProvider specifies a tracer provider to use for creating a tracer.
-//
-// If none is specified, the global provider is used.
-func WithTracerProvider(provider trace.TracerProvider) Option {
-	return otelOptionFunc(func(cfg *otelConfig) {
-		if provider != nil {
-			cfg.TracerProvider = provider
-		}
-	})
-}
-
-// WithMeterProvider specifies a meter provider to use for creating a meter.
-//
-// If none is specified, the otel.GetMeterProvider() is used.
-func WithMeterProvider(provider metric.MeterProvider) Option {
-	return otelOptionFunc(func(cfg *otelConfig) {
-		if provider != nil {
-			cfg.MeterProvider = provider
-		}
-	})
 }
 
 // WithClient specifies http client to use.

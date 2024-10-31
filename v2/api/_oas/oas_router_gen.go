@@ -983,9 +983,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												}
 
 												elem = origElem
-											case 's': // Prefix: "s"
+											case 's': // Prefix: "storage/"
 												origElem := elem
-												if l := len("s"); len(elem) >= l && elem[0:l] == "s" {
+												if l := len("storage/"); len(elem) >= l && elem[0:l] == "storage/" {
 													elem = elem[l:]
 												} else {
 													break
@@ -995,151 +995,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 													break
 												}
 												switch elem[0] {
-												case 't': // Prefix: "torage/"
+												case 'p': // Prefix: "presigned-url"
 													origElem := elem
-													if l := len("torage/"); len(elem) >= l && elem[0:l] == "torage/" {
-														elem = elem[l:]
-													} else {
-														break
-													}
-
-													if len(elem) == 0 {
-														break
-													}
-													switch elem[0] {
-													case 'p': // Prefix: "presigned-url"
-														origElem := elem
-														if l := len("presigned-url"); len(elem) >= l && elem[0:l] == "presigned-url" {
-															elem = elem[l:]
-														} else {
-															break
-														}
-
-														if len(elem) == 0 {
-															// Leaf node.
-															switch r.Method {
-															case "GET":
-																s.handleHtcProjectsProjectIdTasksTaskIdStoragePresignedURLGetRequest([2]string{
-																	args[0],
-																	args[1],
-																}, elemIsEscaped, w, r)
-															default:
-																s.notAllowed(w, r, "GET")
-															}
-
-															return
-														}
-
-														elem = origElem
-													case 'r': // Prefix: "regional-storage"
-														origElem := elem
-														if l := len("regional-storage"); len(elem) >= l && elem[0:l] == "regional-storage" {
-															elem = elem[l:]
-														} else {
-															break
-														}
-
-														if len(elem) == 0 {
-															// Leaf node.
-															switch r.Method {
-															case "GET":
-																s.handleHtcProjectsProjectIdTasksTaskIdStorageRegionalStorageGetRequest([2]string{
-																	args[0],
-																	args[1],
-																}, elemIsEscaped, w, r)
-															default:
-																s.notAllowed(w, r, "GET")
-															}
-
-															return
-														}
-
-														elem = origElem
-													case 't': // Prefix: "token"
-														origElem := elem
-														if l := len("token"); len(elem) >= l && elem[0:l] == "token" {
-															elem = elem[l:]
-														} else {
-															break
-														}
-
-														if len(elem) == 0 {
-															switch r.Method {
-															case "GET":
-																s.handleHtcProjectsProjectIdTasksTaskIdStorageTokenGetRequest([2]string{
-																	args[0],
-																	args[1],
-																}, elemIsEscaped, w, r)
-															default:
-																s.notAllowed(w, r, "GET")
-															}
-
-															return
-														}
-														switch elem[0] {
-														case '/': // Prefix: "/"
-															origElem := elem
-															if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
-																elem = elem[l:]
-															} else {
-																break
-															}
-
-															// Param: "region"
-															// Leaf parameter
-															args[2] = elem
-															elem = ""
-
-															if len(elem) == 0 {
-																// Leaf node.
-																switch r.Method {
-																case "GET":
-																	s.handleHtcProjectsProjectIdTasksTaskIdStorageTokenRegionGetRequest([3]string{
-																		args[0],
-																		args[1],
-																		args[2],
-																	}, elemIsEscaped, w, r)
-																default:
-																	s.notAllowed(w, r, "GET")
-																}
-
-																return
-															}
-
-															elem = origElem
-														case 's': // Prefix: "s"
-															origElem := elem
-															if l := len("s"); len(elem) >= l && elem[0:l] == "s" {
-																elem = elem[l:]
-															} else {
-																break
-															}
-
-															if len(elem) == 0 {
-																// Leaf node.
-																switch r.Method {
-																case "GET":
-																	s.handleHtcProjectsProjectIdTasksTaskIdStorageTokensGetRequest([2]string{
-																		args[0],
-																		args[1],
-																	}, elemIsEscaped, w, r)
-																default:
-																	s.notAllowed(w, r, "GET")
-																}
-
-																return
-															}
-
-															elem = origElem
-														}
-
-														elem = origElem
-													}
-
-													elem = origElem
-												case 'u': // Prefix: "ummary-statistics"
-													origElem := elem
-													if l := len("ummary-statistics"); len(elem) >= l && elem[0:l] == "ummary-statistics" {
+													if l := len("presigned-url"); len(elem) >= l && elem[0:l] == "presigned-url" {
 														elem = elem[l:]
 													} else {
 														break
@@ -1149,7 +1007,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 														// Leaf node.
 														switch r.Method {
 														case "GET":
-															s.handleHtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetRequest([2]string{
+															s.handleHtcProjectsProjectIdTasksTaskIdStoragePresignedURLGetRequest([2]string{
 																args[0],
 																args[1],
 															}, elemIsEscaped, w, r)
@@ -1158,6 +1016,109 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 														}
 
 														return
+													}
+
+													elem = origElem
+												case 'r': // Prefix: "regional-storage"
+													origElem := elem
+													if l := len("regional-storage"); len(elem) >= l && elem[0:l] == "regional-storage" {
+														elem = elem[l:]
+													} else {
+														break
+													}
+
+													if len(elem) == 0 {
+														// Leaf node.
+														switch r.Method {
+														case "GET":
+															s.handleHtcProjectsProjectIdTasksTaskIdStorageRegionalStorageGetRequest([2]string{
+																args[0],
+																args[1],
+															}, elemIsEscaped, w, r)
+														default:
+															s.notAllowed(w, r, "GET")
+														}
+
+														return
+													}
+
+													elem = origElem
+												case 't': // Prefix: "token"
+													origElem := elem
+													if l := len("token"); len(elem) >= l && elem[0:l] == "token" {
+														elem = elem[l:]
+													} else {
+														break
+													}
+
+													if len(elem) == 0 {
+														switch r.Method {
+														case "GET":
+															s.handleHtcProjectsProjectIdTasksTaskIdStorageTokenGetRequest([2]string{
+																args[0],
+																args[1],
+															}, elemIsEscaped, w, r)
+														default:
+															s.notAllowed(w, r, "GET")
+														}
+
+														return
+													}
+													switch elem[0] {
+													case '/': // Prefix: "/"
+														origElem := elem
+														if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+															elem = elem[l:]
+														} else {
+															break
+														}
+
+														// Param: "region"
+														// Leaf parameter
+														args[2] = elem
+														elem = ""
+
+														if len(elem) == 0 {
+															// Leaf node.
+															switch r.Method {
+															case "GET":
+																s.handleHtcProjectsProjectIdTasksTaskIdStorageTokenRegionGetRequest([3]string{
+																	args[0],
+																	args[1],
+																	args[2],
+																}, elemIsEscaped, w, r)
+															default:
+																s.notAllowed(w, r, "GET")
+															}
+
+															return
+														}
+
+														elem = origElem
+													case 's': // Prefix: "s"
+														origElem := elem
+														if l := len("s"); len(elem) >= l && elem[0:l] == "s" {
+															elem = elem[l:]
+														} else {
+															break
+														}
+
+														if len(elem) == 0 {
+															// Leaf node.
+															switch r.Method {
+															case "GET":
+																s.handleHtcProjectsProjectIdTasksTaskIdStorageTokensGetRequest([2]string{
+																	args[0],
+																	args[1],
+																}, elemIsEscaped, w, r)
+															default:
+																s.notAllowed(w, r, "GET")
+															}
+
+															return
+														}
+
+														elem = origElem
 													}
 
 													elem = origElem
@@ -1835,7 +1796,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											switch method {
 											case "GET":
 												r.name = "HtcProjectsProjectIdContainerRegistryImagesImageNameGet"
-												r.summary = "Get Image"
+												r.summary = "Get image status"
 												r.operationID = ""
 												r.pathPattern = "/htc/projects/{projectId}/container-registry/images/{imageName}"
 												r.args = args
@@ -2540,9 +2501,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 												}
 
 												elem = origElem
-											case 's': // Prefix: "s"
+											case 's': // Prefix: "storage/"
 												origElem := elem
-												if l := len("s"); len(elem) >= l && elem[0:l] == "s" {
+												if l := len("storage/"); len(elem) >= l && elem[0:l] == "storage/" {
 													elem = elem[l:]
 												} else {
 													break
@@ -2552,155 +2513,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 													break
 												}
 												switch elem[0] {
-												case 't': // Prefix: "torage/"
+												case 'p': // Prefix: "presigned-url"
 													origElem := elem
-													if l := len("torage/"); len(elem) >= l && elem[0:l] == "torage/" {
-														elem = elem[l:]
-													} else {
-														break
-													}
-
-													if len(elem) == 0 {
-														break
-													}
-													switch elem[0] {
-													case 'p': // Prefix: "presigned-url"
-														origElem := elem
-														if l := len("presigned-url"); len(elem) >= l && elem[0:l] == "presigned-url" {
-															elem = elem[l:]
-														} else {
-															break
-														}
-
-														if len(elem) == 0 {
-															// Leaf node.
-															switch method {
-															case "GET":
-																r.name = "HtcProjectsProjectIdTasksTaskIdStoragePresignedURLGet"
-																r.summary = "Get Task Storage Presigned URL"
-																r.operationID = ""
-																r.pathPattern = "/htc/projects/{projectId}/tasks/{taskId}/storage/presigned-url"
-																r.args = args
-																r.count = 2
-																return r, true
-															default:
-																return
-															}
-														}
-
-														elem = origElem
-													case 'r': // Prefix: "regional-storage"
-														origElem := elem
-														if l := len("regional-storage"); len(elem) >= l && elem[0:l] == "regional-storage" {
-															elem = elem[l:]
-														} else {
-															break
-														}
-
-														if len(elem) == 0 {
-															// Leaf node.
-															switch method {
-															case "GET":
-																r.name = "HtcProjectsProjectIdTasksTaskIdStorageRegionalStorageGet"
-																r.summary = "Get All Task Storage Tokens"
-																r.operationID = ""
-																r.pathPattern = "/htc/projects/{projectId}/tasks/{taskId}/storage/regional-storage"
-																r.args = args
-																r.count = 2
-																return r, true
-															default:
-																return
-															}
-														}
-
-														elem = origElem
-													case 't': // Prefix: "token"
-														origElem := elem
-														if l := len("token"); len(elem) >= l && elem[0:l] == "token" {
-															elem = elem[l:]
-														} else {
-															break
-														}
-
-														if len(elem) == 0 {
-															switch method {
-															case "GET":
-																r.name = "HtcProjectsProjectIdTasksTaskIdStorageTokenGet"
-																r.summary = "Get Task Storage Token"
-																r.operationID = ""
-																r.pathPattern = "/htc/projects/{projectId}/tasks/{taskId}/storage/token"
-																r.args = args
-																r.count = 2
-																return r, true
-															default:
-																return
-															}
-														}
-														switch elem[0] {
-														case '/': // Prefix: "/"
-															origElem := elem
-															if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
-																elem = elem[l:]
-															} else {
-																break
-															}
-
-															// Param: "region"
-															// Leaf parameter
-															args[2] = elem
-															elem = ""
-
-															if len(elem) == 0 {
-																// Leaf node.
-																switch method {
-																case "GET":
-																	r.name = "HtcProjectsProjectIdTasksTaskIdStorageTokenRegionGet"
-																	r.summary = "Get Task Storage Token for a Region"
-																	r.operationID = ""
-																	r.pathPattern = "/htc/projects/{projectId}/tasks/{taskId}/storage/token/{region}"
-																	r.args = args
-																	r.count = 3
-																	return r, true
-																default:
-																	return
-																}
-															}
-
-															elem = origElem
-														case 's': // Prefix: "s"
-															origElem := elem
-															if l := len("s"); len(elem) >= l && elem[0:l] == "s" {
-																elem = elem[l:]
-															} else {
-																break
-															}
-
-															if len(elem) == 0 {
-																// Leaf node.
-																switch method {
-																case "GET":
-																	r.name = "HtcProjectsProjectIdTasksTaskIdStorageTokensGet"
-																	r.summary = "Get All Task Storage Tokens"
-																	r.operationID = ""
-																	r.pathPattern = "/htc/projects/{projectId}/tasks/{taskId}/storage/tokens"
-																	r.args = args
-																	r.count = 2
-																	return r, true
-																default:
-																	return
-																}
-															}
-
-															elem = origElem
-														}
-
-														elem = origElem
-													}
-
-													elem = origElem
-												case 'u': // Prefix: "ummary-statistics"
-													origElem := elem
-													if l := len("ummary-statistics"); len(elem) >= l && elem[0:l] == "ummary-statistics" {
+													if l := len("presigned-url"); len(elem) >= l && elem[0:l] == "presigned-url" {
 														elem = elem[l:]
 													} else {
 														break
@@ -2710,16 +2525,122 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 														// Leaf node.
 														switch method {
 														case "GET":
-															r.name = "HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGet"
-															r.summary = "Get Task Summary Statistics"
+															r.name = "HtcProjectsProjectIdTasksTaskIdStoragePresignedURLGet"
+															r.summary = "Get Task Storage Presigned URL"
 															r.operationID = ""
-															r.pathPattern = "/htc/projects/{projectId}/tasks/{taskId}/summary-statistics"
+															r.pathPattern = "/htc/projects/{projectId}/tasks/{taskId}/storage/presigned-url"
 															r.args = args
 															r.count = 2
 															return r, true
 														default:
 															return
 														}
+													}
+
+													elem = origElem
+												case 'r': // Prefix: "regional-storage"
+													origElem := elem
+													if l := len("regional-storage"); len(elem) >= l && elem[0:l] == "regional-storage" {
+														elem = elem[l:]
+													} else {
+														break
+													}
+
+													if len(elem) == 0 {
+														// Leaf node.
+														switch method {
+														case "GET":
+															r.name = "HtcProjectsProjectIdTasksTaskIdStorageRegionalStorageGet"
+															r.summary = "Get All Task Storage Tokens"
+															r.operationID = ""
+															r.pathPattern = "/htc/projects/{projectId}/tasks/{taskId}/storage/regional-storage"
+															r.args = args
+															r.count = 2
+															return r, true
+														default:
+															return
+														}
+													}
+
+													elem = origElem
+												case 't': // Prefix: "token"
+													origElem := elem
+													if l := len("token"); len(elem) >= l && elem[0:l] == "token" {
+														elem = elem[l:]
+													} else {
+														break
+													}
+
+													if len(elem) == 0 {
+														switch method {
+														case "GET":
+															r.name = "HtcProjectsProjectIdTasksTaskIdStorageTokenGet"
+															r.summary = "Get Task Storage Token"
+															r.operationID = ""
+															r.pathPattern = "/htc/projects/{projectId}/tasks/{taskId}/storage/token"
+															r.args = args
+															r.count = 2
+															return r, true
+														default:
+															return
+														}
+													}
+													switch elem[0] {
+													case '/': // Prefix: "/"
+														origElem := elem
+														if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+															elem = elem[l:]
+														} else {
+															break
+														}
+
+														// Param: "region"
+														// Leaf parameter
+														args[2] = elem
+														elem = ""
+
+														if len(elem) == 0 {
+															// Leaf node.
+															switch method {
+															case "GET":
+																r.name = "HtcProjectsProjectIdTasksTaskIdStorageTokenRegionGet"
+																r.summary = "Get Task Storage Token for a Region"
+																r.operationID = ""
+																r.pathPattern = "/htc/projects/{projectId}/tasks/{taskId}/storage/token/{region}"
+																r.args = args
+																r.count = 3
+																return r, true
+															default:
+																return
+															}
+														}
+
+														elem = origElem
+													case 's': // Prefix: "s"
+														origElem := elem
+														if l := len("s"); len(elem) >= l && elem[0:l] == "s" {
+															elem = elem[l:]
+														} else {
+															break
+														}
+
+														if len(elem) == 0 {
+															// Leaf node.
+															switch method {
+															case "GET":
+																r.name = "HtcProjectsProjectIdTasksTaskIdStorageTokensGet"
+																r.summary = "Get All Task Storage Tokens"
+																r.operationID = ""
+																r.pathPattern = "/htc/projects/{projectId}/tasks/{taskId}/storage/tokens"
+																r.args = args
+																r.count = 2
+																return r, true
+															default:
+																return
+															}
+														}
+
+														elem = origElem
 													}
 
 													elem = origElem

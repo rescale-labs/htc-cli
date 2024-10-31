@@ -32,11 +32,8 @@ func getMetrics(ctx context.Context, c *oapi.Client) (io.Reader, error) {
 }
 
 func Get(cmd *cobra.Command, args []string) error {
-	runner, err := common.NewRunner(cmd)
+	runner, err := common.NewRunnerWithToken(cmd, time.Now())
 	if err != nil {
-		return err
-	}
-	if err := runner.UpdateToken(time.Now()); err != nil {
 		return err
 	}
 

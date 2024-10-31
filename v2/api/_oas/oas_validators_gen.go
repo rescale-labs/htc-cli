@@ -428,6 +428,8 @@ func (s HTCComputeEnvironmentRegion) Validate() error {
 		return nil
 	case "AZURE_US_EAST_2":
 		return nil
+	case "AZURE_US_SOUTHCENTRAL":
+		return nil
 	case "AZURE_EU_NORTH":
 		return nil
 	case "RC_ICELAND_1":
@@ -1020,6 +1022,31 @@ func (s *HTCJobSubmitRequest) Validate() error {
 	return nil
 }
 
+func (s HTCJobSubmitRequests) Validate() error {
+	alias := ([]HTCJobSubmitRequest)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	var failures []validate.FieldError
+	for i, elem := range alias {
+		if err := func() error {
+			if err := elem.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			failures = append(failures, validate.FieldError{
+				Name:  fmt.Sprintf("[%d]", i),
+				Error: err,
+			})
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
 func (s *HTCLimitCreate) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -1098,6 +1125,31 @@ func (s *HTCProject) Validate() error {
 			Name:  "regions",
 			Error: err,
 		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s HTCProjectDimensions) Validate() error {
+	alias := ([]HTCComputeEnvironment)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	var failures []validate.FieldError
+	for i, elem := range alias {
+		if err := func() error {
+			if err := elem.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			failures = append(failures, validate.FieldError{
+				Name:  fmt.Sprintf("[%d]", i),
+				Error: err,
+			})
+		}
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
@@ -1421,6 +1473,8 @@ func (s HTCRegionAdminSettingsRegion) Validate() error {
 		return nil
 	case "AZURE_US_EAST_2":
 		return nil
+	case "AZURE_US_SOUTHCENTRAL":
+		return nil
 	case "AZURE_EU_NORTH":
 		return nil
 	case "RC_ICELAND_1":
@@ -1713,31 +1767,6 @@ func (s *HTCWorkspaceLimit) Validate() error {
 	return nil
 }
 
-func (s HtcProjectsProjectIdDimensionsGetOKApplicationJSON) Validate() error {
-	alias := ([]HTCComputeEnvironment)(s)
-	if alias == nil {
-		return errors.New("nil is invalid value")
-	}
-	var failures []validate.FieldError
-	for i, elem := range alias {
-		if err := func() error {
-			if err := elem.Validate(); err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			failures = append(failures, validate.FieldError{
-				Name:  fmt.Sprintf("[%d]", i),
-				Error: err,
-			})
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
 func (s HtcProjectsProjectIdDimensionsPutCreatedApplicationJSON) Validate() error {
 	alias := ([]HTCComputeEnvironment)(s)
 	if alias == nil {
@@ -1810,31 +1839,6 @@ func (s HtcProjectsProjectIdTasksTaskIdGroupsGetOKApplicationJSON) Validate() er
 	alias := ([]string)(s)
 	if alias == nil {
 		return errors.New("nil is invalid value")
-	}
-	return nil
-}
-
-func (s HtcProjectsProjectIdTasksTaskIdJobsBatchPostOKApplicationJSON) Validate() error {
-	alias := ([]HTCJobSubmitRequest)(s)
-	if alias == nil {
-		return errors.New("nil is invalid value")
-	}
-	var failures []validate.FieldError
-	for i, elem := range alias {
-		if err := func() error {
-			if err := elem.Validate(); err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			failures = append(failures, validate.FieldError{
-				Name:  fmt.Sprintf("[%d]", i),
-				Error: err,
-			})
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
 	}
 	return nil
 }
@@ -2201,6 +2205,8 @@ func (s RescaleRegion) Validate() error {
 		return nil
 	case "AZURE_US_EAST_2":
 		return nil
+	case "AZURE_US_SOUTHCENTRAL":
+		return nil
 	case "AZURE_EU_NORTH":
 		return nil
 	case "RC_ICELAND_1":
@@ -2384,6 +2390,10 @@ func (s SupportedRescaleRegion) Validate() error {
 	case "GCP_EU_WEST_4":
 		return nil
 	case "GCP_CA_CENTRAL_1":
+		return nil
+	case "AZURE_US_WEST_2":
+		return nil
+	case "AZURE_US_SOUTHCENTRAL":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)

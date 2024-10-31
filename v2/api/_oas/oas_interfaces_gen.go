@@ -185,10 +185,6 @@ type HtcProjectsProjectIdTasksTaskIdStorageTokensGetRes interface {
 	htcProjectsProjectIdTasksTaskIdStorageTokensGetRes()
 }
 
-type HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetRes interface {
-	htcProjectsProjectIdTasksTaskIdSummaryStatisticsGetRes()
-}
-
 type HtcRegionsGetRes interface {
 	htcRegionsGetRes()
 }

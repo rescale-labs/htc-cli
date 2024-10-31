@@ -582,6 +582,41 @@ func decodeHtcProjectsProjectIdContainerRegistryImagesImageNameGetResponse(resp 
 	case 403:
 		// Code 403.
 		return &HtcProjectsProjectIdContainerRegistryImagesImageNameGetForbidden{}, nil
+	case 404:
+		// Code 404.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
 	}
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
@@ -715,7 +750,7 @@ func decodeHtcProjectsProjectIdDimensionsGetResponse(resp *http.Response) (res H
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response HtcProjectsProjectIdDimensionsGetOKApplicationJSON
+			var response HTCProjectDimensions
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1871,7 +1906,7 @@ func decodeHtcProjectsProjectIdTasksTaskIdJobsBatchPostResponse(resp *http.Respo
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response HtcProjectsProjectIdTasksTaskIdJobsBatchPostOKApplicationJSON
+			var response HTCJobSubmitRequests
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1896,6 +1931,41 @@ func decodeHtcProjectsProjectIdTasksTaskIdJobsBatchPostResponse(resp *http.Respo
 				return nil
 			}(); err != nil {
 				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 400:
+		// Code 400.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response HTCRequestError
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
 			}
 			return &response, nil
 		default:
@@ -2455,53 +2525,6 @@ func decodeHtcProjectsProjectIdTasksTaskIdStorageTokensGetResponse(resp *http.Re
 	case 403:
 		// Code 403.
 		return &HtcProjectsProjectIdTasksTaskIdStorageTokensGetForbidden{}, nil
-	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
-}
-
-func decodeHtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetResponse(resp *http.Response) (res HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetRes, _ error) {
-	switch resp.StatusCode {
-	case 200:
-		// Code 200.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response JobStatusSummary
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			return &response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	case 401:
-		// Code 401.
-		return &HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetUnauthorized{}, nil
-	case 403:
-		// Code 403.
-		return &HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetForbidden{}, nil
 	}
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }

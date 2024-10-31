@@ -18,11 +18,14 @@ func LimitsGet(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	projectId := args[0]
+	p := common.IDParams{RequireProjectId: true}
+	if err := runner.GetIds(&p); err != nil {
+		return err
+	}
 
 	ctx := context.Background()
 	res, err := runner.Client.HtcProjectsProjectIdLimitsGet(ctx,
-		oapi.HtcProjectsProjectIdLimitsGetParams{ProjectId: projectId})
+		oapi.HtcProjectsProjectIdLimitsGetParams{ProjectId: p.ProjectId})
 	if err != nil {
 		return err
 	}
@@ -44,26 +47,27 @@ var LimitsCmd = &cobra.Command{
 }
 
 var LimitsGetCmd = &cobra.Command{
-	Use:   "get PROJECT_ID",
+	Use:   "get",
 	Short: "Returns limits for an HTC project",
 	Run:   common.WrapRunE(LimitsGet),
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(0),
 }
 
-var LimitsApplyCmd = &cobra.Command{
-	Use:   "apply PROJECT_ID",
-	Short: "Sets limits for an HTC project",
-	Run:   common.WrapRunE(LimitsGet),
-	Args:  cobra.ExactArgs(1),
-}
-
-var LimitsDeleteCmd = &cobra.Command{
-	Use:   "delete PROJECT_ID",
-	Short: "Deletes limits for an HTC project",
-	Run:   common.WrapRunE(LimitsGet),
-	Args:  cobra.ExactArgs(1),
-}
+// var LimitsApplyCmd = &cobra.Command{
+// 	Use:   "apply",
+// 	Short: "Sets limits for an HTC project",
+// 	Run:   common.WrapRunE(LimitsGet),
+// 	Args:  cobra.ExactArgs(0),
+// }
+//
+// var LimitsDeleteCmd = &cobra.Command{
+// 	Use:   "delete",
+// 	Short: "Deletes limits for an HTC project",
+// 	Run:   common.WrapRunE(LimitsGet),
+// 	Args:  cobra.ExactArgs(0),
+// }
 
 func init() {
+	LimitsGetCmd.Flags().String("project-id", "", "HTC project ID")
 	LimitsCmd.AddCommand(LimitsGetCmd)
 }

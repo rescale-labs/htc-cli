@@ -44,11 +44,8 @@ func Get(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("Error setting limit: %w", err)
 	}
 
-	runner, err := common.NewRunner(cmd)
+	runner, err := common.NewRunnerWithToken(cmd, time.Now())
 	if err != nil {
-		return err
-	}
-	if err := runner.UpdateToken(time.Now()); err != nil {
 		return err
 	}
 

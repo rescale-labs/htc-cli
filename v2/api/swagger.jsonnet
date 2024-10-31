@@ -50,6 +50,19 @@ local patches = {
         },
       },
     },
+    '/htc/projects/{projectId}/dimensions'+: {
+      get+: {
+        responses+: {
+          '200'+: {
+            content+: {
+              'application/json'+: {
+                schema: { '$ref': '#/components/schemas/HTCProjectDimensions' },
+              },
+            },
+          },
+        },
+      },
+    },
     '/htc/projects/{projectId}/limits'+: {
       get+: {
         responses+: {
@@ -78,18 +91,50 @@ local patches = {
         },
       },
     },
+    '/htc/projects/{projectId}/tasks/{taskId}/jobs/batch'+: {
+      post+: {
+        responses+: {
+          '200'+: {
+            content+: {
+              'application/json'+: {
+                schema: { '$ref':
+                  '#/components/schemas/HTCJobSubmitRequests' },
+              },
+            },
+          },
+          '400': {
+            content: {
+              'application/json': {
+                schema: { '$ref': '#/components/schemas/HTCRequestError' },
+              },
+            },
+          },
+        },
+      },
+    },
   },
   components+: {
     schemas+: {
-      HTCTokenPayload: { type: 'string' },
-      // They said it was only ever a string! But this isn't always
-      // true.
+      HTCJobSubmitRequests: {
+        items: {
+          '$ref': '#/components/schemas/HTCJobSubmitRequest',
+        },
+        type: 'array',
+      },
       HTCProject+: {
         properties+: {
           organizationCode+: {
+            // The docs said it was only ever a string! But sometimes
+            // it's null and then we fail at runtime :-(
             nullable: true,
           },
         },
+      },
+      HTCProjectDimensions: {
+        items: {
+          '$ref': '#/components/schemas/HTCComputeEnvironment',
+        },
+        type: 'array',
       },
       HTCProjectLimits: {
         items: {
@@ -111,6 +156,14 @@ local patches = {
             type: 'string',
             example: 'https://page2.com',
           },
+        },
+      },
+      HTCRequestError: {  // Catchall for many HTC error responses
+        type: 'object',
+        properties: {
+          errorType: { type: 'string' },
+          errorDescription: { type: 'string' },
+          message: { type: 'string' },
         },
       },
       HTCTask+: {
@@ -139,6 +192,7 @@ local patches = {
           },
         },
       },
+      HTCTokenPayload: { type: 'string' },
     },
   },
 };

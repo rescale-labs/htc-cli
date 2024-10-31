@@ -574,6 +574,8 @@ type HTCComputeEnvironmentDerived struct {
 	Architecture OptHTCComputeEnvironmentDerivedArchitecture `json:"architecture"`
 	// The total memory available in the compute environment.
 	Memory OptFloat64 `json:"memory"`
+	// If swap is enabled for the node pool. Only for GCP.
+	Swap OptBool `json:"swap"`
 	// The number of virtual CPU cores allocated to the environment.
 	VCPUs OptInt32 `json:"vCPUs"`
 }
@@ -586,6 +588,11 @@ func (s *HTCComputeEnvironmentDerived) GetArchitecture() OptHTCComputeEnvironmen
 // GetMemory returns the value of Memory.
 func (s *HTCComputeEnvironmentDerived) GetMemory() OptFloat64 {
 	return s.Memory
+}
+
+// GetSwap returns the value of Swap.
+func (s *HTCComputeEnvironmentDerived) GetSwap() OptBool {
+	return s.Swap
 }
 
 // GetVCPUs returns the value of VCPUs.
@@ -601,6 +608,11 @@ func (s *HTCComputeEnvironmentDerived) SetArchitecture(val OptHTCComputeEnvironm
 // SetMemory sets the value of Memory.
 func (s *HTCComputeEnvironmentDerived) SetMemory(val OptFloat64) {
 	s.Memory = val
+}
+
+// SetSwap sets the value of Swap.
+func (s *HTCComputeEnvironmentDerived) SetSwap(val OptBool) {
+	s.Swap = val
 }
 
 // SetVCPUs sets the value of VCPUs.
@@ -700,35 +712,36 @@ func (s *HTCComputeEnvironmentPriority) UnmarshalText(data []byte) error {
 type HTCComputeEnvironmentRegion string
 
 const (
-	HTCComputeEnvironmentRegionAWSAPSOUTHEAST1   HTCComputeEnvironmentRegion = "AWS_AP_SOUTHEAST_1"
-	HTCComputeEnvironmentRegionAWSCACENTRAL1     HTCComputeEnvironmentRegion = "AWS_CA_CENTRAL_1"
-	HTCComputeEnvironmentRegionAWSEUNORTH1       HTCComputeEnvironmentRegion = "AWS_EU_NORTH_1"
-	HTCComputeEnvironmentRegionAWSEUCENTRAL1     HTCComputeEnvironmentRegion = "AWS_EU_CENTRAL_1"
-	HTCComputeEnvironmentRegionAWSEUWEST1        HTCComputeEnvironmentRegion = "AWS_EU_WEST_1"
-	HTCComputeEnvironmentRegionAWSEUWEST2        HTCComputeEnvironmentRegion = "AWS_EU_WEST_2"
-	HTCComputeEnvironmentRegionAWSEUWEST3        HTCComputeEnvironmentRegion = "AWS_EU_WEST_3"
-	HTCComputeEnvironmentRegionAWSSAEAST1        HTCComputeEnvironmentRegion = "AWS_SA_EAST_1"
-	HTCComputeEnvironmentRegionAWSUSEAST2        HTCComputeEnvironmentRegion = "AWS_US_EAST_2"
-	HTCComputeEnvironmentRegionAWSUSWEST2        HTCComputeEnvironmentRegion = "AWS_US_WEST_2"
-	HTCComputeEnvironmentRegionAWSUSEAST1        HTCComputeEnvironmentRegion = "AWS_US_EAST_1"
-	HTCComputeEnvironmentRegionGCPASIASOUTHEAST1 HTCComputeEnvironmentRegion = "GCP_ASIA_SOUTHEAST_1"
-	HTCComputeEnvironmentRegionGCPUSCENTRAL1     HTCComputeEnvironmentRegion = "GCP_US_CENTRAL_1"
-	HTCComputeEnvironmentRegionGCPUSEAST1        HTCComputeEnvironmentRegion = "GCP_US_EAST_1"
-	HTCComputeEnvironmentRegionGCPUSEAST2        HTCComputeEnvironmentRegion = "GCP_US_EAST_2"
-	HTCComputeEnvironmentRegionGCPUSEAST4        HTCComputeEnvironmentRegion = "GCP_US_EAST_4"
-	HTCComputeEnvironmentRegionGCPUSWEST1        HTCComputeEnvironmentRegion = "GCP_US_WEST_1"
-	HTCComputeEnvironmentRegionGCPUSWEST4        HTCComputeEnvironmentRegion = "GCP_US_WEST_4"
-	HTCComputeEnvironmentRegionGCPEUWEST1        HTCComputeEnvironmentRegion = "GCP_EU_WEST_1"
-	HTCComputeEnvironmentRegionGCPEUWEST2        HTCComputeEnvironmentRegion = "GCP_EU_WEST_2"
-	HTCComputeEnvironmentRegionGCPEUWEST3        HTCComputeEnvironmentRegion = "GCP_EU_WEST_3"
-	HTCComputeEnvironmentRegionGCPEUWEST4        HTCComputeEnvironmentRegion = "GCP_EU_WEST_4"
-	HTCComputeEnvironmentRegionGCPCACENTRAL1     HTCComputeEnvironmentRegion = "GCP_CA_CENTRAL_1"
-	HTCComputeEnvironmentRegionNGCENOCH1         HTCComputeEnvironmentRegion = "NGC_ENOCH_1"
-	HTCComputeEnvironmentRegionAZUREUSWEST2      HTCComputeEnvironmentRegion = "AZURE_US_WEST_2"
-	HTCComputeEnvironmentRegionAZUREUSEAST2      HTCComputeEnvironmentRegion = "AZURE_US_EAST_2"
-	HTCComputeEnvironmentRegionAZUREEUNORTH      HTCComputeEnvironmentRegion = "AZURE_EU_NORTH"
-	HTCComputeEnvironmentRegionRCICELAND1        HTCComputeEnvironmentRegion = "RC_ICELAND_1"
-	HTCComputeEnvironmentRegionUNASSIGNED        HTCComputeEnvironmentRegion = "UNASSIGNED"
+	HTCComputeEnvironmentRegionAWSAPSOUTHEAST1     HTCComputeEnvironmentRegion = "AWS_AP_SOUTHEAST_1"
+	HTCComputeEnvironmentRegionAWSCACENTRAL1       HTCComputeEnvironmentRegion = "AWS_CA_CENTRAL_1"
+	HTCComputeEnvironmentRegionAWSEUNORTH1         HTCComputeEnvironmentRegion = "AWS_EU_NORTH_1"
+	HTCComputeEnvironmentRegionAWSEUCENTRAL1       HTCComputeEnvironmentRegion = "AWS_EU_CENTRAL_1"
+	HTCComputeEnvironmentRegionAWSEUWEST1          HTCComputeEnvironmentRegion = "AWS_EU_WEST_1"
+	HTCComputeEnvironmentRegionAWSEUWEST2          HTCComputeEnvironmentRegion = "AWS_EU_WEST_2"
+	HTCComputeEnvironmentRegionAWSEUWEST3          HTCComputeEnvironmentRegion = "AWS_EU_WEST_3"
+	HTCComputeEnvironmentRegionAWSSAEAST1          HTCComputeEnvironmentRegion = "AWS_SA_EAST_1"
+	HTCComputeEnvironmentRegionAWSUSEAST2          HTCComputeEnvironmentRegion = "AWS_US_EAST_2"
+	HTCComputeEnvironmentRegionAWSUSWEST2          HTCComputeEnvironmentRegion = "AWS_US_WEST_2"
+	HTCComputeEnvironmentRegionAWSUSEAST1          HTCComputeEnvironmentRegion = "AWS_US_EAST_1"
+	HTCComputeEnvironmentRegionGCPASIASOUTHEAST1   HTCComputeEnvironmentRegion = "GCP_ASIA_SOUTHEAST_1"
+	HTCComputeEnvironmentRegionGCPUSCENTRAL1       HTCComputeEnvironmentRegion = "GCP_US_CENTRAL_1"
+	HTCComputeEnvironmentRegionGCPUSEAST1          HTCComputeEnvironmentRegion = "GCP_US_EAST_1"
+	HTCComputeEnvironmentRegionGCPUSEAST2          HTCComputeEnvironmentRegion = "GCP_US_EAST_2"
+	HTCComputeEnvironmentRegionGCPUSEAST4          HTCComputeEnvironmentRegion = "GCP_US_EAST_4"
+	HTCComputeEnvironmentRegionGCPUSWEST1          HTCComputeEnvironmentRegion = "GCP_US_WEST_1"
+	HTCComputeEnvironmentRegionGCPUSWEST4          HTCComputeEnvironmentRegion = "GCP_US_WEST_4"
+	HTCComputeEnvironmentRegionGCPEUWEST1          HTCComputeEnvironmentRegion = "GCP_EU_WEST_1"
+	HTCComputeEnvironmentRegionGCPEUWEST2          HTCComputeEnvironmentRegion = "GCP_EU_WEST_2"
+	HTCComputeEnvironmentRegionGCPEUWEST3          HTCComputeEnvironmentRegion = "GCP_EU_WEST_3"
+	HTCComputeEnvironmentRegionGCPEUWEST4          HTCComputeEnvironmentRegion = "GCP_EU_WEST_4"
+	HTCComputeEnvironmentRegionGCPCACENTRAL1       HTCComputeEnvironmentRegion = "GCP_CA_CENTRAL_1"
+	HTCComputeEnvironmentRegionNGCENOCH1           HTCComputeEnvironmentRegion = "NGC_ENOCH_1"
+	HTCComputeEnvironmentRegionAZUREUSWEST2        HTCComputeEnvironmentRegion = "AZURE_US_WEST_2"
+	HTCComputeEnvironmentRegionAZUREUSEAST2        HTCComputeEnvironmentRegion = "AZURE_US_EAST_2"
+	HTCComputeEnvironmentRegionAZUREUSSOUTHCENTRAL HTCComputeEnvironmentRegion = "AZURE_US_SOUTHCENTRAL"
+	HTCComputeEnvironmentRegionAZUREEUNORTH        HTCComputeEnvironmentRegion = "AZURE_EU_NORTH"
+	HTCComputeEnvironmentRegionRCICELAND1          HTCComputeEnvironmentRegion = "RC_ICELAND_1"
+	HTCComputeEnvironmentRegionUNASSIGNED          HTCComputeEnvironmentRegion = "UNASSIGNED"
 )
 
 // AllValues returns all HTCComputeEnvironmentRegion values.
@@ -760,6 +773,7 @@ func (HTCComputeEnvironmentRegion) AllValues() []HTCComputeEnvironmentRegion {
 		HTCComputeEnvironmentRegionNGCENOCH1,
 		HTCComputeEnvironmentRegionAZUREUSWEST2,
 		HTCComputeEnvironmentRegionAZUREUSEAST2,
+		HTCComputeEnvironmentRegionAZUREUSSOUTHCENTRAL,
 		HTCComputeEnvironmentRegionAZUREEUNORTH,
 		HTCComputeEnvironmentRegionRCICELAND1,
 		HTCComputeEnvironmentRegionUNASSIGNED,
@@ -820,6 +834,8 @@ func (s HTCComputeEnvironmentRegion) MarshalText() ([]byte, error) {
 	case HTCComputeEnvironmentRegionAZUREUSWEST2:
 		return []byte(s), nil
 	case HTCComputeEnvironmentRegionAZUREUSEAST2:
+		return []byte(s), nil
+	case HTCComputeEnvironmentRegionAZUREUSSOUTHCENTRAL:
 		return []byte(s), nil
 	case HTCComputeEnvironmentRegionAZUREEUNORTH:
 		return []byte(s), nil
@@ -912,6 +928,9 @@ func (s *HTCComputeEnvironmentRegion) UnmarshalText(data []byte) error {
 		return nil
 	case HTCComputeEnvironmentRegionAZUREUSEAST2:
 		*s = HTCComputeEnvironmentRegionAZUREUSEAST2
+		return nil
+	case HTCComputeEnvironmentRegionAZUREUSSOUTHCENTRAL:
+		*s = HTCComputeEnvironmentRegionAZUREUSSOUTHCENTRAL
 		return nil
 	case HTCComputeEnvironmentRegionAZUREEUNORTH:
 		*s = HTCComputeEnvironmentRegionAZUREEUNORTH
@@ -1764,6 +1783,10 @@ func (s *HTCJobSubmitRequest) SetWorkspaceId(val OptString) {
 	s.WorkspaceId = val
 }
 
+type HTCJobSubmitRequests []HTCJobSubmitRequest
+
+func (*HTCJobSubmitRequests) htcProjectsProjectIdTasksTaskIdJobsBatchPostRes() {}
+
 // Ref: #/components/schemas/HTCLimitCreate
 type HTCLimitCreate struct {
 	ModifierRole ModifierRole `json:"modifierRole"`
@@ -2003,6 +2026,10 @@ func (s *HTCProject) SetWorkspaceId(val OptString) {
 func (*HTCProject) htcProjectsPostRes()           {}
 func (*HTCProject) htcProjectsProjectIdGetRes()   {}
 func (*HTCProject) htcProjectsProjectIdPatchRes() {}
+
+type HTCProjectDimensions []HTCComputeEnvironment
+
+func (*HTCProjectDimensions) htcProjectsProjectIdDimensionsGetRes() {}
 
 // Ref: #/components/schemas/HTCProjectLimit
 type HTCProjectLimit struct {
@@ -2286,35 +2313,36 @@ func (*HTCRegionAdminSettings) htcRegionsRegionGetRes() {}
 type HTCRegionAdminSettingsRegion string
 
 const (
-	HTCRegionAdminSettingsRegionAWSAPSOUTHEAST1   HTCRegionAdminSettingsRegion = "AWS_AP_SOUTHEAST_1"
-	HTCRegionAdminSettingsRegionAWSCACENTRAL1     HTCRegionAdminSettingsRegion = "AWS_CA_CENTRAL_1"
-	HTCRegionAdminSettingsRegionAWSEUNORTH1       HTCRegionAdminSettingsRegion = "AWS_EU_NORTH_1"
-	HTCRegionAdminSettingsRegionAWSEUCENTRAL1     HTCRegionAdminSettingsRegion = "AWS_EU_CENTRAL_1"
-	HTCRegionAdminSettingsRegionAWSEUWEST1        HTCRegionAdminSettingsRegion = "AWS_EU_WEST_1"
-	HTCRegionAdminSettingsRegionAWSEUWEST2        HTCRegionAdminSettingsRegion = "AWS_EU_WEST_2"
-	HTCRegionAdminSettingsRegionAWSEUWEST3        HTCRegionAdminSettingsRegion = "AWS_EU_WEST_3"
-	HTCRegionAdminSettingsRegionAWSSAEAST1        HTCRegionAdminSettingsRegion = "AWS_SA_EAST_1"
-	HTCRegionAdminSettingsRegionAWSUSEAST2        HTCRegionAdminSettingsRegion = "AWS_US_EAST_2"
-	HTCRegionAdminSettingsRegionAWSUSWEST2        HTCRegionAdminSettingsRegion = "AWS_US_WEST_2"
-	HTCRegionAdminSettingsRegionAWSUSEAST1        HTCRegionAdminSettingsRegion = "AWS_US_EAST_1"
-	HTCRegionAdminSettingsRegionGCPASIASOUTHEAST1 HTCRegionAdminSettingsRegion = "GCP_ASIA_SOUTHEAST_1"
-	HTCRegionAdminSettingsRegionGCPUSCENTRAL1     HTCRegionAdminSettingsRegion = "GCP_US_CENTRAL_1"
-	HTCRegionAdminSettingsRegionGCPUSEAST1        HTCRegionAdminSettingsRegion = "GCP_US_EAST_1"
-	HTCRegionAdminSettingsRegionGCPUSEAST2        HTCRegionAdminSettingsRegion = "GCP_US_EAST_2"
-	HTCRegionAdminSettingsRegionGCPUSEAST4        HTCRegionAdminSettingsRegion = "GCP_US_EAST_4"
-	HTCRegionAdminSettingsRegionGCPUSWEST1        HTCRegionAdminSettingsRegion = "GCP_US_WEST_1"
-	HTCRegionAdminSettingsRegionGCPUSWEST4        HTCRegionAdminSettingsRegion = "GCP_US_WEST_4"
-	HTCRegionAdminSettingsRegionGCPEUWEST1        HTCRegionAdminSettingsRegion = "GCP_EU_WEST_1"
-	HTCRegionAdminSettingsRegionGCPEUWEST2        HTCRegionAdminSettingsRegion = "GCP_EU_WEST_2"
-	HTCRegionAdminSettingsRegionGCPEUWEST3        HTCRegionAdminSettingsRegion = "GCP_EU_WEST_3"
-	HTCRegionAdminSettingsRegionGCPEUWEST4        HTCRegionAdminSettingsRegion = "GCP_EU_WEST_4"
-	HTCRegionAdminSettingsRegionGCPCACENTRAL1     HTCRegionAdminSettingsRegion = "GCP_CA_CENTRAL_1"
-	HTCRegionAdminSettingsRegionNGCENOCH1         HTCRegionAdminSettingsRegion = "NGC_ENOCH_1"
-	HTCRegionAdminSettingsRegionAZUREUSWEST2      HTCRegionAdminSettingsRegion = "AZURE_US_WEST_2"
-	HTCRegionAdminSettingsRegionAZUREUSEAST2      HTCRegionAdminSettingsRegion = "AZURE_US_EAST_2"
-	HTCRegionAdminSettingsRegionAZUREEUNORTH      HTCRegionAdminSettingsRegion = "AZURE_EU_NORTH"
-	HTCRegionAdminSettingsRegionRCICELAND1        HTCRegionAdminSettingsRegion = "RC_ICELAND_1"
-	HTCRegionAdminSettingsRegionUNASSIGNED        HTCRegionAdminSettingsRegion = "UNASSIGNED"
+	HTCRegionAdminSettingsRegionAWSAPSOUTHEAST1     HTCRegionAdminSettingsRegion = "AWS_AP_SOUTHEAST_1"
+	HTCRegionAdminSettingsRegionAWSCACENTRAL1       HTCRegionAdminSettingsRegion = "AWS_CA_CENTRAL_1"
+	HTCRegionAdminSettingsRegionAWSEUNORTH1         HTCRegionAdminSettingsRegion = "AWS_EU_NORTH_1"
+	HTCRegionAdminSettingsRegionAWSEUCENTRAL1       HTCRegionAdminSettingsRegion = "AWS_EU_CENTRAL_1"
+	HTCRegionAdminSettingsRegionAWSEUWEST1          HTCRegionAdminSettingsRegion = "AWS_EU_WEST_1"
+	HTCRegionAdminSettingsRegionAWSEUWEST2          HTCRegionAdminSettingsRegion = "AWS_EU_WEST_2"
+	HTCRegionAdminSettingsRegionAWSEUWEST3          HTCRegionAdminSettingsRegion = "AWS_EU_WEST_3"
+	HTCRegionAdminSettingsRegionAWSSAEAST1          HTCRegionAdminSettingsRegion = "AWS_SA_EAST_1"
+	HTCRegionAdminSettingsRegionAWSUSEAST2          HTCRegionAdminSettingsRegion = "AWS_US_EAST_2"
+	HTCRegionAdminSettingsRegionAWSUSWEST2          HTCRegionAdminSettingsRegion = "AWS_US_WEST_2"
+	HTCRegionAdminSettingsRegionAWSUSEAST1          HTCRegionAdminSettingsRegion = "AWS_US_EAST_1"
+	HTCRegionAdminSettingsRegionGCPASIASOUTHEAST1   HTCRegionAdminSettingsRegion = "GCP_ASIA_SOUTHEAST_1"
+	HTCRegionAdminSettingsRegionGCPUSCENTRAL1       HTCRegionAdminSettingsRegion = "GCP_US_CENTRAL_1"
+	HTCRegionAdminSettingsRegionGCPUSEAST1          HTCRegionAdminSettingsRegion = "GCP_US_EAST_1"
+	HTCRegionAdminSettingsRegionGCPUSEAST2          HTCRegionAdminSettingsRegion = "GCP_US_EAST_2"
+	HTCRegionAdminSettingsRegionGCPUSEAST4          HTCRegionAdminSettingsRegion = "GCP_US_EAST_4"
+	HTCRegionAdminSettingsRegionGCPUSWEST1          HTCRegionAdminSettingsRegion = "GCP_US_WEST_1"
+	HTCRegionAdminSettingsRegionGCPUSWEST4          HTCRegionAdminSettingsRegion = "GCP_US_WEST_4"
+	HTCRegionAdminSettingsRegionGCPEUWEST1          HTCRegionAdminSettingsRegion = "GCP_EU_WEST_1"
+	HTCRegionAdminSettingsRegionGCPEUWEST2          HTCRegionAdminSettingsRegion = "GCP_EU_WEST_2"
+	HTCRegionAdminSettingsRegionGCPEUWEST3          HTCRegionAdminSettingsRegion = "GCP_EU_WEST_3"
+	HTCRegionAdminSettingsRegionGCPEUWEST4          HTCRegionAdminSettingsRegion = "GCP_EU_WEST_4"
+	HTCRegionAdminSettingsRegionGCPCACENTRAL1       HTCRegionAdminSettingsRegion = "GCP_CA_CENTRAL_1"
+	HTCRegionAdminSettingsRegionNGCENOCH1           HTCRegionAdminSettingsRegion = "NGC_ENOCH_1"
+	HTCRegionAdminSettingsRegionAZUREUSWEST2        HTCRegionAdminSettingsRegion = "AZURE_US_WEST_2"
+	HTCRegionAdminSettingsRegionAZUREUSEAST2        HTCRegionAdminSettingsRegion = "AZURE_US_EAST_2"
+	HTCRegionAdminSettingsRegionAZUREUSSOUTHCENTRAL HTCRegionAdminSettingsRegion = "AZURE_US_SOUTHCENTRAL"
+	HTCRegionAdminSettingsRegionAZUREEUNORTH        HTCRegionAdminSettingsRegion = "AZURE_EU_NORTH"
+	HTCRegionAdminSettingsRegionRCICELAND1          HTCRegionAdminSettingsRegion = "RC_ICELAND_1"
+	HTCRegionAdminSettingsRegionUNASSIGNED          HTCRegionAdminSettingsRegion = "UNASSIGNED"
 )
 
 // AllValues returns all HTCRegionAdminSettingsRegion values.
@@ -2346,6 +2374,7 @@ func (HTCRegionAdminSettingsRegion) AllValues() []HTCRegionAdminSettingsRegion {
 		HTCRegionAdminSettingsRegionNGCENOCH1,
 		HTCRegionAdminSettingsRegionAZUREUSWEST2,
 		HTCRegionAdminSettingsRegionAZUREUSEAST2,
+		HTCRegionAdminSettingsRegionAZUREUSSOUTHCENTRAL,
 		HTCRegionAdminSettingsRegionAZUREEUNORTH,
 		HTCRegionAdminSettingsRegionRCICELAND1,
 		HTCRegionAdminSettingsRegionUNASSIGNED,
@@ -2406,6 +2435,8 @@ func (s HTCRegionAdminSettingsRegion) MarshalText() ([]byte, error) {
 	case HTCRegionAdminSettingsRegionAZUREUSWEST2:
 		return []byte(s), nil
 	case HTCRegionAdminSettingsRegionAZUREUSEAST2:
+		return []byte(s), nil
+	case HTCRegionAdminSettingsRegionAZUREUSSOUTHCENTRAL:
 		return []byte(s), nil
 	case HTCRegionAdminSettingsRegionAZUREEUNORTH:
 		return []byte(s), nil
@@ -2498,6 +2529,9 @@ func (s *HTCRegionAdminSettingsRegion) UnmarshalText(data []byte) error {
 		return nil
 	case HTCRegionAdminSettingsRegionAZUREUSEAST2:
 		*s = HTCRegionAdminSettingsRegionAZUREUSEAST2
+		return nil
+	case HTCRegionAdminSettingsRegionAZUREUSSOUTHCENTRAL:
+		*s = HTCRegionAdminSettingsRegionAZUREUSSOUTHCENTRAL
 		return nil
 	case HTCRegionAdminSettingsRegionAZUREEUNORTH:
 		*s = HTCRegionAdminSettingsRegionAZUREEUNORTH
@@ -2640,6 +2674,45 @@ func (s *HTCRepository) SetWorkspaceId(val OptString) {
 }
 
 func (*HTCRepository) htcProjectsProjectIdContainerRegistryRepoRepoNamePostRes() {}
+
+// Ref: #/components/schemas/HTCRequestError
+type HTCRequestError struct {
+	ErrorDescription OptString `json:"errorDescription"`
+	ErrorType        OptString `json:"errorType"`
+	Message          OptString `json:"message"`
+}
+
+// GetErrorDescription returns the value of ErrorDescription.
+func (s *HTCRequestError) GetErrorDescription() OptString {
+	return s.ErrorDescription
+}
+
+// GetErrorType returns the value of ErrorType.
+func (s *HTCRequestError) GetErrorType() OptString {
+	return s.ErrorType
+}
+
+// GetMessage returns the value of Message.
+func (s *HTCRequestError) GetMessage() OptString {
+	return s.Message
+}
+
+// SetErrorDescription sets the value of ErrorDescription.
+func (s *HTCRequestError) SetErrorDescription(val OptString) {
+	s.ErrorDescription = val
+}
+
+// SetErrorType sets the value of ErrorType.
+func (s *HTCRequestError) SetErrorType(val OptString) {
+	s.ErrorType = val
+}
+
+// SetMessage sets the value of Message.
+func (s *HTCRequestError) SetMessage(val OptString) {
+	s.Message = val
+}
+
+func (*HTCRequestError) htcProjectsProjectIdTasksTaskIdJobsBatchPostRes() {}
 
 // Ref: #/components/schemas/HTCRetryStrategy
 type HTCRetryStrategy struct {
@@ -3115,6 +3188,34 @@ type HtcProjectsProjectIdContainerRegistryImagesImageNameGetForbidden struct{}
 func (*HtcProjectsProjectIdContainerRegistryImagesImageNameGetForbidden) htcProjectsProjectIdContainerRegistryImagesImageNameGetRes() {
 }
 
+type HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound struct {
+	ErrorDescription OptString `json:"errorDescription"`
+	ErrorType        OptString `json:"errorType"`
+}
+
+// GetErrorDescription returns the value of ErrorDescription.
+func (s *HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound) GetErrorDescription() OptString {
+	return s.ErrorDescription
+}
+
+// GetErrorType returns the value of ErrorType.
+func (s *HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound) GetErrorType() OptString {
+	return s.ErrorType
+}
+
+// SetErrorDescription sets the value of ErrorDescription.
+func (s *HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound) SetErrorDescription(val OptString) {
+	s.ErrorDescription = val
+}
+
+// SetErrorType sets the value of ErrorType.
+func (s *HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound) SetErrorType(val OptString) {
+	s.ErrorType = val
+}
+
+func (*HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound) htcProjectsProjectIdContainerRegistryImagesImageNameGetRes() {
+}
+
 // HtcProjectsProjectIdContainerRegistryImagesImageNameGetUnauthorized is response for HtcProjectsProjectIdContainerRegistryImagesImageNameGet operation.
 type HtcProjectsProjectIdContainerRegistryImagesImageNameGetUnauthorized struct{}
 
@@ -3192,10 +3293,6 @@ func (*HtcProjectsProjectIdContainerRegistryTokenGetUnauthorized) htcProjectsPro
 type HtcProjectsProjectIdDimensionsGetForbidden struct{}
 
 func (*HtcProjectsProjectIdDimensionsGetForbidden) htcProjectsProjectIdDimensionsGetRes() {}
-
-type HtcProjectsProjectIdDimensionsGetOKApplicationJSON []HTCComputeEnvironment
-
-func (*HtcProjectsProjectIdDimensionsGetOKApplicationJSON) htcProjectsProjectIdDimensionsGetRes() {}
 
 // HtcProjectsProjectIdDimensionsGetUnauthorized is response for HtcProjectsProjectIdDimensionsGet operation.
 type HtcProjectsProjectIdDimensionsGetUnauthorized struct{}
@@ -3659,11 +3756,6 @@ type HtcProjectsProjectIdTasksTaskIdJobsBatchPostForbidden struct{}
 func (*HtcProjectsProjectIdTasksTaskIdJobsBatchPostForbidden) htcProjectsProjectIdTasksTaskIdJobsBatchPostRes() {
 }
 
-type HtcProjectsProjectIdTasksTaskIdJobsBatchPostOKApplicationJSON []HTCJobSubmitRequest
-
-func (*HtcProjectsProjectIdTasksTaskIdJobsBatchPostOKApplicationJSON) htcProjectsProjectIdTasksTaskIdJobsBatchPostRes() {
-}
-
 // HtcProjectsProjectIdTasksTaskIdJobsBatchPostUnauthorized is response for HtcProjectsProjectIdTasksTaskIdJobsBatchPost operation.
 type HtcProjectsProjectIdTasksTaskIdJobsBatchPostUnauthorized struct{}
 
@@ -3818,18 +3910,6 @@ func (*HtcProjectsProjectIdTasksTaskIdStorageTokensGetForbidden) htcProjectsProj
 type HtcProjectsProjectIdTasksTaskIdStorageTokensGetUnauthorized struct{}
 
 func (*HtcProjectsProjectIdTasksTaskIdStorageTokensGetUnauthorized) htcProjectsProjectIdTasksTaskIdStorageTokensGetRes() {
-}
-
-// HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetForbidden is response for HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGet operation.
-type HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetForbidden struct{}
-
-func (*HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetForbidden) htcProjectsProjectIdTasksTaskIdSummaryStatisticsGetRes() {
-}
-
-// HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetUnauthorized is response for HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGet operation.
-type HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetUnauthorized struct{}
-
-func (*HtcProjectsProjectIdTasksTaskIdSummaryStatisticsGetUnauthorized) htcProjectsProjectIdTasksTaskIdSummaryStatisticsGetRes() {
 }
 
 // HtcRegionsGetForbidden is response for HtcRegionsGet operation.
@@ -4075,114 +4155,6 @@ func (s *JobPriority) UnmarshalText(data []byte) error {
 	default:
 		return errors.Errorf("invalid value: %q", data)
 	}
-}
-
-// Ref: #/components/schemas/JobStatusSummary
-type JobStatusSummary struct {
-	Group       OptString                      `json:"group"`
-	JobStatuses OptJobStatusSummaryJobStatuses `json:"jobStatuses"`
-}
-
-// GetGroup returns the value of Group.
-func (s *JobStatusSummary) GetGroup() OptString {
-	return s.Group
-}
-
-// GetJobStatuses returns the value of JobStatuses.
-func (s *JobStatusSummary) GetJobStatuses() OptJobStatusSummaryJobStatuses {
-	return s.JobStatuses
-}
-
-// SetGroup sets the value of Group.
-func (s *JobStatusSummary) SetGroup(val OptString) {
-	s.Group = val
-}
-
-// SetJobStatuses sets the value of JobStatuses.
-func (s *JobStatusSummary) SetJobStatuses(val OptJobStatusSummaryJobStatuses) {
-	s.JobStatuses = val
-}
-
-func (*JobStatusSummary) htcProjectsProjectIdTasksTaskIdSummaryStatisticsGetRes() {}
-
-type JobStatusSummaryJobStatuses struct {
-	FAILED              OptInt `json:"FAILED"`
-	RUNNABLE            OptInt `json:"RUNNABLE"`
-	RUNNING             OptInt `json:"RUNNING"`
-	STARTING            OptInt `json:"STARTING"`
-	SUBMITTEDTOPROVIDER OptInt `json:"SUBMITTED_TO_PROVIDER"`
-	SUBMITTEDTORESCALE  OptInt `json:"SUBMITTED_TO_RESCALE"`
-	SUCCEEDED           OptInt `json:"SUCCEEDED"`
-}
-
-// GetFAILED returns the value of FAILED.
-func (s *JobStatusSummaryJobStatuses) GetFAILED() OptInt {
-	return s.FAILED
-}
-
-// GetRUNNABLE returns the value of RUNNABLE.
-func (s *JobStatusSummaryJobStatuses) GetRUNNABLE() OptInt {
-	return s.RUNNABLE
-}
-
-// GetRUNNING returns the value of RUNNING.
-func (s *JobStatusSummaryJobStatuses) GetRUNNING() OptInt {
-	return s.RUNNING
-}
-
-// GetSTARTING returns the value of STARTING.
-func (s *JobStatusSummaryJobStatuses) GetSTARTING() OptInt {
-	return s.STARTING
-}
-
-// GetSUBMITTEDTOPROVIDER returns the value of SUBMITTEDTOPROVIDER.
-func (s *JobStatusSummaryJobStatuses) GetSUBMITTEDTOPROVIDER() OptInt {
-	return s.SUBMITTEDTOPROVIDER
-}
-
-// GetSUBMITTEDTORESCALE returns the value of SUBMITTEDTORESCALE.
-func (s *JobStatusSummaryJobStatuses) GetSUBMITTEDTORESCALE() OptInt {
-	return s.SUBMITTEDTORESCALE
-}
-
-// GetSUCCEEDED returns the value of SUCCEEDED.
-func (s *JobStatusSummaryJobStatuses) GetSUCCEEDED() OptInt {
-	return s.SUCCEEDED
-}
-
-// SetFAILED sets the value of FAILED.
-func (s *JobStatusSummaryJobStatuses) SetFAILED(val OptInt) {
-	s.FAILED = val
-}
-
-// SetRUNNABLE sets the value of RUNNABLE.
-func (s *JobStatusSummaryJobStatuses) SetRUNNABLE(val OptInt) {
-	s.RUNNABLE = val
-}
-
-// SetRUNNING sets the value of RUNNING.
-func (s *JobStatusSummaryJobStatuses) SetRUNNING(val OptInt) {
-	s.RUNNING = val
-}
-
-// SetSTARTING sets the value of STARTING.
-func (s *JobStatusSummaryJobStatuses) SetSTARTING(val OptInt) {
-	s.STARTING = val
-}
-
-// SetSUBMITTEDTOPROVIDER sets the value of SUBMITTEDTOPROVIDER.
-func (s *JobStatusSummaryJobStatuses) SetSUBMITTEDTOPROVIDER(val OptInt) {
-	s.SUBMITTEDTOPROVIDER = val
-}
-
-// SetSUBMITTEDTORESCALE sets the value of SUBMITTEDTORESCALE.
-func (s *JobStatusSummaryJobStatuses) SetSUBMITTEDTORESCALE(val OptInt) {
-	s.SUBMITTEDTORESCALE = val
-}
-
-// SetSUCCEEDED sets the value of SUCCEEDED.
-func (s *JobStatusSummaryJobStatuses) SetSUCCEEDED(val OptInt) {
-	s.SUCCEEDED = val
 }
 
 // Ref: #/components/schemas/JsonWebKey
@@ -5875,52 +5847,6 @@ func (o OptInstant) Or(d Instant) Instant {
 	return d
 }
 
-// NewOptInt returns new OptInt with value set to v.
-func NewOptInt(v int) OptInt {
-	return OptInt{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptInt is optional int.
-type OptInt struct {
-	Value int
-	Set   bool
-}
-
-// IsSet returns true if OptInt was set.
-func (o OptInt) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptInt) Reset() {
-	var v int
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptInt) SetTo(v int) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptInt) Get() (v int, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptInt) Or(d int) int {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptInt32 returns new OptInt32 with value set to v.
 func NewOptInt32(v int32) OptInt32 {
 	return OptInt32{
@@ -6099,52 +6025,6 @@ func (o OptJobPriority) Get() (v JobPriority, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptJobPriority) Or(d JobPriority) JobPriority {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptJobStatusSummaryJobStatuses returns new OptJobStatusSummaryJobStatuses with value set to v.
-func NewOptJobStatusSummaryJobStatuses(v JobStatusSummaryJobStatuses) OptJobStatusSummaryJobStatuses {
-	return OptJobStatusSummaryJobStatuses{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptJobStatusSummaryJobStatuses is optional JobStatusSummaryJobStatuses.
-type OptJobStatusSummaryJobStatuses struct {
-	Value JobStatusSummaryJobStatuses
-	Set   bool
-}
-
-// IsSet returns true if OptJobStatusSummaryJobStatuses was set.
-func (o OptJobStatusSummaryJobStatuses) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptJobStatusSummaryJobStatuses) Reset() {
-	var v JobStatusSummaryJobStatuses
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptJobStatusSummaryJobStatuses) SetTo(v JobStatusSummaryJobStatuses) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptJobStatusSummaryJobStatuses) Get() (v JobStatusSummaryJobStatuses, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptJobStatusSummaryJobStatuses) Or(d JobStatusSummaryJobStatuses) JobStatusSummaryJobStatuses {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -7590,35 +7470,36 @@ func (s *RescaleJobStatus) UnmarshalText(data []byte) error {
 type RescaleRegion string
 
 const (
-	RescaleRegionAWSAPSOUTHEAST1   RescaleRegion = "AWS_AP_SOUTHEAST_1"
-	RescaleRegionAWSCACENTRAL1     RescaleRegion = "AWS_CA_CENTRAL_1"
-	RescaleRegionAWSEUNORTH1       RescaleRegion = "AWS_EU_NORTH_1"
-	RescaleRegionAWSEUCENTRAL1     RescaleRegion = "AWS_EU_CENTRAL_1"
-	RescaleRegionAWSEUWEST1        RescaleRegion = "AWS_EU_WEST_1"
-	RescaleRegionAWSEUWEST2        RescaleRegion = "AWS_EU_WEST_2"
-	RescaleRegionAWSEUWEST3        RescaleRegion = "AWS_EU_WEST_3"
-	RescaleRegionAWSSAEAST1        RescaleRegion = "AWS_SA_EAST_1"
-	RescaleRegionAWSUSEAST2        RescaleRegion = "AWS_US_EAST_2"
-	RescaleRegionAWSUSWEST2        RescaleRegion = "AWS_US_WEST_2"
-	RescaleRegionAWSUSEAST1        RescaleRegion = "AWS_US_EAST_1"
-	RescaleRegionGCPASIASOUTHEAST1 RescaleRegion = "GCP_ASIA_SOUTHEAST_1"
-	RescaleRegionGCPUSCENTRAL1     RescaleRegion = "GCP_US_CENTRAL_1"
-	RescaleRegionGCPUSEAST1        RescaleRegion = "GCP_US_EAST_1"
-	RescaleRegionGCPUSEAST2        RescaleRegion = "GCP_US_EAST_2"
-	RescaleRegionGCPUSEAST4        RescaleRegion = "GCP_US_EAST_4"
-	RescaleRegionGCPUSWEST1        RescaleRegion = "GCP_US_WEST_1"
-	RescaleRegionGCPUSWEST4        RescaleRegion = "GCP_US_WEST_4"
-	RescaleRegionGCPEUWEST1        RescaleRegion = "GCP_EU_WEST_1"
-	RescaleRegionGCPEUWEST2        RescaleRegion = "GCP_EU_WEST_2"
-	RescaleRegionGCPEUWEST3        RescaleRegion = "GCP_EU_WEST_3"
-	RescaleRegionGCPEUWEST4        RescaleRegion = "GCP_EU_WEST_4"
-	RescaleRegionGCPCACENTRAL1     RescaleRegion = "GCP_CA_CENTRAL_1"
-	RescaleRegionNGCENOCH1         RescaleRegion = "NGC_ENOCH_1"
-	RescaleRegionAZUREUSWEST2      RescaleRegion = "AZURE_US_WEST_2"
-	RescaleRegionAZUREUSEAST2      RescaleRegion = "AZURE_US_EAST_2"
-	RescaleRegionAZUREEUNORTH      RescaleRegion = "AZURE_EU_NORTH"
-	RescaleRegionRCICELAND1        RescaleRegion = "RC_ICELAND_1"
-	RescaleRegionUNASSIGNED        RescaleRegion = "UNASSIGNED"
+	RescaleRegionAWSAPSOUTHEAST1     RescaleRegion = "AWS_AP_SOUTHEAST_1"
+	RescaleRegionAWSCACENTRAL1       RescaleRegion = "AWS_CA_CENTRAL_1"
+	RescaleRegionAWSEUNORTH1         RescaleRegion = "AWS_EU_NORTH_1"
+	RescaleRegionAWSEUCENTRAL1       RescaleRegion = "AWS_EU_CENTRAL_1"
+	RescaleRegionAWSEUWEST1          RescaleRegion = "AWS_EU_WEST_1"
+	RescaleRegionAWSEUWEST2          RescaleRegion = "AWS_EU_WEST_2"
+	RescaleRegionAWSEUWEST3          RescaleRegion = "AWS_EU_WEST_3"
+	RescaleRegionAWSSAEAST1          RescaleRegion = "AWS_SA_EAST_1"
+	RescaleRegionAWSUSEAST2          RescaleRegion = "AWS_US_EAST_2"
+	RescaleRegionAWSUSWEST2          RescaleRegion = "AWS_US_WEST_2"
+	RescaleRegionAWSUSEAST1          RescaleRegion = "AWS_US_EAST_1"
+	RescaleRegionGCPASIASOUTHEAST1   RescaleRegion = "GCP_ASIA_SOUTHEAST_1"
+	RescaleRegionGCPUSCENTRAL1       RescaleRegion = "GCP_US_CENTRAL_1"
+	RescaleRegionGCPUSEAST1          RescaleRegion = "GCP_US_EAST_1"
+	RescaleRegionGCPUSEAST2          RescaleRegion = "GCP_US_EAST_2"
+	RescaleRegionGCPUSEAST4          RescaleRegion = "GCP_US_EAST_4"
+	RescaleRegionGCPUSWEST1          RescaleRegion = "GCP_US_WEST_1"
+	RescaleRegionGCPUSWEST4          RescaleRegion = "GCP_US_WEST_4"
+	RescaleRegionGCPEUWEST1          RescaleRegion = "GCP_EU_WEST_1"
+	RescaleRegionGCPEUWEST2          RescaleRegion = "GCP_EU_WEST_2"
+	RescaleRegionGCPEUWEST3          RescaleRegion = "GCP_EU_WEST_3"
+	RescaleRegionGCPEUWEST4          RescaleRegion = "GCP_EU_WEST_4"
+	RescaleRegionGCPCACENTRAL1       RescaleRegion = "GCP_CA_CENTRAL_1"
+	RescaleRegionNGCENOCH1           RescaleRegion = "NGC_ENOCH_1"
+	RescaleRegionAZUREUSWEST2        RescaleRegion = "AZURE_US_WEST_2"
+	RescaleRegionAZUREUSEAST2        RescaleRegion = "AZURE_US_EAST_2"
+	RescaleRegionAZUREUSSOUTHCENTRAL RescaleRegion = "AZURE_US_SOUTHCENTRAL"
+	RescaleRegionAZUREEUNORTH        RescaleRegion = "AZURE_EU_NORTH"
+	RescaleRegionRCICELAND1          RescaleRegion = "RC_ICELAND_1"
+	RescaleRegionUNASSIGNED          RescaleRegion = "UNASSIGNED"
 )
 
 // AllValues returns all RescaleRegion values.
@@ -7650,6 +7531,7 @@ func (RescaleRegion) AllValues() []RescaleRegion {
 		RescaleRegionNGCENOCH1,
 		RescaleRegionAZUREUSWEST2,
 		RescaleRegionAZUREUSEAST2,
+		RescaleRegionAZUREUSSOUTHCENTRAL,
 		RescaleRegionAZUREEUNORTH,
 		RescaleRegionRCICELAND1,
 		RescaleRegionUNASSIGNED,
@@ -7710,6 +7592,8 @@ func (s RescaleRegion) MarshalText() ([]byte, error) {
 	case RescaleRegionAZUREUSWEST2:
 		return []byte(s), nil
 	case RescaleRegionAZUREUSEAST2:
+		return []byte(s), nil
+	case RescaleRegionAZUREUSSOUTHCENTRAL:
 		return []byte(s), nil
 	case RescaleRegionAZUREEUNORTH:
 		return []byte(s), nil
@@ -7802,6 +7686,9 @@ func (s *RescaleRegion) UnmarshalText(data []byte) error {
 		return nil
 	case RescaleRegionAZUREUSEAST2:
 		*s = RescaleRegionAZUREUSEAST2
+		return nil
+	case RescaleRegionAZUREUSSOUTHCENTRAL:
+		*s = RescaleRegionAZUREUSSOUTHCENTRAL
 		return nil
 	case RescaleRegionAZUREEUNORTH:
 		*s = RescaleRegionAZUREEUNORTH
@@ -8203,29 +8090,31 @@ func (*StorageAccessTokens) htcProjectsProjectIdTasksTaskIdStorageTokensGetRes()
 type SupportedRescaleRegion string
 
 const (
-	SupportedRescaleRegionAWSAPSOUTHEAST1   SupportedRescaleRegion = "AWS_AP_SOUTHEAST_1"
-	SupportedRescaleRegionAWSCACENTRAL1     SupportedRescaleRegion = "AWS_CA_CENTRAL_1"
-	SupportedRescaleRegionAWSEUNORTH1       SupportedRescaleRegion = "AWS_EU_NORTH_1"
-	SupportedRescaleRegionAWSEUCENTRAL1     SupportedRescaleRegion = "AWS_EU_CENTRAL_1"
-	SupportedRescaleRegionAWSEUWEST1        SupportedRescaleRegion = "AWS_EU_WEST_1"
-	SupportedRescaleRegionAWSEUWEST2        SupportedRescaleRegion = "AWS_EU_WEST_2"
-	SupportedRescaleRegionAWSEUWEST3        SupportedRescaleRegion = "AWS_EU_WEST_3"
-	SupportedRescaleRegionAWSSAEAST1        SupportedRescaleRegion = "AWS_SA_EAST_1"
-	SupportedRescaleRegionAWSUSEAST2        SupportedRescaleRegion = "AWS_US_EAST_2"
-	SupportedRescaleRegionAWSUSWEST2        SupportedRescaleRegion = "AWS_US_WEST_2"
-	SupportedRescaleRegionAWSUSEAST1        SupportedRescaleRegion = "AWS_US_EAST_1"
-	SupportedRescaleRegionGCPASIASOUTHEAST1 SupportedRescaleRegion = "GCP_ASIA_SOUTHEAST_1"
-	SupportedRescaleRegionGCPUSCENTRAL1     SupportedRescaleRegion = "GCP_US_CENTRAL_1"
-	SupportedRescaleRegionGCPUSEAST1        SupportedRescaleRegion = "GCP_US_EAST_1"
-	SupportedRescaleRegionGCPUSEAST2        SupportedRescaleRegion = "GCP_US_EAST_2"
-	SupportedRescaleRegionGCPUSEAST4        SupportedRescaleRegion = "GCP_US_EAST_4"
-	SupportedRescaleRegionGCPUSWEST1        SupportedRescaleRegion = "GCP_US_WEST_1"
-	SupportedRescaleRegionGCPUSWEST4        SupportedRescaleRegion = "GCP_US_WEST_4"
-	SupportedRescaleRegionGCPEUWEST1        SupportedRescaleRegion = "GCP_EU_WEST_1"
-	SupportedRescaleRegionGCPEUWEST2        SupportedRescaleRegion = "GCP_EU_WEST_2"
-	SupportedRescaleRegionGCPEUWEST3        SupportedRescaleRegion = "GCP_EU_WEST_3"
-	SupportedRescaleRegionGCPEUWEST4        SupportedRescaleRegion = "GCP_EU_WEST_4"
-	SupportedRescaleRegionGCPCACENTRAL1     SupportedRescaleRegion = "GCP_CA_CENTRAL_1"
+	SupportedRescaleRegionAWSAPSOUTHEAST1     SupportedRescaleRegion = "AWS_AP_SOUTHEAST_1"
+	SupportedRescaleRegionAWSCACENTRAL1       SupportedRescaleRegion = "AWS_CA_CENTRAL_1"
+	SupportedRescaleRegionAWSEUNORTH1         SupportedRescaleRegion = "AWS_EU_NORTH_1"
+	SupportedRescaleRegionAWSEUCENTRAL1       SupportedRescaleRegion = "AWS_EU_CENTRAL_1"
+	SupportedRescaleRegionAWSEUWEST1          SupportedRescaleRegion = "AWS_EU_WEST_1"
+	SupportedRescaleRegionAWSEUWEST2          SupportedRescaleRegion = "AWS_EU_WEST_2"
+	SupportedRescaleRegionAWSEUWEST3          SupportedRescaleRegion = "AWS_EU_WEST_3"
+	SupportedRescaleRegionAWSSAEAST1          SupportedRescaleRegion = "AWS_SA_EAST_1"
+	SupportedRescaleRegionAWSUSEAST2          SupportedRescaleRegion = "AWS_US_EAST_2"
+	SupportedRescaleRegionAWSUSWEST2          SupportedRescaleRegion = "AWS_US_WEST_2"
+	SupportedRescaleRegionAWSUSEAST1          SupportedRescaleRegion = "AWS_US_EAST_1"
+	SupportedRescaleRegionGCPASIASOUTHEAST1   SupportedRescaleRegion = "GCP_ASIA_SOUTHEAST_1"
+	SupportedRescaleRegionGCPUSCENTRAL1       SupportedRescaleRegion = "GCP_US_CENTRAL_1"
+	SupportedRescaleRegionGCPUSEAST1          SupportedRescaleRegion = "GCP_US_EAST_1"
+	SupportedRescaleRegionGCPUSEAST2          SupportedRescaleRegion = "GCP_US_EAST_2"
+	SupportedRescaleRegionGCPUSEAST4          SupportedRescaleRegion = "GCP_US_EAST_4"
+	SupportedRescaleRegionGCPUSWEST1          SupportedRescaleRegion = "GCP_US_WEST_1"
+	SupportedRescaleRegionGCPUSWEST4          SupportedRescaleRegion = "GCP_US_WEST_4"
+	SupportedRescaleRegionGCPEUWEST1          SupportedRescaleRegion = "GCP_EU_WEST_1"
+	SupportedRescaleRegionGCPEUWEST2          SupportedRescaleRegion = "GCP_EU_WEST_2"
+	SupportedRescaleRegionGCPEUWEST3          SupportedRescaleRegion = "GCP_EU_WEST_3"
+	SupportedRescaleRegionGCPEUWEST4          SupportedRescaleRegion = "GCP_EU_WEST_4"
+	SupportedRescaleRegionGCPCACENTRAL1       SupportedRescaleRegion = "GCP_CA_CENTRAL_1"
+	SupportedRescaleRegionAZUREUSWEST2        SupportedRescaleRegion = "AZURE_US_WEST_2"
+	SupportedRescaleRegionAZUREUSSOUTHCENTRAL SupportedRescaleRegion = "AZURE_US_SOUTHCENTRAL"
 )
 
 // AllValues returns all SupportedRescaleRegion values.
@@ -8254,6 +8143,8 @@ func (SupportedRescaleRegion) AllValues() []SupportedRescaleRegion {
 		SupportedRescaleRegionGCPEUWEST3,
 		SupportedRescaleRegionGCPEUWEST4,
 		SupportedRescaleRegionGCPCACENTRAL1,
+		SupportedRescaleRegionAZUREUSWEST2,
+		SupportedRescaleRegionAZUREUSSOUTHCENTRAL,
 	}
 }
 
@@ -8305,6 +8196,10 @@ func (s SupportedRescaleRegion) MarshalText() ([]byte, error) {
 	case SupportedRescaleRegionGCPEUWEST4:
 		return []byte(s), nil
 	case SupportedRescaleRegionGCPCACENTRAL1:
+		return []byte(s), nil
+	case SupportedRescaleRegionAZUREUSWEST2:
+		return []byte(s), nil
+	case SupportedRescaleRegionAZUREUSSOUTHCENTRAL:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -8382,6 +8277,12 @@ func (s *SupportedRescaleRegion) UnmarshalText(data []byte) error {
 		return nil
 	case SupportedRescaleRegionGCPCACENTRAL1:
 		*s = SupportedRescaleRegionGCPCACENTRAL1
+		return nil
+	case SupportedRescaleRegionAZUREUSWEST2:
+		*s = SupportedRescaleRegionAZUREUSWEST2
+		return nil
+	case SupportedRescaleRegionAZUREUSSOUTHCENTRAL:
+		*s = SupportedRescaleRegionAZUREUSSOUTHCENTRAL
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
