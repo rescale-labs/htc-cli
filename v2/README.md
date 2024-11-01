@@ -10,6 +10,15 @@ make build
 make test
 ```
 
+## Building for distribation
+
+```
+make dist
+```
+
+and poke around in `build/dist`. I guess we should zip these things at
+some point.
+
 ## Developing
 
 Docs are useful, especially API docs, which you can view under
