@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -86,8 +85,7 @@ func Submit(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("Error on job submission: %v", err)
 	}
-	log.Printf("res: %#v", res)
-	return nil
+	return runner.PrintResult(res, os.Stdout)
 }
 
 var SubmitCmd = &cobra.Command{
