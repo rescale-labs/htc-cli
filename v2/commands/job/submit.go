@@ -63,7 +63,7 @@ func Submit(cmd *cobra.Command, args []string) error {
 		var err error
 		r, err = os.Open(args[0])
 		if err != nil {
-			return fmt.Errorf("Error opening %s: %w", err)
+			return fmt.Errorf("Error opening %s: %v", args[0], err)
 		}
 		defer r.Close()
 	}
