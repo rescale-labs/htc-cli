@@ -1,42 +1,43 @@
 # Soon
 
-* Jobs:
-  * GET /jobs
-  * GET /jobs/{jobId}
-  * GET /jobs/{jobId}/events
-  * GET /jobs/{jobId}/logs
-  * POST /jobs/cancel
+Essential API operations:
+  * Jobs:
+    * GET /jobs
+    * GET /jobs/{jobId}
+    * GET /jobs/{jobId}/events
+    * GET /jobs/{jobId}/logs
+    * POST /jobs/cancel
+  * Tasks:
+    * GET /tasks/summary-statistics
+  * Limits: all the CRUD
 
-* Tasks:
-  * GET /tasks/summary-statistics
+Essential build tooling:
+  * Automate universal OS X binaries from Makefile: see [GitHub - randall77/makefat: A tool for making fat OSX binaries (a portable lipo)](https://github.com/randall77/makefat)
 
-* Universal OS X binaries: [GitHub - randall77/makefat: A tool for making fat OSX binaries (a portable lipo)](https://github.com/randall77/makefat)
+Testing:
+  * Identify the most important things to test. Test them. Somehow.
 
+Usability:
+  * Print the env vars expected, if any, in usage.
+  * Support multiple config contexts for workspace, project, and task id
+  * Default to table output for things that are Tabler interface
+  * Decide on whether we need the YAML encoder. It doesn't handle OptString, etc properly, e.g.:
+    ```
+    $ go run cmd/htc/main.go  task get --project-id e8dee146-5606-407e-8e51-3f28070ece6e -l 1  -o yaml
+    2024/09/25 13:03:40 HtcProjectsProjectIdTasksGet: pageIndex= pageSize=500
+    -   archivedat:
+            value: 0001-01-01T00:00:00Z
+            set: true
+            "null": true
+    ```
 
-* CRUD and view for all limits
-* Tests!
+Upcoming build automation:
+    * Build artifacts for OS X universal, AMD64 linux, and arm64 linux. Then upload them to S3. See:
+        * https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-go
+        * https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/storing-and-sharing-data-from-a-workflow
+        * https://github.com/actions/upload-artifact?tab=readme-ov-file#where-does-the-upload-go
+    * prepare releases when tagged with https://github.com/softprops/action-gh-release
 
-* merge in upload/download from htccli
-
-* CRUD for tasks and (modulo delete) projects
-* Print env vars expected in usage.
-* scope out htcctl functionality to implement here
-
-* YAML encoder doesn't handle OptString, etc properly, e.g.:
-  ```
-  $ go run cmd/htc/main.go  task get --project-id e8dee146-5606-407e-8e51-3f28070ece6e -l 1  -o yaml
-  2024/09/25 13:03:40 HtcProjectsProjectIdTasksGet: pageIndex= pageSize=500
-  -   archivedat:
-          value: 0001-01-01T00:00:00Z
-          set: true
-          "null": true
-  ```
-
-* Build automation:
-    * build artifacts and upload https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-go
-    * https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/storing-and-sharing-data-from-a-workflow
-    * https://github.com/actions/upload-artifact?tab=readme-ov-file#where-does-the-upload-go
-    * prepare release with https://github.com/softprops/action-gh-release
 
 # stuff from Alistair 2024-10-22
 
@@ -44,11 +45,11 @@ things we run a lot in my team are:
   * list out all the workspaces - with the name / ID and (possibly) API key
   * list out all the projects that are configured as part of a given WS
   * describe the vcpu-limits of a project
-  	* and set the vcpu-limits of a project
+    * and set the vcpu-limits of a project
   * describe the dimensions of a project
-  	* and change the dimensions of a project
+    * and change the dimensions of a project
   * describe the task-lifecycle of a project
-  	* and set this
+    * and set this
   * show the details of 50 jobs from a Task
 
 separate to these simpler scripts is:
@@ -65,6 +66,10 @@ I can give example output from any of the above / existing scripting, if that he
 
 
 # Later
+
+* merge in upload/download from htccli
+* scope out htcctl functionality to implement here
+* task deletion
 
 * All the methods:
     ```

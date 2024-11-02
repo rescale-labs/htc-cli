@@ -71,7 +71,6 @@ func Get(cmd *cobra.Command, args []string) error {
 			break
 		}
 	}
-	log.Printf("items: %#v", items)
 	return runner.PrintResult(items, os.Stdout)
 }
 

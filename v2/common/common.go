@@ -215,6 +215,7 @@ func (r *Runner) PrintResult(res interface{}, w io.Writer) error {
 
 	default:
 		e := json.NewEncoder(w)
+		e.SetIndent("", "  ")
 		return e.Encode(res)
 	}
 }
