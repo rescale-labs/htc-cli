@@ -1091,7 +1091,7 @@ func encodeHtcProjectsProjectIdTasksTaskIdJobsCancelPostResponse(response HtcPro
 
 func encodeHtcProjectsProjectIdTasksTaskIdJobsGetResponse(response HtcProjectsProjectIdTasksTaskIdJobsGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
-	case *HtcProjectsProjectIdTasksTaskIdJobsGetOKApplicationJSON:
+	case *HTCJobs:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 

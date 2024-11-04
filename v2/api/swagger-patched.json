@@ -585,6 +585,22 @@
             },
             "type": "array"
          },
+         "HTCJobs": {
+            "properties": {
+               "items": {
+                  "items": {
+                     "$ref": "#/components/schemas/HTCJob"
+                  },
+                  "type": "array"
+               },
+               "next": {
+                  "example": "https://page2.com",
+                  "format": "uri",
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
          "HTCLimitCreate": {
             "properties": {
                "modifierRole": {
@@ -3813,19 +3829,7 @@
                   "content": {
                      "application/json": {
                         "schema": {
-                           "properties": {
-                              "items": {
-                                 "items": {
-                                    "$ref": "#/components/schemas/HTCJob"
-                                 },
-                                 "type": "array"
-                              },
-                              "next": {
-                                 "example": "https://page2.com",
-                                 "format": "uri",
-                                 "type": "string"
-                              }
-                           }
+                           "$ref": "#/components/schemas/HTCJobs"
                         }
                      }
                   },

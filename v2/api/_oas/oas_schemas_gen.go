@@ -1787,6 +1787,34 @@ type HTCJobSubmitRequests []HTCJobSubmitRequest
 
 func (*HTCJobSubmitRequests) htcProjectsProjectIdTasksTaskIdJobsBatchPostRes() {}
 
+// Ref: #/components/schemas/HTCJobs
+type HTCJobs struct {
+	Items []HTCJob `json:"items"`
+	Next  OptURI   `json:"next"`
+}
+
+// GetItems returns the value of Items.
+func (s *HTCJobs) GetItems() []HTCJob {
+	return s.Items
+}
+
+// GetNext returns the value of Next.
+func (s *HTCJobs) GetNext() OptURI {
+	return s.Next
+}
+
+// SetItems sets the value of Items.
+func (s *HTCJobs) SetItems(val []HTCJob) {
+	s.Items = val
+}
+
+// SetNext sets the value of Next.
+func (s *HTCJobs) SetNext(val OptURI) {
+	s.Next = val
+}
+
+func (*HTCJobs) htcProjectsProjectIdTasksTaskIdJobsGetRes() {}
+
 // Ref: #/components/schemas/HTCLimitCreate
 type HTCLimitCreate struct {
 	ModifierRole ModifierRole `json:"modifierRole"`
@@ -3784,11 +3812,6 @@ func (*HtcProjectsProjectIdTasksTaskIdJobsCancelPostUnauthorized) htcProjectsPro
 type HtcProjectsProjectIdTasksTaskIdJobsGetForbidden struct{}
 
 func (*HtcProjectsProjectIdTasksTaskIdJobsGetForbidden) htcProjectsProjectIdTasksTaskIdJobsGetRes() {}
-
-type HtcProjectsProjectIdTasksTaskIdJobsGetOKApplicationJSON jx.Raw
-
-func (*HtcProjectsProjectIdTasksTaskIdJobsGetOKApplicationJSON) htcProjectsProjectIdTasksTaskIdJobsGetRes() {
-}
 
 // HtcProjectsProjectIdTasksTaskIdJobsGetUnauthorized is response for HtcProjectsProjectIdTasksTaskIdJobsGet operation.
 type HtcProjectsProjectIdTasksTaskIdJobsGetUnauthorized struct{}
