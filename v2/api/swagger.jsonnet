@@ -129,6 +129,16 @@ local patches = {
   },
   components+: {
     schemas+: {
+      HTCJob+: {
+        properties+: {
+          failureCode+: {
+            nullable: true,
+          },
+          statusReason+: {
+            nullable: true,
+          },
+        },
+      },
       HTCJobs: {
         type: 'object',
         properties: {
@@ -142,6 +152,13 @@ local patches = {
             example: 'https://page2.com',
             format: 'uri',
             type: 'string',
+          },
+        },
+      },
+      HTCJobStatusEvent+: {
+        properties+: {
+          statusReason+: {
+            nullable: true,
           },
         },
       },

@@ -1040,7 +1040,7 @@ type HTCJob struct {
 	CreatedBy               OptString                  `json:"createdBy"`
 	Envs                    []EnvPair                  `json:"envs"`
 	ExecTimeoutSeconds      OptInt32                   `json:"execTimeoutSeconds"`
-	FailureCode             OptHTCJobFailureCode       `json:"failureCode"`
+	FailureCode             OptNilHTCJobFailureCode    `json:"failureCode"`
 	Group                   OptString                  `json:"group"`
 	ImageName               OptString                  `json:"imageName"`
 	InstanceId              OptString                  `json:"instanceId"`
@@ -1056,7 +1056,7 @@ type HTCJob struct {
 	Region                  OptRescaleRegion           `json:"region"`
 	StartedAt               OptInstant                 `json:"startedAt"`
 	Status                  OptRescaleJobStatus        `json:"status"`
-	StatusReason            OptString                  `json:"statusReason"`
+	StatusReason            OptNilString               `json:"statusReason"`
 	Tags                    []Tag                      `json:"tags"`
 	TaskId                  OptString                  `json:"taskId"`
 	UpdatedAt               OptInstant                 `json:"updatedAt"`
@@ -1104,7 +1104,7 @@ func (s *HTCJob) GetExecTimeoutSeconds() OptInt32 {
 }
 
 // GetFailureCode returns the value of FailureCode.
-func (s *HTCJob) GetFailureCode() OptHTCJobFailureCode {
+func (s *HTCJob) GetFailureCode() OptNilHTCJobFailureCode {
 	return s.FailureCode
 }
 
@@ -1184,7 +1184,7 @@ func (s *HTCJob) GetStatus() OptRescaleJobStatus {
 }
 
 // GetStatusReason returns the value of StatusReason.
-func (s *HTCJob) GetStatusReason() OptString {
+func (s *HTCJob) GetStatusReason() OptNilString {
 	return s.StatusReason
 }
 
@@ -1249,7 +1249,7 @@ func (s *HTCJob) SetExecTimeoutSeconds(val OptInt32) {
 }
 
 // SetFailureCode sets the value of FailureCode.
-func (s *HTCJob) SetFailureCode(val OptHTCJobFailureCode) {
+func (s *HTCJob) SetFailureCode(val OptNilHTCJobFailureCode) {
 	s.FailureCode = val
 }
 
@@ -1329,7 +1329,7 @@ func (s *HTCJob) SetStatus(val OptRescaleJobStatus) {
 }
 
 // SetStatusReason sets the value of StatusReason.
-func (s *HTCJob) SetStatusReason(val OptString) {
+func (s *HTCJob) SetStatusReason(val OptNilString) {
 	s.StatusReason = val
 }
 
@@ -5226,52 +5226,6 @@ func (o OptHTCJobDefinitionTags) Or(d HTCJobDefinitionTags) HTCJobDefinitionTags
 	return d
 }
 
-// NewOptHTCJobFailureCode returns new OptHTCJobFailureCode with value set to v.
-func NewOptHTCJobFailureCode(v HTCJobFailureCode) OptHTCJobFailureCode {
-	return OptHTCJobFailureCode{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptHTCJobFailureCode is optional HTCJobFailureCode.
-type OptHTCJobFailureCode struct {
-	Value HTCJobFailureCode
-	Set   bool
-}
-
-// IsSet returns true if OptHTCJobFailureCode was set.
-func (o OptHTCJobFailureCode) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptHTCJobFailureCode) Reset() {
-	var v HTCJobFailureCode
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptHTCJobFailureCode) SetTo(v HTCJobFailureCode) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptHTCJobFailureCode) Get() (v HTCJobFailureCode, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptHTCJobFailureCode) Or(d HTCJobFailureCode) HTCJobFailureCode {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptHTCLimitCreate returns new OptHTCLimitCreate with value set to v.
 func NewOptHTCLimitCreate(v HTCLimitCreate) OptHTCLimitCreate {
 	return OptHTCLimitCreate{
@@ -6203,6 +6157,69 @@ func (o OptNilDateTime) Get() (v time.Time, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilDateTime) Or(d time.Time) time.Time {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilHTCJobFailureCode returns new OptNilHTCJobFailureCode with value set to v.
+func NewOptNilHTCJobFailureCode(v HTCJobFailureCode) OptNilHTCJobFailureCode {
+	return OptNilHTCJobFailureCode{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilHTCJobFailureCode is optional nullable HTCJobFailureCode.
+type OptNilHTCJobFailureCode struct {
+	Value HTCJobFailureCode
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilHTCJobFailureCode was set.
+func (o OptNilHTCJobFailureCode) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilHTCJobFailureCode) Reset() {
+	var v HTCJobFailureCode
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilHTCJobFailureCode) SetTo(v HTCJobFailureCode) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilHTCJobFailureCode) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilHTCJobFailureCode) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v HTCJobFailureCode
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilHTCJobFailureCode) Get() (v HTCJobFailureCode, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilHTCJobFailureCode) Or(d HTCJobFailureCode) HTCJobFailureCode {
 	if v, ok := o.Get(); ok {
 		return v
 	}
