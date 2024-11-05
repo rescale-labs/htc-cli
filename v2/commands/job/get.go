@@ -65,7 +65,7 @@ func Get(cmd *cobra.Command, args []string) error {
 			return err
 		}
 		items = append(items, res.Items...)
-		if limit > 0 && len(items) > limit {
+		if limit > 0 && len(items) >= limit {
 			items = items[:limit]
 			break
 		}
