@@ -153,11 +153,11 @@ func NewConfig(dirPath, apiKey, apiUrl, outputFormat string) (*Config, error) {
 		return nil, UsageErrorf("Invalid API URL: %w", err)
 	}
 
-	if c.OutputFormat == "" {
-		c.OutputFormat = "json"
-	}
+	// if c.OutputFormat == "" {
+	// 	c.OutputFormat = "json"
+	// }
 	switch c.OutputFormat {
-	case "json", "yaml":
+	case "json", "yaml", "":
 		break
 	default:
 		return nil, UsageErrorf(

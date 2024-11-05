@@ -2,6 +2,8 @@ package tabler
 
 import (
 	"bytes"
+	"fmt"
+	"io"
 	"math"
 	"strings"
 	"testing"
@@ -17,12 +19,18 @@ func (t *ThreeColTabler) Fields() []Field {
 	}
 }
 
-func (t ThreeColTabler) Rows() [][]any {
-	return [][]any{
+func (t ThreeColTabler) WriteRows(rowFmt string, w io.Writer) error {
+	rows := [][]any{
 		[]any{"Bruce", 12919, 2.3443},
 		[]any{"Jim", 35, 322.64},
 		[]any{"John", 393, math.Pi},
 	}
+	for _, row := range rows {
+		if _, err := fmt.Fprintf(w, rowFmt, row...); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func TestWriteTable(t *testing.T) {

@@ -11,6 +11,7 @@ import (
 	oapi "github.com/rescale/htc-storage-cli/v2/api/_oas"
 	"github.com/rescale/htc-storage-cli/v2/common"
 	"github.com/rescale/htc-storage-cli/v2/config"
+	"github.com/rescale/htc-storage-cli/v2/tabler"
 )
 
 const pageSize = 500
@@ -76,7 +77,7 @@ func Get(cmd *cobra.Command, args []string) error {
 			break
 		}
 	}
-	return runner.PrintResult(items, os.Stdout)
+	return runner.PrintResult(tabler.HTCJobs(items), os.Stdout)
 }
 
 var GetCmd = &cobra.Command{
