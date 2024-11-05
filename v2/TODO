@@ -1,12 +1,11 @@
-# Done
+# TODO
 
-A bunch of things before 2024-11-01, then:
+Roughly sorted task list while building out core functionality of `htc`.
 
-* Automate universal OS X binaries from Makefile: see [GitHub - randall77/makefat: A tool for making fat OSX binaries (a portable lipo)](https://github.com/randall77/makefat)
-* GET /jobs
-* Default to table output for things that are Tabler interface
+As things check off, please remember to copy to
+[CHANGES.md # Pending next release](./CHANGES.md#pending-next-release).
 
-# Soon
+## Soon
 
 Bugs:
   * Why does `htc project get | grep e60148ef-5e2c-45b6-ad12-913009469f03` find nothing?
@@ -45,7 +44,7 @@ Upcoming build automation:
     * prepare releases when tagged with https://github.com/softprops/action-gh-release
 
 
-# stuff from Alistair 2024-10-22
+## stuff from Alistair 2024-10-22
 
 things we run a lot in my team are:
   * list out all the workspaces - with the name / ID and (possibly) API key
@@ -71,7 +70,7 @@ separate to these simpler scripts is:
 I can give example output from any of the above / existing scripting, if that helps ?
 
 
-# Later
+## Later
 
 * merge in upload/download from htccli
 * scope out htcctl functionality to implement here
