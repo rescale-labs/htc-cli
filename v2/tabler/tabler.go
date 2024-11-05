@@ -5,7 +5,6 @@ package tabler
 import (
 	"fmt"
 	"io"
-	"log"
 	"strings"
 )
 
@@ -16,8 +15,12 @@ type Field struct {
 }
 
 type Tabler interface {
+	// Returns all fields to print in the table, in order.
 	Fields() []Field
-	Rows() [][]any
+
+	// Takes a row printf format string and a writer. Writes all rows to
+	// the writer, returning the first error encountered, if any.
+	WriteRows(string, io.Writer) error
 }
 
 func WriteTable(t Tabler, w io.Writer) error {
@@ -30,17 +33,10 @@ func WriteTable(t Tabler, w io.Writer) error {
 		headers = append(headers, strings.ToUpper(f.Name))
 	}
 	headerFmt := strings.Join(headerFmts, "  ") + "\n"
-	cellFmt := strings.Join(cellFmts, "  ") + "\n"
-	log.Printf("headerFmt=%q cellFmt=%q", headerFmt, cellFmt)
+	rowFmt := strings.Join(cellFmts, "  ") + "\n"
+
 	if _, err := fmt.Fprintf(w, headerFmt, headers...); err != nil {
 		return err
 	}
-
-	for _, values := range t.Rows() {
-		if _, err := fmt.Fprintf(w, cellFmt, values...); err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return t.WriteRows(rowFmt, w)
 }

@@ -1,6 +1,11 @@
-DOCKER := $(shell if which podman >/dev/null 2>/dev/null; then echo podman; else echo docker; fi)
-
 .DEFAULT_GOAL := build
+
+# Manually update this when tagging a new release.
+VERSION := v0.0.1
+
+.PHONY: echo-version
+echo-version:
+	@echo $(VERSION)
 
 BUILD := build
 
@@ -16,8 +21,6 @@ endif
 ifeq ($(UNAME_S),Darwin)
 	HOST_OS := darwin
 endif
-
-VERSION := 0.0.1
 
 # Create statically linked binaries.
 GO_OPTS := CGO_ENABLED=0
@@ -63,32 +66,52 @@ oapi: api/swagger-patched.json
 # Pattern rule for any individual arch.
 #
 # Follows pattern of build/dist/$GOOS/$GOARCH/htc
-$(BUILD)/dist/%/htc: $(GO_SOURCES)
+$(BUILD)/dist/%/rescale-htc/htc: $(GO_SOURCES)
 	@mkdir -p $(dir $@)
 	GOOS=$(subst /,,$(dir $*)) GOARCH=$(notdir $*) $(GO_OPTS) go build -o $@ ./cmd/htc
 
 # Overridding static rule for OS X universal. Uses a portable version of
 # lipo.
-$(BUILD)/dist/darwin/universal/htc: $(foreach arch,arm64 amd64,$(BUILD)/dist/darwin/$(arch)/htc)
+$(BUILD)/dist/darwin/universal/rescale-htc/htc: $(foreach arch,arm64 amd64,$(BUILD)/dist/darwin/$(arch)/rescale-htc/htc)
 	@mkdir -p $(dir $@)
 	go run github.com/randall77/makefat@7ddd0e42c8442593c87c1705a5545099604008e5 \
 		$@ $<
 
 # Convenience target for building+copying host OS binary to build/htc.
-$(BUILD)/htc: $(BUILD)/dist/$(HOST_OS)/$(HOST_ARCH)/htc
+$(BUILD)/htc: $(BUILD)/dist/$(HOST_OS)/$(HOST_ARCH)/rescale-htc/htc
 	@mkdir -p $(dir $@)
 	@cp $< $@
 
 .PHONY: build
 build: $(BUILD)/htc
 
-GO_DIST_OUTPUTS := $(foreach \
+DIST_BINARIES := $(foreach \
 	arch,arm64 amd64,$(foreach \
-		os,darwin linux,$(BUILD)/dist/$(os)/$(arch)/htc)) \
+		os,darwin linux,$(BUILD)/dist/$(os)/$(arch)/rescale-htc/htc)) \
 	$(BUILD)/dist/darwin/universal/htc
 
+ARCHIVE_PREFIX := $(BUILD)/dist/rescale-htc-$(VERSION)
+
+DIST_ARCHIVES := $(foreach \
+	arch,arm64 amd64,$(ARCHIVE_PREFIX)-linux-$(arch).tar.gz) \
+	$(ARCHIVE_PREFIX)-darwin-universal.tar.gz
+
+define tar-archive
+cp CHANGES.md $(dir $<)/
+tar -czf $@ -C $(dir $<).. rescale-htc
+endef
+
+$(ARCHIVE_PREFIX)-linux-amd64.tar.gz: $(BUILD)/dist/linux/amd64/rescale-htc/htc
+	$(tar-archive)
+
+$(ARCHIVE_PREFIX)-linux-arm64.tar.gz: $(BUILD)/dist/linux/arm64/rescale-htc/htc
+	$(tar-archive)
+
+$(ARCHIVE_PREFIX)-darwin-universal.tar.gz: $(BUILD)/dist/darwin/universal/rescale-htc/htc
+	$(tar-archive)
+
 .PHONY: dist
-dist: $(GO_DIST_OUTPUTS)
+dist: $(DIST_ARCHIVES)
 
 #
 # Tests and docs
