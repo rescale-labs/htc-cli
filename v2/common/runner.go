@@ -74,7 +74,7 @@ func getBearerToken(c *oapi.Client) (*oapi.HTCToken, error) {
 		return nil, fmt.Errorf("Login failed: error=%s description=%s",
 			r.GetError().Value, r.GetErrorDescription().Value)
 	}
-	return nil, fmt.Errorf("Login failed: unknown response.")
+	return nil, fmt.Errorf("Login failed: unknown response type %T.", res)
 }
 
 func updateBearerToken(c *oapi.Client, config *config.Config) error {
@@ -116,7 +116,7 @@ func NewRunner(cmd *cobra.Command) (*Runner, error) {
 }
 
 func (r *Runner) UpdateToken(now time.Time) error {
-	if r.Config.NeedsToken(time.Now()) {
+	if r.Config.NeedsToken(now) {
 		if r.Config.ApiKey == "" {
 			return fmt.Errorf("Needed a current bearer token, but unable to get one. Please set RESCALE_API_KEY and retry.")
 		}

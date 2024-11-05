@@ -24,5 +24,3 @@
   ```
 * Automate universal OS X binaries from Makefile: see [GitHub - randall77/makefat: A tool for making fat OSX binaries (a portable lipo)](https://github.com/randall77/makefat)
 * Default to table output for things that are Tabler interface
-
-
