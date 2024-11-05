@@ -310,6 +310,7 @@
                      }
                   ],
                   "example": "ErrorTimeout",
+                  "nullable": true,
                   "type": "string"
                },
                "group": {
@@ -367,6 +368,7 @@
                },
                "statusReason": {
                   "example": "Completed",
+                  "nullable": true,
                   "type": "string"
                },
                "tags": {
@@ -490,6 +492,13 @@
             ],
             "type": "string"
          },
+         "HTCJobStatusEvent": {
+            "properties": {
+               "statusReason": {
+                  "nullable": true
+               }
+            }
+         },
          "HTCJobSubmitRequest": {
             "properties": {
                "batchSize": {
@@ -584,6 +593,22 @@
                "$ref": "#/components/schemas/HTCJobSubmitRequest"
             },
             "type": "array"
+         },
+         "HTCJobs": {
+            "properties": {
+               "items": {
+                  "items": {
+                     "$ref": "#/components/schemas/HTCJob"
+                  },
+                  "type": "array"
+               },
+               "next": {
+                  "example": "https://page2.com",
+                  "format": "uri",
+                  "type": "string"
+               }
+            },
+            "type": "object"
          },
          "HTCLimitCreate": {
             "properties": {
@@ -3813,19 +3838,7 @@
                   "content": {
                      "application/json": {
                         "schema": {
-                           "properties": {
-                              "items": {
-                                 "items": {
-                                    "$ref": "#/components/schemas/HTCJob"
-                                 },
-                                 "type": "array"
-                              },
-                              "next": {
-                                 "example": "https://page2.com",
-                                 "format": "uri",
-                                 "type": "string"
-                              }
-                           }
+                           "$ref": "#/components/schemas/HTCJobs"
                         }
                      }
                   },

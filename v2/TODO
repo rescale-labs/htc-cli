@@ -1,3 +1,10 @@
+# Done
+
+A bunch of things before 2024-11-01, then:
+
+* Automate universal OS X binaries from Makefile: see [GitHub - randall77/makefat: A tool for making fat OSX binaries (a portable lipo)](https://github.com/randall77/makefat)
+* GET /jobs
+
 # Soon
 
 Essential API operations:
@@ -10,9 +17,6 @@ Essential API operations:
   * Tasks:
     * GET /tasks/summary-statistics
   * Limits: all the CRUD
-
-Essential build tooling:
-  * Automate universal OS X binaries from Makefile: see [GitHub - randall77/makefat: A tool for making fat OSX binaries (a portable lipo)](https://github.com/randall77/makefat)
 
 Testing:
   * Identify the most important things to test. Test them. Somehow.

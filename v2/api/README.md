@@ -39,6 +39,30 @@ things:
    that it works for our needs.
 3. Generates the code in `_oas` using [ogen](https://ogen.dev/docs/intro).
 
+## Updating the original swagger
+
+To download the latest swagger JSON from the prod HTC API and regenaret
+the client, from the parent directory, run:
+
+```
+make refresh-swagger
+make oapi
+```
+
+## Comparing original and patched swagger
+
+In general, reading `swagger.jsonnet` is probably the best way to see
+what we've changed from the prod API. But to view the real diff, for
+instance when debugging your jsonnet, use this make target from the
+parent directory:
+
+```
+make diff-swagger
+```
+
+This will compare a sorted version of the prod JSON to the
+jsonnet-patched output, `swagger-patched.json`.
+
 ## Other options for OpenAPI codegen.
 
 ogen-go/ogen has nice instrumentation for traces and timing, even if it

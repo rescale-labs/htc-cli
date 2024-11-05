@@ -91,6 +91,20 @@ local patches = {
         },
       },
     },
+    '/htc/projects/{projectId}/tasks/{taskId}/jobs'+: {
+      get+: {
+        responses+: {
+          '200'+: {
+            content+: {
+              'application/json'+: {
+                schema: { '$ref':
+                  '#/components/schemas/HTCJobs' },
+              },
+            },
+          },
+        },
+      },
+    },
     '/htc/projects/{projectId}/tasks/{taskId}/jobs/batch'+: {
       post+: {
         responses+: {
@@ -115,11 +129,44 @@ local patches = {
   },
   components+: {
     schemas+: {
+      HTCJob+: {
+        properties+: {
+          failureCode+: {
+            nullable: true,
+          },
+          statusReason+: {
+            nullable: true,
+          },
+        },
+      },
+      HTCJobs: {
+        type: 'object',
+        properties: {
+          items: {
+            items: {
+              '$ref': '#/components/schemas/HTCJob',
+            },
+            type: 'array',
+          },
+          next: {
+            example: 'https://page2.com',
+            format: 'uri',
+            type: 'string',
+          },
+        },
+      },
+      HTCJobStatusEvent+: {
+        properties+: {
+          statusReason+: {
+            nullable: true,
+          },
+        },
+      },
       HTCJobSubmitRequests: {
+        type: 'array',
         items: {
           '$ref': '#/components/schemas/HTCJobSubmitRequest',
         },
-        type: 'array',
       },
       HTCProject+: {
         properties+: {
@@ -131,16 +178,16 @@ local patches = {
         },
       },
       HTCProjectDimensions: {
+        type: 'array',
         items: {
           '$ref': '#/components/schemas/HTCComputeEnvironment',
         },
-        type: 'array',
       },
       HTCProjectLimits: {
+        type: 'array',
         items: {
           '$ref': '#/components/schemas/HTCProjectLimit',
         },
-        type: 'array',
       },
       HTCProjectsResponse: {
         type: 'object',

@@ -44,7 +44,7 @@ func init() {
 		Use: "job",
 	}
 	jobCmd.AddCommand(job.SubmitCmd)
-	// jobCmd.AddCommand(job.GetCmd)
+	jobCmd.AddCommand(job.GetCmd)
 	RootCmd.AddCommand(jobCmd)
 
 	// metrics
