@@ -1,5 +1,10 @@
 name: Pull Request CI
 
+# Cancel builds in progress when PR has been updated
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 on:
   pull_request:
     branches: [ main ]
