@@ -9,6 +9,7 @@ import (
 	"github.com/rescale/htc-storage-cli/v2/commands/metrics"
 	"github.com/rescale/htc-storage-cli/v2/commands/project"
 	"github.com/rescale/htc-storage-cli/v2/commands/task"
+	"github.com/rescale/htc-storage-cli/v2/commands/version"
 )
 
 var RootCmd = &cobra.Command{
@@ -71,4 +72,6 @@ func init() {
 	taskCmd.AddCommand(task.GetCmd)
 	RootCmd.AddCommand(taskCmd)
 
+	// version
+	RootCmd.AddCommand(version.Cmd)
 }

@@ -33,22 +33,22 @@ make godoc
 
 Steps are pretty simple:
 
-1. Update `VERSION` in `Makefile`:
-   ```
-   VERSION := v0.0.1
-   ```
 1. In `CHANGES.md`, rename `## Pending next release` -> `## {VERSION}`
-   and create a new pending next release section.
-1. Commit.
+1. Commit and push the branch for review.
+1. After merge, pull main and tag the version as an annoted tag:
+   ```
+   git pull origin main
+   git tag -a v<LATEST_VERSION_HERE>
+   ```
 1. Build the dist archives:
    ```
    make dist
    ```
-1. Create the tag and push:
+1. Push the tag:
    ```
-   git tag $(make echo-version)
+   git push --tags
    ```
 1. Create a new release at
    https://github.com/rescale/htc-storage-cli/releases/new
    1. Copy in the text from `CHANGES.md`.
-   1. Upload the dist archives.
+   1. Upload the dist archives you built in `build/dist`.
