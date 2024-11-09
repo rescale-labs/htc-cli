@@ -7,13 +7,6 @@ As things check off, please remember to copy to
 
 ## Soon
 
-Config:
-  * `htc config`:
-    * `set`
-    * `create-context`
-    * `use-context`
-    * `delete-context`
-
 Essential API operations:
   * Jobs:
     * GET /jobs/{jobId}
@@ -23,6 +16,9 @@ Essential API operations:
   * Tasks:
     * GET /tasks/summary-statistics
   * Limits: all the CRUD
+
+Warts:
+  * We now have `--project-id` on CLI, `project_id` in TOML, and `projectId` in some (but not all!) JSON. Will need to ask for Enkis' thoughts on this.
 
 Testing:
   * Identify the most important things to test. Test them. Somehow.

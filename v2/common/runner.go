@@ -41,23 +41,11 @@ func (c *ClientWrapper) Do(r *http.Request) (*http.Response, error) {
 }
 
 func loadConfig(cmd *cobra.Command) (*config.Config, error) {
-	outputFormat, err := cmd.Flags().GetString("output")
-	if err != nil {
-		return nil, config.UsageErrorf("Error setting output format: %w", err)
-	}
-
-	config, err := config.NewConfig(
-		"",
-		"",
-		"",
-		outputFormat)
+	c, err := config.NewConfig(cmd)
 	if err != nil {
 		return nil, err
 	}
-	if err := config.LoadToken(); err != nil {
-		return nil, err
-	}
-	return config, nil
+	return c, nil
 }
 
 func getBearerToken(c *oapi.Client) (*oapi.HTCToken, error) {
@@ -117,7 +105,7 @@ func NewRunner(cmd *cobra.Command) (*Runner, error) {
 
 func (r *Runner) UpdateToken(now time.Time) error {
 	if r.Config.NeedsToken(now) {
-		if r.Config.ApiKey == "" {
+		if r.Config.Credentials.ApiKey == "" {
 			return fmt.Errorf("Needed a current bearer token, but unable to get one. Please set RESCALE_API_KEY and retry.")
 		}
 		return r.RenewToken()
@@ -129,7 +117,7 @@ func (r *Runner) RenewToken() error {
 	if err := updateBearerToken(r.Client, r.Config); err != nil {
 		return fmt.Errorf("API client auth failed: %w", err)
 	}
-	if err := r.Config.SaveToken(); err != nil {
+	if err := r.Config.SaveCredentials(); err != nil {
 		return fmt.Errorf("Saving bearer token failed: %s", err)
 	}
 	return nil
@@ -161,28 +149,20 @@ type IDParams struct {
 func (r *Runner) GetIds(p *IDParams) error {
 	var errors []error
 	if p.RequireProjectId {
-		projectId, err := r.Command.Flags().GetString("project-id")
-		if err != nil {
-			errors = append(errors,
-				config.UsageErrorf("Error setting project ID: %w", err))
-		} else if projectId == "" {
+		if r.Config.ProjectId == "" {
 			errors = append(errors,
 				config.UsageErrorf("Error: missing project ID."))
 		} else {
-			p.ProjectId = projectId
+			p.ProjectId = r.Config.ProjectId
 		}
 	}
 
 	if p.RequireTaskId {
-		taskId, err := r.Command.Flags().GetString("task-id")
-		if err != nil {
-			errors = append(errors,
-				config.UsageErrorf("Error setting task ID: %w", err))
-		} else if taskId == "" {
+		if r.Config.TaskId == "" {
 			errors = append(errors,
 				config.UsageErrorf("Error: missing task ID."))
 		} else {
-			p.TaskId = taskId
+			p.TaskId = r.Config.TaskId
 		}
 	}
 
@@ -220,7 +200,7 @@ func (r *Runner) PrintResult(res interface{}, w io.Writer) error {
 		e.SetIndent("", "  ")
 		return e.Encode(res)
 
-	default:
+	case "text":
 		if t, ok := res.(tabler.Tabler); ok {
 			return tabler.WriteTable(t, w)
 		}
@@ -228,4 +208,6 @@ func (r *Runner) PrintResult(res interface{}, w io.Writer) error {
 		e.SetIndent("", "  ")
 		return e.Encode(res)
 	}
+
+	return fmt.Errorf("Unsupported output format %q", r.Config.OutputFormat)
 }
