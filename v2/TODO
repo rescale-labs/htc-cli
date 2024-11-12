@@ -7,8 +7,12 @@ As things check off, please remember to copy to
 
 ## Soon
 
-Bugs:
-  * Why does `htc project get | grep e60148ef-5e2c-45b6-ad12-913009469f03` find nothing?
+Config:
+  * `htc config`:
+    * `set`
+    * `create-context`
+    * `use-context`
+    * `delete-context`
 
 Essential API operations:
   * Jobs:
@@ -35,6 +39,7 @@ Usability:
             set: true
             "null": true
     ```
+		* Brian would like per-record (transposed table output) - this may / may not be the same as YAML output.
 
 Upcoming build automation:
     * Build artifacts for OS X universal, AMD64 linux, and arm64 linux. Then upload them to S3. See:

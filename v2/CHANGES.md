@@ -2,6 +2,8 @@
 
 ## Pending next release
 
+* added `htc version`
+
 ## v0.0.1
 
 * Initial functionality for the following commands:

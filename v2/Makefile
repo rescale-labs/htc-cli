@@ -1,7 +1,6 @@
 .DEFAULT_GOAL := build
 
-# Manually update this when tagging a new release.
-VERSION := v0.0.1
+VERSION = $(shell git describe --tags)
 
 .PHONY: echo-version
 echo-version:
@@ -22,8 +21,13 @@ ifeq ($(UNAME_S),Darwin)
 	HOST_OS := darwin
 endif
 
+GO_PACKAGE := github.com/rescale/htc-storage-cli/v2
+
 # Create statically linked binaries.
-GO_OPTS := CGO_ENABLED=0
+GO_BUILD := CGO_ENABLED=0 go build
+
+# Tag dist builds using pinned $(VERSION) above.
+GO_OPTS = -ldflags="-X '$(GO_PACKAGE)/commands/version.Version=$(VERSION)'"
 
 GO_SOURCES := \
 	../go.mod \
@@ -68,7 +72,10 @@ oapi: api/swagger-patched.json
 # Follows pattern of build/dist/$GOOS/$GOARCH/htc
 $(BUILD)/dist/%/rescale-htc/htc: $(GO_SOURCES)
 	@mkdir -p $(dir $@)
-	GOOS=$(subst /,,$(dir $*)) GOARCH=$(notdir $*) $(GO_OPTS) go build -o $@ ./cmd/htc
+	GOOS=$(subst /,,$(dir $*)) \
+		GOARCH=$(notdir $*) \
+		$(GO_BUILD) \
+		$(GO_OPTS) -o $@ ./cmd/htc
 
 # Overridding static rule for OS X universal. Uses a portable version of
 # lipo.
@@ -98,6 +105,7 @@ DIST_ARCHIVES := $(foreach \
 
 define tar-archive
 cp CHANGES.md $(dir $<)/
+cp RELEASE_README.md $(dir $<)/README.md
 tar -czf $@ -C $(dir $<).. rescale-htc
 endef
 
@@ -112,6 +120,10 @@ $(ARCHIVE_PREFIX)-darwin-universal.tar.gz: $(BUILD)/dist/darwin/universal/rescal
 
 .PHONY: dist
 dist: $(DIST_ARCHIVES)
+
+.PHONY: clean
+clean:
+	rm -f $(DIST_ARCHIVES) $(BUILD)/htc
 
 #
 # Tests and docs
