@@ -1,8 +1,11 @@
 # Changelog
 
-## Pending next release
+## v0.0.2
 
-* added `htc version`
+* Add `htc version`
+* Add `htc config set/unset` and `htc config context get/use/delete`.
+* Add README to release tarballs including docs on several basic
+  commands.
 
 ## v0.0.1
 
