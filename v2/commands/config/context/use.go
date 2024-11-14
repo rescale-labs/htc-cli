@@ -18,6 +18,8 @@ func use(cmd *cobra.Command, args []string) error {
 var UseCmd = &cobra.Command{
 	Use:   "use CONTEXT_NAME",
 	Short: "Sets the current config context",
+	Long: `Sets the specified context as the current context. 
+        This allows you to run commands without specifying the --project-id and --task-id flags.`,
 	Args:  cobra.ExactArgs(1),
 	Run:   common.WrapRunE(use),
 }
