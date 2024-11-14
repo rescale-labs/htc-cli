@@ -4,6 +4,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/rescale/htc-storage-cli/v2/commands/auth"
+	"github.com/rescale/htc-storage-cli/v2/commands/config"
+	cfgcontext "github.com/rescale/htc-storage-cli/v2/commands/config/context"
 	"github.com/rescale/htc-storage-cli/v2/commands/image"
 	"github.com/rescale/htc-storage-cli/v2/commands/job"
 	"github.com/rescale/htc-storage-cli/v2/commands/metrics"
@@ -21,7 +23,8 @@ var RootCmd = &cobra.Command{
 
 func init() {
 	// cobra.OnInitialize(initConfig)
-	RootCmd.PersistentFlags().StringP("output", "o", "", "output format")
+	RootCmd.PersistentFlags().StringP("output", "o", "text", "output format")
+	RootCmd.PersistentFlags().String("context", "", "config context to use (\"default\" if not provided)")
 
 	// auth
 	authCmd := &cobra.Command{
@@ -30,6 +33,23 @@ func init() {
 	authCmd.AddCommand(auth.LoginCmd)
 	authCmd.AddCommand(auth.WhoAmICmd)
 	RootCmd.AddCommand(authCmd)
+
+	// config
+	configCmd := &cobra.Command{
+		Use: "config",
+	}
+	configCmd.AddCommand(config.SetCmd)
+	configCmd.AddCommand(config.UnsetCmd)
+	RootCmd.AddCommand(configCmd)
+
+	// config context
+	contextCmd := &cobra.Command{
+		Use: "context",
+	}
+	contextCmd.AddCommand(cfgcontext.DeleteCmd)
+	contextCmd.AddCommand(cfgcontext.GetCmd)
+	contextCmd.AddCommand(cfgcontext.UseCmd)
+	configCmd.AddCommand(contextCmd)
 
 	// image
 	imageCmd := &cobra.Command{

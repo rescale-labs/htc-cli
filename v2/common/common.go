@@ -14,7 +14,7 @@ func WrapRunE(f func(cmd *cobra.Command, args []string) error) func(cmd *cobra.C
 		err := f(cmd, args)
 		if err != nil {
 			if _, ok := err.(*config.UsageError); ok {
-				fmt.Fprintf(cmd.ErrOrStderr(), "Error: %s\n", err)
+				fmt.Fprintf(cmd.ErrOrStderr(), "Error: %s\n\n", err)
 				cmd.Usage()
 				os.Exit(1)
 			}

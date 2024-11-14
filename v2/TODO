@@ -7,13 +7,6 @@ As things check off, please remember to copy to
 
 ## Soon
 
-Config:
-  * `htc config`:
-    * `set`
-    * `create-context`
-    * `use-context`
-    * `delete-context`
-
 Essential API operations:
   * Jobs:
     * GET /jobs/{jobId}
@@ -22,14 +15,24 @@ Essential API operations:
     * POST /jobs/cancel
   * Tasks:
     * GET /tasks/summary-statistics
-  * Limits: all the CRUD
+  * Limits:
+    * `workspace dimensions get`
+    * all the CRUD
+  * `clusters get`
+
+Warts:
+  * We now have `--project-id` on CLI, `project_id` in TOML, and `projectId` in some (but not all!) JSON. Will need to ask for Enkis' thoughts on this.
+  * Some commands display global flags in help even though they don't use them. And, calling cobra.Command.ResetFlags() on them doesn't seem to help. So. Yuck.
+  * Deleting context does not delete credentials
 
 Testing:
   * Identify the most important things to test. Test them. Somehow.
 
 Usability:
   * Print the env vars expected, if any, in usage.
-  * Support multiple config contexts for workspace, project, and task id
+  * Store workspace ID when refreshing token into credentials JSON:
+    * And store it in Config sturct
+    * And report it as a column in `config context get`
   * Decide on whether we need the YAML encoder. It doesn't handle OptString, etc properly, e.g.:
     ```
     $ go run cmd/htc/main.go  task get --project-id e8dee146-5606-407e-8e51-3f28070ece6e -l 1  -o yaml
