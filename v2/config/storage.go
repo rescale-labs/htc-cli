@@ -63,11 +63,11 @@ type BearerToken struct {
 
 type Credentials struct {
 	ApiKey      string      `json:"api_key"`
-	BearerToken BearerToken `json:"bearer_token",omitempty`
+	BearerToken BearerToken `json:"bearer_token,omitempty"`
 }
 
 func writeCredentials(p string, c *Credentials) error {
-	f, err := os.Create(p + ".tmp")
+	f, err := os.CreateTemp(filepath.Dir(p), filepath.Base(p)+".*")
 	if err != nil {
 		return err
 	}
