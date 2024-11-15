@@ -52,13 +52,7 @@ func init() {
 	configCmd.AddCommand(contextCmd)
 
 	// image
-	imageCmd := &cobra.Command{
-		Use: "image",
-	}
-	imageCmd.AddCommand(image.GetCmd)
-	// imageCmd.AddCommand(image.CreateRepoCmd)
-	// imageCmd.AddCommand(image.LoginCmd)
-	RootCmd.AddCommand(imageCmd)
+	RootCmd.AddCommand(image.ImageCmd)
 
 	// job
 	jobCmd := &cobra.Command{
@@ -76,13 +70,7 @@ func init() {
 	RootCmd.AddCommand(metricsCmd)
 
 	// project
-	projectCmd := &cobra.Command{
-		Use: "project",
-	}
-	projectCmd.AddCommand(project.DimensionsCmd)
-	projectCmd.AddCommand(project.GetCmd)
-	projectCmd.AddCommand(project.LimitsCmd)
-	RootCmd.AddCommand(projectCmd)
+	RootCmd.AddCommand(project.ProjectCmd)
 
 	// task
 	taskCmd := &cobra.Command{

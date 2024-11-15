@@ -8,6 +8,7 @@ As things check off, please remember to copy to
 ## Soon
 
 Essential API operations:
+  * `project retention-policy get` returns error on 404 instead of nothing
   * Jobs:
     * GET /jobs/{jobId}
     * GET /jobs/{jobId}/events
@@ -30,9 +31,6 @@ Testing:
 
 Usability:
   * Print the env vars expected, if any, in usage.
-  * Store workspace ID when refreshing token into credentials JSON:
-    * And store it in Config sturct
-    * And report it as a column in `config context get`
   * Decide on whether we need the YAML encoder. It doesn't handle OptString, etc properly, e.g.:
     ```
     $ go run cmd/htc/main.go  task get --project-id e8dee146-5606-407e-8e51-3f28070ece6e -l 1  -o yaml
@@ -44,8 +42,8 @@ Usability:
     ```
 		* Brian would like per-record (transposed table output) - this may / may not be the same as YAML output.
 
-Upcoming build automation:
-    * Build artifacts for OS X universal, AMD64 linux, and arm64 linux. Then upload them to S3. See:
+Automation:
+    * Run `make dist` and upload them to Github releases. Maybe S3, too.
         * https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-go
         * https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/storing-and-sharing-data-from-a-workflow
         * https://github.com/actions/upload-artifact?tab=readme-ov-file#where-does-the-upload-go

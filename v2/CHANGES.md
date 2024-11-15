@@ -1,5 +1,14 @@
 # Changelog
 
+## v.0.03
+
+* Extend `htc config context get` to report workspace name, workspace
+  id, and the email address associated with this context's credential.
+* Add `htc project retention-policy get`
+* Add `htc image create-repo/login-repo/get [IMAGE_NAME:TAG]`.
+  `login-repo` is particularly nice since it will log docker or podman
+  into a given HTC project's private registry.
+
 ## v0.0.2
 
 * Add `htc version`

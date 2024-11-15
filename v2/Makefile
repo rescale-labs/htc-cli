@@ -137,3 +137,21 @@ godoc:
 	@echo "view oapi docs on: http://localhost:6060/pkg/github.com/rescale/htc-storage-cli/v2/api/_oas/"
 	@echo
 	godoc -http=localhost:6060
+
+#
+# Uploading to S3
+#
+# Will be removed if we switch the repo over to rescale labs and open
+# source it.
+
+S3_CP := aws --profile dev s3 cp
+S3_PREFIX := s3://rescale-htc-cli-agae5ucedee8kohtaet8naekx/rescale-htc-storage/htc-cli
+
+
+.PHONY: login-s3
+login-s3:
+	aws sso login --profile dev
+
+.PHONY: upload
+upload:
+	$(foreach archive,$(DIST_ARCHIVES),$(S3_CP) $(archive) $(S3_PREFIX);)

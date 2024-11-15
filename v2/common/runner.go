@@ -48,8 +48,7 @@ func loadConfig(cmd *cobra.Command) (*config.Config, error) {
 	return c, nil
 }
 
-func getBearerToken(c *oapi.Client) (*oapi.HTCToken, error) {
-	ctx := context.Background()
+func getBearerToken(ctx context.Context, c *oapi.Client) (*oapi.HTCToken, error) {
 	res, err := c.AuthTokenGet(ctx)
 	if err != nil {
 		log.Fatalf("Login failed: %s", err)
@@ -65,14 +64,14 @@ func getBearerToken(c *oapi.Client) (*oapi.HTCToken, error) {
 	return nil, fmt.Errorf("Login failed: unknown response type %T.", res)
 }
 
-func updateBearerToken(c *oapi.Client, config *config.Config) error {
+func updateBearerToken(ctx context.Context, c *oapi.Client, cfg *config.Config) error {
 	start := time.Now()
-	t, err := getBearerToken(c)
+	t, err := getBearerToken(ctx, c)
 	if err != nil {
 		return fmt.Errorf("updateBearerToken: %w", err)
 	}
 	log.Printf("Bearer token: ExpiresIn=%d", t.GetExpiresIn().Value)
-	config.SetToken(t, start)
+	cfg.SetToken(t, start)
 	return nil
 }
 
@@ -113,10 +112,30 @@ func (r *Runner) UpdateToken(now time.Time) error {
 	return nil
 }
 
+func updateWhoAmI(ctx context.Context, c *oapi.Client, cfg *config.Config) error {
+	res, err := c.AuthWhoamiGet(ctx)
+	if err != nil {
+		return err
+	}
+	switch res := res.(type) {
+	case *oapi.WhoAmI:
+		cfg.SetWhoAmI(res)
+		return nil
+	case *oapi.OAuth2ErrorResponse:
+		return fmt.Errorf("auth error: %s", res.GetError().Value)
+	}
+	return fmt.Errorf("Unknown response type: %s", res)
+}
+
 func (r *Runner) RenewToken() error {
-	if err := updateBearerToken(r.Client, r.Config); err != nil {
+	ctx := context.Background()
+	if err := updateBearerToken(ctx, r.Client, r.Config); err != nil {
 		return fmt.Errorf("API client auth failed: %w", err)
 	}
+	if err := updateWhoAmI(ctx, r.Client, r.Config); err != nil {
+		return fmt.Errorf("API client auth failed: %w", err)
+	}
+
 	if err := r.Config.SaveCredentials(); err != nil {
 		return fmt.Errorf("Saving bearer token failed: %s", err)
 	}

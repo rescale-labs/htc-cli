@@ -68,6 +68,5 @@ var DimensionsGetCmd = &cobra.Command{
 // }
 
 func init() {
-	DimensionsGetCmd.Flags().String("project-id", "", "HTC project ID")
 	DimensionsCmd.AddCommand(DimensionsGetCmd)
 }
