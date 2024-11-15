@@ -52,13 +52,7 @@ func init() {
 	configCmd.AddCommand(contextCmd)
 
 	// image
-	imageCmd := &cobra.Command{
-		Use: "image",
-	}
-	imageCmd.AddCommand(image.GetCmd)
-	// imageCmd.AddCommand(image.CreateRepoCmd)
-	// imageCmd.AddCommand(image.LoginCmd)
-	RootCmd.AddCommand(imageCmd)
+	RootCmd.AddCommand(image.ImageCmd)
 
 	// job
 	jobCmd := &cobra.Command{
