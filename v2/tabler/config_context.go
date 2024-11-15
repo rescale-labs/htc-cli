@@ -3,6 +3,7 @@ package tabler
 import (
 	"fmt"
 	"io"
+	"unicode/utf8"
 
 	"github.com/rescale/htc-storage-cli/v2/config"
 )
@@ -25,13 +26,17 @@ type ContextConfs []*ContextConf
 func (c ContextConfs) Fields() []Field {
 	var nameLen, wsLen, emailLen int
 	for _, i := range c {
-		nameLen = max(nameLen, len(i.Name))
-		wsLen = max(wsLen, len(i.Identity.WorkspaceName))
-		emailLen = max(emailLen, len(i.Identity.Email))
+		// It's not especially clear how much this matters because
+		// some non-ASCII characters are wider than normal runes,
+		// especially emoji. But, let's at least try to make these
+		// the right width since fmt's widths use number of runes, too.
+		nameLen = max(nameLen, utf8.RuneCountInString(i.Name))
+		wsLen = max(wsLen, utf8.RuneCountInString(i.Identity.WorkspaceName))
+		emailLen = max(emailLen, utf8.RuneCountInString(i.Identity.Email))
 	}
-	nameField := fmt.Sprintf("%%-%ds", nameLen)
-	wsField := fmt.Sprintf("%%-%ds", wsLen)
-	emailField := fmt.Sprintf("%%-%ds", emailLen)
+	nameField := fmt.Sprintf("%%-%d.%ds", nameLen, nameLen)
+	wsField := fmt.Sprintf("%%-%d.%ds", wsLen, wsLen)
+	emailField := fmt.Sprintf("%%-%d.%ds", emailLen, emailLen)
 	return []Field{
 		Field{"", "%-2s", "%2s"},
 		Field{"Name", nameField, nameField},
