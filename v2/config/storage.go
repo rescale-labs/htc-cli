@@ -2,6 +2,8 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"time"
@@ -64,6 +66,14 @@ type BearerToken struct {
 type Credentials struct {
 	ApiKey      string      `json:"api_key"`
 	BearerToken BearerToken `json:"bearer_token,omitempty"`
+	Identity
+}
+
+// Shareable metadata associated with creds
+type Identity struct {
+	Email         string `json:"email,omitempty"`
+	WorkspaceId   string `json:"workspace_id,omitempty"`
+	WorkspaceName string `json:"workspace_name,omitempty"`
 }
 
 func writeCredentials(p string, c *Credentials) error {
@@ -94,7 +104,7 @@ func writeCredentials(p string, c *Credentials) error {
 func readCredentials(p string, c *Credentials) error {
 	f, err := os.Open(p)
 	if err != nil {
-		if os.IsNotExist(err) {
+		if errors.Is(err, fs.ErrNotExist) {
 			return nil
 		}
 		return err

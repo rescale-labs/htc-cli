@@ -54,7 +54,7 @@ func (c *Config) configPath() string {
 	return filepath.Join(c.DirPath, "config.toml")
 }
 
-func (c *Config) tokenPath(cfgContext string) string {
+func (c *Config) credentialsPath(cfgContext string) string {
 	return filepath.Join(c.DirPath, "private", cfgContext+"-credentials.json")
 }
 
@@ -79,11 +79,17 @@ func (c *Config) SetToken(t *oapi.HTCToken, issuedAt time.Time) {
 	}
 }
 
+func (c *Config) SetWhoAmI(w *oapi.WhoAmI) {
+	c.Credentials.Email = w.User.Value.Email.Value
+	c.Credentials.WorkspaceName = w.User.Value.Workspace.Value.Name.Value
+	c.Credentials.WorkspaceId = w.User.Value.Workspace.Value.ID.Value
+}
+
 func (c *Config) SaveCredentials() error {
 	if err := c.makeDirs(); err != nil {
 		return fmt.Errorf("SaveCredentials: %w", err)
 	}
-	if err := writeCredentials(c.tokenPath(c.Context), &c.Credentials); err != nil {
+	if err := writeCredentials(c.credentialsPath(c.Context), &c.Credentials); err != nil {
 		return fmt.Errorf("SaveCredentials: %w", err)
 	}
 	return nil
@@ -92,10 +98,19 @@ func (c *Config) SaveCredentials() error {
 // Attempts to load a token from our config dir, returning error only
 // when token can't be parsed or we weren't able to read the existing
 // file.
-func (c *Config) loadCredentials() error {
-	if err := readCredentials(c.tokenPath(c.Context), &c.Credentials); err != nil {
+func (c *Config) loadCredentials(contextName string, creds *Credentials) error {
+	if err := readCredentials(c.credentialsPath(contextName), creds); err != nil {
 		return fmt.Errorf("Failed to load credentials: %w", err)
 	}
+	return nil
+}
+
+func (c *Config) ReadIdentity(contextName string, i *Identity) error {
+	var creds Credentials
+	if err := c.loadCredentials(contextName, &creds); err != nil {
+		return err
+	}
+	*i = creds.Identity
 	return nil
 }
 
@@ -324,7 +339,7 @@ func NewConfig(cmd *cobra.Command) (*Config, error) {
 	//
 	// Set credentials and remaining config values
 	//
-	if err := c.loadCredentials(); err != nil {
+	if err := c.loadCredentials(c.Context, &c.Credentials); err != nil {
 		return nil, err
 	}
 	switch {
@@ -334,7 +349,7 @@ func NewConfig(cmd *cobra.Command) (*Config, error) {
 		return nil, UsageErrorf(
 			"API key is not present in %s or as env var RESCALE_API_KEY, "+
 				"and bearer token in %s does not exist or is expired.",
-			c.tokenPath(c.Context), c.tokenPath(c.Context))
+			c.credentialsPath(c.Context), c.credentialsPath(c.Context))
 	}
 
 	switch {
