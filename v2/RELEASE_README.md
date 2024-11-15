@@ -3,8 +3,18 @@
 `htc` is a single, static binary for doing the most useful things in
 HTC, including with the API and inside the job runtime.
 
+## DISCLAIMER
+
 **Please note**: this version of `htc` is pre-release, alpha software
-with very limited functionality.
+with very limited functionality. It is provided with NO WARRANTY. Bugs
+are likely and features are mostly incomplete.
+
+Bug reports and feature requests are welcome, though at this stage,
+Rescale's HTC team is mostly just working to fill out basic
+functionality to parity with the Rescale HTC API, and on a best effort
+basis. For any problems or questions, please contact `htc`'s current
+maintainer, Hunter Blanks, at hblanks@rescale.com or in any appropriate,
+existing Slack channel.
 
 ## Quickstart
 
