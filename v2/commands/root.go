@@ -76,13 +76,7 @@ func init() {
 	RootCmd.AddCommand(metricsCmd)
 
 	// project
-	projectCmd := &cobra.Command{
-		Use: "project",
-	}
-	projectCmd.AddCommand(project.DimensionsCmd)
-	projectCmd.AddCommand(project.GetCmd)
-	projectCmd.AddCommand(project.LimitsCmd)
-	RootCmd.AddCommand(projectCmd)
+	RootCmd.AddCommand(project.ProjectCmd)
 
 	// task
 	taskCmd := &cobra.Command{

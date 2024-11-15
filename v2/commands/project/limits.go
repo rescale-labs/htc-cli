@@ -68,6 +68,5 @@ var LimitsGetCmd = &cobra.Command{
 // }
 
 func init() {
-	LimitsGetCmd.Flags().String("project-id", "", "HTC project ID")
 	LimitsCmd.AddCommand(LimitsGetCmd)
 }
