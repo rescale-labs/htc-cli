@@ -29,6 +29,17 @@ after running:
 make godoc
 ```
 
+### Updating dependencies
+
+Dependabot will occasionally want updates, or you'll want to do them
+yourself. To do that, from the top directory of the repo:
+
+```
+go get -u
+go get -u ./...
+go mod tidy
+```
+
 ## Releasing
 
 Steps are pretty simple:
