@@ -145,8 +145,10 @@ godoc:
 # source it.
 
 S3_CP := aws --profile dev s3 cp
-S3_PREFIX := s3://rescale-htc-cli-agae5ucedee8kohtaet8naekx/rescale-htc-storage/htc-cli
-
+S3_BUCKET := rescale-htc-cli-agae5ucedee8kohtaet8naekx
+S3_DIR := rescale-htc-storage/htc-cli
+S3_PREFIX := s3://$(S3_BUCKET)/$(S3_DIR)
+S3_HTTPS_URL := https://$(S3_BUCKET).s3.eu-west-1.amazonaws.com/$(S3_DIR)
 
 .PHONY: login-s3
 login-s3:
@@ -154,4 +156,8 @@ login-s3:
 
 .PHONY: upload
 upload:
-	$(foreach archive,$(DIST_ARCHIVES),$(S3_CP) $(archive) $(S3_PREFIX);)
+	$(foreach archive,$(DIST_ARCHIVES),$(S3_CP) $(archive) $(S3_PREFIX)/$(notdir $(archive));)
+	@echo
+	@echo "Archives available at"
+	@echo
+	@$(foreach archive,$(DIST_ARCHIVES),echo "  " $(S3_HTTPS_URL)/$(notdir $(archive));)
