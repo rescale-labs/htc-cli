@@ -24,22 +24,22 @@ func ParseBucket(bucketPath string) (string, string, error) {
 	return match[1], strings.TrimRight(match[2], "/"), nil
 }
 
-func ParseArgs(args []string) (string, string, error) {
+func ParseArgs(args []string) (Transfer, error) {
 	help := flag.Bool("h", false, "help message")
 	cmd := flag.NewFlagSet("cp", flag.ContinueOnError)
+	parallel := cmd.Int("p", 10, "Number of parallel transfers")
+
 	err := cmd.Parse(args)
 
 	if err != nil {
-		return "", "", errors.New("error parsing args")
+		return Transfer{[]string{""}, "", 0}, errors.New("error parsing args")
 	}
 
-	if *help || len(cmd.Args()) != 2 {
-		Usage()
+	if *help || len(cmd.Args()) < 2 {
+		return Transfer{[]string{""}, "", 0}, errors.New("user chose help or not enough args")
 	}
 
-	src := cmd.Arg(0)
-	dest := cmd.Arg(1)
-	return src, dest, nil
+	return Transfer{cmd.Args()[:len(cmd.Args())-1], cmd.Args()[len(cmd.Args())-1], *parallel}, nil
 }
 
 func Usage() {
@@ -48,6 +48,12 @@ func Usage() {
 
 Available commands:
     cp      uploads or downloads one or more files to a destination URL
+
+Available options:
+	-h			Print this usage
+
+Available cp Options:
+	-p			Number of uploads/downloads to make in parallel [default=10]
 
 cp arguments:
     src		  path or cloud storage URI
@@ -83,8 +89,10 @@ func getGoogleCredentials() (string, error) {
 	return credentials, nil
 }
 
-type TransferObject struct {
-	source      string
-	destination string
-	err         error
+// Transfer is a struct for the parsed command line args sources can be a path, list of paths (wildcards) or a remote object
+// destination can be a path or remote path and parallelization is the amount of goroutine workers when transferring (default is 10)
+type Transfer struct {
+	sources         []string
+	destination     string
+	parallelization int
 }

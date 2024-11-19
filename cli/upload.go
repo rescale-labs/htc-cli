@@ -17,36 +17,23 @@ import (
 
 // Upload iterates over local paths to upload as a remote object
 // An error is returned if there was a failure uploading
-func Upload(ctx context.Context, client *storage.Client, src string, dest string) error {
+func Upload(ctx context.Context, client *storage.Client, transfer *Transfer) error {
+	dest := transfer.destination
 	bucket, path, err := ParseBucket(dest)
 	if err != nil {
 		return err
 	}
-
-	stat, err := os.Stat(src)
-	if err != nil {
-		return errors.New("unable to check if path is file or directory")
-	}
-
-	if stat.IsDir() {
-		return uploadDirectory(ctx, client, bucket, path, src)
-	} else if stat.Mode().IsRegular() {
-		upload := uploadFile(ctx, client, bucket, fmt.Sprintf("%s/%s", path, stat.Name()), src)
-		return upload.err
-	} else {
-		return fmt.Errorf("path %s is not a directory or file", src)
-	}
+	return uploadFiles(ctx, client, bucket, path, transfer)
 }
 
-func uploadDirectory(ctx context.Context, client *storage.Client, bucket string, remotePath string, localPath string) error {
+func uploadFiles(ctx context.Context, client *storage.Client, bucket, remotePath string, transfer *Transfer) error {
 	var failedUploads []string
 
-	jobs := make(chan TransferObject)
-	results := make(chan TransferObject)
-	walkError := make(chan error)
+	jobs := make(chan TransferResult)
+	results := make(chan TransferResult)
 	wg := sync.WaitGroup{}
 
-	const numWorkers = 10
+	numWorkers := transfer.parallelization
 
 	for w := 0; w < numWorkers; w++ {
 		wg.Add(1)
@@ -54,35 +41,33 @@ func uploadDirectory(ctx context.Context, client *storage.Client, bucket string,
 	}
 
 	go func() {
-		err := filepath.Walk(localPath, func(pathStr string, info os.FileInfo, err error) error {
-			if !info.IsDir() {
-				objectPath := strings.TrimPrefix(pathStr, localPath)
-				objectPath = strings.TrimPrefix(objectPath, "/")
-				remotePath = strings.TrimPrefix(remotePath, "/")
-				sourceFilePath := path.Join(strings.TrimSuffix(localPath, "/"), objectPath)
-				remoteFilePath := path.Join(remotePath, objectPath)
-
-				upload := TransferObject{sourceFilePath, remoteFilePath, nil}
-				jobs <- upload
+		for _, source := range transfer.sources {
+			// TODO: Improve handling of walk errors and stat errors
+			if _, err := os.Stat(source); err != nil {
+				continue
 			}
-			return err
-		})
+			filepath.Walk(source, func(pathStr string, info os.FileInfo, err error) error {
+				if !info.IsDir() {
+					objectPath := strings.TrimPrefix(pathStr, "/")
+					remotePath = strings.TrimPrefix(remotePath, "/")
+					remoteFilePath := path.Join(remotePath, objectPath)
+
+					upload := TransferResult{pathStr, remoteFilePath, nil}
+					jobs <- upload
+				}
+				return err
+			})
+		}
 		// when there are no more files to upload we close the jobs channel wait then close the results
 		close(jobs)
 		wg.Wait()
 		close(results)
-		walkError <- err
 	}()
 
 	for result := range results {
 		if result.err != nil {
 			failedUploads = append(failedUploads, result.source)
 		}
-	}
-
-	close(walkError)
-	if err := <-walkError; err != nil {
-		return err
 	}
 
 	if len(failedUploads) != 0 {
@@ -95,8 +80,8 @@ func uploadDirectory(ctx context.Context, client *storage.Client, bucket string,
 	return nil
 }
 
-func uploadFile(ctx context.Context, client *storage.Client, bucket string, object string, localFile string) (result TransferObject) {
-	result = TransferObject{localFile, object, nil}
+func uploadFile(ctx context.Context, client *storage.Client, bucket string, object string, localFile string) (result TransferResult) {
+	result = TransferResult{localFile, object, nil}
 	f, err := os.Open(localFile)
 	if err != nil {
 		result.err = err
@@ -113,7 +98,7 @@ func uploadFile(ctx context.Context, client *storage.Client, bucket string, obje
 	o := client.Bucket(bucket).Object(object)
 
 	// TODO: reduce default timeout and make it configurable
-	workerCtx, cancel := context.WithTimeout(ctx, time.Hour*1)
+	workerCtx, cancel := context.WithTimeout(ctx, time.Minute*20)
 	defer cancel()
 
 	writer := o.NewWriter(workerCtx)
@@ -129,11 +114,11 @@ func uploadFile(ctx context.Context, client *storage.Client, bucket string, obje
 		return result
 	}
 
-	log.Printf("Blob %s uploaded.\n", object)
+	log.Printf("Blob %s uploaded to %s", localFile, object)
 	return result
 }
 
-func uploadWorker(ctx context.Context, client *storage.Client, bucket string, jobs <-chan TransferObject, results chan<- TransferObject, wg *sync.WaitGroup) {
+func uploadWorker(ctx context.Context, client *storage.Client, bucket string, jobs <-chan TransferResult, results chan<- TransferResult, wg *sync.WaitGroup) {
 	for job := range jobs {
 		results <- uploadFile(ctx, client, bucket, job.destination, job.source)
 	}

@@ -19,7 +19,9 @@ import (
 // Download iterates over remote objects from a csp to download into a destination directory
 // An error is returned if there was a failure listing or downloading files
 // The local destination path is created if it does not exist
-func Download(ctx context.Context, client *storage.Client, src string, dest string) error {
+func Download(ctx context.Context, client *storage.Client, transfer *Transfer) error {
+	src := transfer.sources[0]
+	dest := transfer.destination
 	bucket, remotePath, err := ParseBucket(src)
 	if err != nil {
 		return err
@@ -31,18 +33,18 @@ func Download(ctx context.Context, client *storage.Client, src string, dest stri
 		return err
 	}
 
-	return downloadObjects(ctx, client, bucket, remotePath, dest)
+	return downloadObjects(ctx, client, bucket, remotePath, dest, transfer)
 }
 
-func downloadObjects(ctx context.Context, client *storage.Client, bucket, remotePath, destinationDir string) error {
+func downloadObjects(ctx context.Context, client *storage.Client, bucket, remotePath, destinationDir string, transfer *Transfer) error {
 	var failedDownloads []string
 
-	jobs := make(chan TransferObject)
-	results := make(chan TransferObject)
+	jobs := make(chan TransferResult)
+	results := make(chan TransferResult)
 	pageError := make(chan error)
 	wg := sync.WaitGroup{}
 
-	const numWorkers = 10
+	numWorkers := transfer.parallelization
 
 	for w := 0; w < numWorkers; w++ {
 		wg.Add(1)
@@ -64,7 +66,11 @@ func downloadObjects(ctx context.Context, client *storage.Client, bucket, remote
 
 			for _, object := range remoteObjects {
 				destinationFilePath := getLocalDestination(object.Name, remotePath, destinationDir)
-				jobs <- TransferObject{object.Name, destinationFilePath, nil}
+				jobs <- TransferResult{object.Name, destinationFilePath, nil}
+				// if we are only downloading a single file we can break out of this loop
+				if object.Name == remotePath {
+					break
+				}
 			}
 
 			if nextPageToken == "" {
@@ -79,6 +85,7 @@ func downloadObjects(ctx context.Context, client *storage.Client, bucket, remote
 
 	for result := range results {
 		if result.err != nil {
+			log.Printf("Result = %v", result.err)
 			failedDownloads = append(failedDownloads, result.source)
 		}
 	}
@@ -98,8 +105,8 @@ func downloadObjects(ctx context.Context, client *storage.Client, bucket, remote
 	return nil
 }
 
-func downloadFile(ctx context.Context, client *storage.Client, bucket string, object string, localFile string) (result TransferObject) {
-	result = TransferObject{localFile, object, nil}
+func downloadFile(ctx context.Context, client *storage.Client, bucket string, object string, localFile string) (result TransferResult) {
+	result = TransferResult{localFile, object, nil}
 	destinationDirectory := filepath.Dir(localFile)
 	err := os.MkdirAll(destinationDirectory, 0755)
 	if err != nil {
@@ -108,7 +115,7 @@ func downloadFile(ctx context.Context, client *storage.Client, bucket string, ob
 	}
 
 	// TODO: reduce default timeout and make it configurable
-	workerCtx, cancel := context.WithTimeout(ctx, time.Hour)
+	workerCtx, cancel := context.WithTimeout(ctx, time.Minute*20)
 	defer cancel()
 
 	filePtr, err := os.Create(localFile)
@@ -140,24 +147,27 @@ func downloadFile(ctx context.Context, client *storage.Client, bucket string, ob
 		return result
 	}
 
-	log.Printf("Blob %v downloaded to local file %v\n", object, localFile)
 	return result
 }
 
-func getLocalDestination(objectName string, remotePath string, destinationDir string) string {
-	objectPath := strings.TrimPrefix(objectName, remotePath)
+func getLocalDestination(objectName string, remotePath string, destination string) string {
+	// this is if we cut based on an object file
+	objectPath := strings.TrimPrefix(objectName, remotePath[:strings.LastIndex(remotePath, "/")])
+	// this is if we want to instead cut based on a directory
+	if objectName != remotePath {
+		objectPath = strings.TrimPrefix(objectName, remotePath)
+	}
 	objectPath = strings.TrimPrefix(objectPath, "/")
-	destinationDir = strings.TrimSuffix(destinationDir, "/")
-	destinationPath := path.Join(destinationDir, objectPath)
+	destination = strings.TrimSuffix(destination, "/")
+	destinationPath := path.Join(destination, objectPath)
 	// this check is to support downloading a single remote object, not just a path
 	if objectName == remotePath {
-		_, file := filepath.Split(objectName)
-		destinationPath = path.Join(destinationPath, file)
+		destinationPath = destination
 	}
 	return destinationPath
 }
 
-func downloadWorker(ctx context.Context, client *storage.Client, bucket string, jobs <-chan TransferObject, results chan<- TransferObject, wg *sync.WaitGroup) {
+func downloadWorker(ctx context.Context, client *storage.Client, bucket string, jobs <-chan TransferResult, results chan<- TransferResult, wg *sync.WaitGroup) {
 	for job := range jobs {
 		results <- downloadFile(ctx, client, bucket, job.source, job.destination)
 	}

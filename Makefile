@@ -1,7 +1,7 @@
 DOCKER := $(shell if which podman >/dev/null 2>/dev/null; then echo podman; else echo docker; fi)
 BUILD := build
 DIST_ARCH := $(shell if [ "$$(uname -m)" = "x86_64" ]; then echo amd64; else echo arm64; fi)
-VERSION := 0.0.1
+VERSION := 0.0.2
 DIST_TGZ := $(BUILD)/htccli-$(VERSION)-$(DIST_ARCH).tar.gz
 
 BUILD_OPTS := --platform linux/$(DIST_ARCH)
@@ -39,6 +39,10 @@ $(BUILD)/htccli.linux-arm64: $(GO_SOURCES)
 		GOARCH=arm64 \
 		go build -o $@
 
+
+.PHONY: build
+build: $(GO_LINUX_BINARIES)
+
 .PHONY: image
 image: $(GO_LINUX_BINARIES)
 	@$(DOCKER) manifest rm $(IMAGE_NAME):$(VERSION) || true
@@ -72,11 +76,11 @@ binary: format
 
 .PHONY: test
 test:
-	go test
+	go test ./...
 
 .PHONY: clean
 clean:
-	rm -f htccli
+	rm -rf $(BUILD)
 
 
 .PHONY: push-dev

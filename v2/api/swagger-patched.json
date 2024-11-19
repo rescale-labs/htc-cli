@@ -1,0 +1,4947 @@
+{
+   "components": {
+      "schemas": {
+         "Architecture": {
+            "enum": [
+               "AARCH64",
+               "X86",
+               "A100"
+            ],
+            "type": "string"
+         },
+         "AutoscalingConfig": {
+            "properties": {
+               "enabled": {
+                  "type": "boolean"
+               },
+               "maxNodeCount": {
+                  "format": "int32",
+                  "type": "integer"
+               },
+               "minNodeCount": {
+                  "format": "int32",
+                  "type": "integer"
+               }
+            },
+            "type": "object"
+         },
+         "AutoscalingProfile": {
+            "enum": [
+               "PROFILE_UNSPECIFIED",
+               "OPTIMIZE_UTILIZATION",
+               "BALANCED",
+               "UNRECOGNIZED"
+            ],
+            "type": "string"
+         },
+         "CloudProvider": {
+            "enum": [
+               "AWS",
+               "GCP",
+               "NGC",
+               "AZURE",
+               "RC",
+               "UNASSIGNED"
+            ],
+            "type": "string"
+         },
+         "ContainerDetails": {
+            "properties": {
+               "exitCode": {
+                  "example": 3,
+                  "type": "number"
+               },
+               "reason": {
+                  "example": "Container Exited",
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "DerivedComputeAttributes": {
+            "properties": {
+               "architecture": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/Architecture"
+                     }
+                  ],
+                  "description": "The CPU architecture of the environment.",
+                  "type": "string"
+               },
+               "memory": {
+                  "description": "The total memory available in the compute environment.",
+                  "format": "double",
+                  "type": "number"
+               },
+               "swap": {
+                  "description": "If swap is enabled for the node pool. Only for GCP",
+                  "type": "boolean"
+               },
+               "vCPUs": {
+                  "description": "The number of virtual CPU cores allocated to the environment.",
+                  "format": "int32",
+                  "type": "integer"
+               }
+            },
+            "type": "object"
+         },
+         "EnvPair": {
+            "properties": {
+               "name": {
+                  "example": "FOO",
+                  "pattern": "^(?!.*AWS_BATCH_|RESCALE_PROJECT_ID|RESCALE_TASK_ID|RESCALE_JOB_ID|PROJECT_SHARED_FOLDER|TASK_SHARED_FOLDER|AWS_SESSION_TOKEN|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY).*",
+                  "type": "string"
+               },
+               "value": {
+                  "example": "bar",
+                  "type": "string"
+               }
+            },
+            "required": [
+               "name",
+               "value"
+            ],
+            "type": "object"
+         },
+         "ExperimentalFields": {
+            "properties": {
+               "kubernetesSwap": {
+                  "type": "boolean"
+               }
+            },
+            "type": "object"
+         },
+         "FeatureFlagsResult": {
+            "properties": {
+               "count": {
+                  "format": "int32",
+                  "type": "integer"
+               },
+               "results": {
+                  "items": {
+                     "$ref": "#/components/schemas/RescaleFlag"
+                  },
+                  "type": "array"
+               }
+            },
+            "type": "object"
+         },
+         "HTCCluster": {
+            "properties": {
+               "autoscaling": {
+                  "$ref": "#/components/schemas/AutoscalingProfile"
+               },
+               "name": {
+                  "type": "string"
+               },
+               "nodePools": {
+                  "items": {
+                     "$ref": "#/components/schemas/HTCNodePool"
+                  },
+                  "type": "array"
+               },
+               "region": {
+                  "$ref": "#/components/schemas/RescaleRegion"
+               },
+               "status": {
+                  "type": "string"
+               },
+               "subnetwork": {
+                  "type": "string"
+               },
+               "version": {
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "HTCClusterStatusResponse": {
+            "properties": {
+               "clusters": {
+                  "items": {
+                     "$ref": "#/components/schemas/HTCCluster"
+                  },
+                  "type": "array"
+               },
+               "gcpProjectId": {
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "HTCComputeEnvironment": {
+            "properties": {
+               "computeScalingPolicy": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/AutoscalingProfile"
+                     }
+                  ],
+                  "description": "The autoscaling profile used in the environment. Relevant only for GCP environments. \"BALANCED\" is the default. \"OPTIMIZE-UTILIZATION\" aggressively scales down clusters, optimizing for batch workloads with less sensitivity to start-up latency.",
+                  "type": "string"
+               },
+               "derived": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/DerivedComputeAttributes"
+                     }
+                  ],
+                  "description": "This nested object provides detailed information about the compute resources allocated to the environment, aiding users in understanding the capabilities specifically of the `machineType`.",
+                  "readOnly": true,
+                  "type": "object"
+               },
+               "hyperthreading": {
+                  "description": "Indicates if simultaneous multithreading (SMT) is enabled. Affects performance for tasks that may not benefit from parallelism. Useful for understanding the nature of CPU allocation for high-performance tasks.",
+                  "type": "boolean"
+               },
+               "machineType": {
+                  "description": "The CSP-specific name for the instance type.",
+                  "example": "t2d-standard-16",
+                  "type": "string"
+               },
+               "priority": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/JobPriority"
+                     }
+                  ],
+                  "description": "The instance priority type. \"ON_DEMAND_ECONOMY\" for spot instances, \"ON_DEMAND_PRIORITY\" for on-demand instances. Spot instances (\"ON_DEMAND_ECONOMY\") offer cost savings but less reliability compared to on-demand instances.",
+                  "type": "string"
+               },
+               "region": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/RescaleRegion"
+                     }
+                  ],
+                  "description": "The CSP-specific region where the job will run. Selecting a region close to data sources or users can reduce latency.",
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "HTCImageStatus": {
+            "properties": {
+               "status": {
+                  "$ref": "#/components/schemas/Status"
+               }
+            },
+            "type": "object"
+         },
+         "HTCImages": {
+            "properties": {
+               "containerRegistry": {
+                  "example": "123456789.dkr.ecr.us-west-2.amazonaws.com/rescale/project-12345/",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "images": {
+                  "example": [
+                     "repo1:latest",
+                     "repo1:v2",
+                     "repo2:latest"
+                  ],
+                  "items": {
+                     "type": "string"
+                  },
+                  "readOnly": true,
+                  "type": "array"
+               }
+            },
+            "type": "object"
+         },
+         "HTCInfraResource": {
+            "properties": {
+               "name": {
+                  "type": "string"
+               },
+               "resourceId": {
+                  "type": "string"
+               },
+               "resourceStatus": {
+                  "$ref": "#/components/schemas/Status1"
+               }
+            },
+            "type": "object"
+         },
+         "HTCJob": {
+            "properties": {
+               "architecture": {
+                  "$ref": "#/components/schemas/Architecture"
+               },
+               "commands": {
+                  "example": [
+                     "python",
+                     "script.py"
+                  ],
+                  "items": {
+                     "type": "string"
+                  },
+                  "type": "array"
+               },
+               "completedAt": {
+                  "$ref": "#/components/schemas/Instant"
+               },
+               "container": {
+                  "$ref": "#/components/schemas/ContainerDetails"
+               },
+               "createdAt": {
+                  "$ref": "#/components/schemas/Instant"
+               },
+               "createdBy": {
+                  "example": "qWoUF",
+                  "type": "string"
+               },
+               "envs": {
+                  "items": {
+                     "$ref": "#/components/schemas/EnvPair"
+                  },
+                  "type": "array"
+               },
+               "execTimeoutSeconds": {
+                  "format": "int32",
+                  "type": "integer"
+               },
+               "failureCode": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/HTCJobErrorCodeName"
+                     }
+                  ],
+                  "example": "ErrorTimeout",
+                  "nullable": true,
+                  "type": "string"
+               },
+               "group": {
+                  "example": "sample-group",
+                  "type": "string"
+               },
+               "imageName": {
+                  "type": "string"
+               },
+               "instanceId": {
+                  "type": "string"
+               },
+               "instanceLabels": {
+                  "$ref": "#/components/schemas/InstanceLabels"
+               },
+               "jobExecutionEnvironment": {
+                  "$ref": "#/components/schemas/JobExecutionEnvironment"
+               },
+               "jobUUID": {
+                  "example": "155f18d4",
+                  "type": "string"
+               },
+               "maxDiskGiB": {
+                  "format": "int32",
+                  "type": "integer"
+               },
+               "maxMemory": {
+                  "format": "int32",
+                  "type": "integer"
+               },
+               "maxSwap": {
+                  "format": "int32",
+                  "type": "integer"
+               },
+               "maxVCpus": {
+                  "format": "int32",
+                  "type": "integer"
+               },
+               "projectId": {
+                  "example": "project-12345",
+                  "type": "string"
+               },
+               "providerJobId": {
+                  "example": "provider-id-12345",
+                  "type": "string"
+               },
+               "region": {
+                  "$ref": "#/components/schemas/RescaleRegion"
+               },
+               "startedAt": {
+                  "$ref": "#/components/schemas/Instant"
+               },
+               "status": {
+                  "$ref": "#/components/schemas/RescaleJobStatus"
+               },
+               "statusReason": {
+                  "example": "Completed",
+                  "nullable": true,
+                  "type": "string"
+               },
+               "tags": {
+                  "items": {
+                     "$ref": "#/components/schemas/Tag"
+                  },
+                  "type": "array"
+               },
+               "taskId": {
+                  "example": "task-12345",
+                  "type": "string"
+               },
+               "updatedAt": {
+                  "$ref": "#/components/schemas/Instant"
+               },
+               "workspaceId": {
+                  "example": "04-8098234",
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "HTCJobDefinition": {
+            "properties": {
+               "architecture": {
+                  "$ref": "#/components/schemas/Architecture"
+               },
+               "claims": {
+                  "items": {
+                     "$ref": "#/components/schemas/NameValuePair"
+                  },
+                  "type": "array"
+               },
+               "commands": {
+                  "example": [
+                     "python",
+                     "script.py"
+                  ],
+                  "items": {
+                     "type": "string"
+                  },
+                  "type": "array"
+               },
+               "envs": {
+                  "items": {
+                     "$ref": "#/components/schemas/EnvPair"
+                  },
+                  "type": "array"
+               },
+               "execTimeoutSeconds": {
+                  "example": 300,
+                  "format": "int32",
+                  "maximum": 1209600,
+                  "minimum": 60,
+                  "type": "integer"
+               },
+               "imageName": {
+                  "example": "my-image",
+                  "minLength": 1,
+                  "pattern": "(?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*(:[\\_a-zA-Z0-9]([\\-\\.\\_a-zA-Z0-9])*)?",
+                  "type": "string"
+               },
+               "maxDiskGiB": {
+                  "description": "maxDiskGiB is supported on GCP only.",
+                  "example": 1,
+                  "format": "int32",
+                  "maximum": 64000,
+                  "minimum": 0,
+                  "type": "integer"
+               },
+               "maxMemory": {
+                  "example": 128,
+                  "format": "int32",
+                  "maximum": 235520,
+                  "minimum": 4,
+                  "type": "integer"
+               },
+               "maxSwap": {
+                  "description": "On AWS, maxSwap allows swap memory to be used, up to the limit. On other providers, swap is not available, but maxSwap is added to the maxMemory to provide the same amount of available space. The default value is 2000 MB",
+                  "format": "int32",
+                  "minimum": 0,
+                  "type": "integer"
+               },
+               "maxVCpus": {
+                  "example": 8,
+                  "format": "int32",
+                  "maximum": 64,
+                  "minimum": 1,
+                  "type": "integer"
+               },
+               "priority": {
+                  "$ref": "#/components/schemas/JobPriority"
+               },
+               "tags": {
+                  "additionalProperties": {
+                     "type": "string"
+                  },
+                  "example": {
+                     "HOME": "foo_bar"
+                  },
+                  "type": "object"
+               }
+            },
+            "required": [
+               "imageName"
+            ],
+            "type": "object"
+         },
+         "HTCJobErrorCodeName": {
+            "enum": [
+               "ErrorUnknownFailure",
+               "ErrorTimeout",
+               "ErrorNotEnoughMemory",
+               "ErrorNonZeroContainerExitCode",
+               "ErrorCostExceeded",
+               "ErrorInfrastructureFault",
+               "ErrorInstanceTermination",
+               "ErrorStartingContainer",
+               "ErrorProviderDown",
+               "ErrorProviderRegionDown"
+            ],
+            "type": "string"
+         },
+         "HTCJobStatusEvent": {
+            "properties": {
+               "statusReason": {
+                  "nullable": true
+               }
+            }
+         },
+         "HTCJobSubmitRequest": {
+            "properties": {
+               "batchSize": {
+                  "example": 10,
+                  "format": "int32",
+                  "maximum": 1000,
+                  "minimum": 1,
+                  "type": "integer"
+               },
+               "cloudProvider": {
+                  "$ref": "#/components/schemas/CloudProvider"
+               },
+               "createdBy": {
+                  "example": "qWoUF",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "experimental": {
+                  "$ref": "#/components/schemas/ExperimentalFields"
+               },
+               "group": {
+                  "example": "sample-group",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "htcJobDefinition": {
+                  "$ref": "#/components/schemas/HTCJobDefinition"
+               },
+               "jobDefinitionName": {
+                  "example": "job-definition-321",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "jobName": {
+                  "example": "Sample job",
+                  "type": "string"
+               },
+               "parentJobId": {
+                  "example": "job-12345",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "projectId": {
+                  "example": "project-12345",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "regions": {
+                  "items": {
+                     "$ref": "#/components/schemas/RescaleRegion"
+                  },
+                  "type": "array",
+                  "uniqueItems": true,
+                  "writeOnly": true
+               },
+               "rescaleTimeReceived": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/Instant"
+                     }
+                  ],
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "retryStrategy": {
+                  "$ref": "#/components/schemas/HTCRetryStrategy"
+               },
+               "tags": {
+                  "items": {
+                     "$ref": "#/components/schemas/Tag"
+                  },
+                  "type": "array"
+               },
+               "taskId": {
+                  "example": "task-12345",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "workspaceId": {
+                  "example": "04-8234074",
+                  "readOnly": true,
+                  "type": "string"
+               }
+            },
+            "required": [
+               "htcJobDefinition"
+            ],
+            "type": "object"
+         },
+         "HTCJobSubmitRequests": {
+            "items": {
+               "$ref": "#/components/schemas/HTCJobSubmitRequest"
+            },
+            "type": "array"
+         },
+         "HTCJobs": {
+            "properties": {
+               "items": {
+                  "items": {
+                     "$ref": "#/components/schemas/HTCJob"
+                  },
+                  "type": "array"
+               },
+               "next": {
+                  "example": "https://page2.com",
+                  "format": "uri",
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "HTCLimitCreate": {
+            "properties": {
+               "modifierRole": {
+                  "$ref": "#/components/schemas/ModifierRole"
+               },
+               "vCPUs": {
+                  "format": "int32",
+                  "type": "integer"
+               }
+            },
+            "required": [
+               "vCPUs",
+               "modifierRole"
+            ],
+            "type": "object"
+         },
+         "HTCLimitUpdate": {
+            "properties": {
+               "vCPUs": {
+                  "format": "int32",
+                  "type": "integer"
+               }
+            },
+            "required": [
+               "vCPUs"
+            ],
+            "type": "object"
+         },
+         "HTCLogEvent": {
+            "properties": {
+               "message": {
+                  "example": "JOB COMPLETED SUCCESSFULLY",
+                  "type": "string"
+               },
+               "timestamp": {
+                  "$ref": "#/components/schemas/Instant"
+               }
+            },
+            "type": "object"
+         },
+         "HTCNodePool": {
+            "properties": {
+               "autoscaling": {
+                  "$ref": "#/components/schemas/AutoscalingConfig"
+               },
+               "instanceType": {
+                  "type": "string"
+               },
+               "name": {
+                  "type": "string"
+               },
+               "status": {
+                  "type": "string"
+               },
+               "version": {
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "HTCProject": {
+            "properties": {
+               "containerRegistry": {
+                  "example": "123456789.dkr.ecr.us-west-2.amazonaws.com/rescale/project-12345/",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "createdAt": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/Instant"
+                     }
+                  ],
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "createdBy": {
+                  "example": "qWoUF",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "organizationCode": {
+                  "example": "my-org",
+                  "nullable": true,
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "projectDescription": {
+                  "example": "my-first-project",
+                  "type": "string"
+               },
+               "projectFolderPath": {
+                  "example": "projects/project-12345/",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "projectId": {
+                  "example": "project-12345",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "projectName": {
+                  "example": "my-project",
+                  "type": "string"
+               },
+               "regionSettings": {
+                  "items": {
+                     "$ref": "#/components/schemas/HTCRegionSettings"
+                  },
+                  "type": "array"
+               },
+               "regions": {
+                  "example": [
+                     "AWS_US_EAST_2",
+                     "AWS_US_WEST_2"
+                  ],
+                  "items": {
+                     "$ref": "#/components/schemas/RescaleRegion"
+                  },
+                  "type": "array"
+               },
+               "repositories": {
+                  "example": [
+                     "repo1",
+                     "repo2"
+                  ],
+                  "items": {
+                     "type": "string"
+                  },
+                  "readOnly": true,
+                  "type": "array"
+               },
+               "workspaceId": {
+                  "example": "04-8473942",
+                  "readOnly": true,
+                  "type": "string"
+               }
+            },
+            "required": [
+               "projectName",
+               "projectDescription"
+            ],
+            "type": "object"
+         },
+         "HTCProjectDimensions": {
+            "items": {
+               "$ref": "#/components/schemas/HTCComputeEnvironment"
+            },
+            "type": "array"
+         },
+         "HTCProjectLimit": {
+            "properties": {
+               "createdAt": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/Instant"
+                     }
+                  ],
+                  "example": "",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "createdBy": {
+                  "example": "qWoUF",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "id": {
+                  "example": 1,
+                  "format": "int32",
+                  "readOnly": true,
+                  "type": "integer"
+               },
+               "modifierRole": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/ModifierRole"
+                     }
+                  ],
+                  "description": "The highest role that can modify this limit",
+                  "example": "PROJECT_ADMIN",
+                  "type": "string"
+               },
+               "projectId": {
+                  "example": "project-12345",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "updatedAt": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/Instant"
+                     }
+                  ],
+                  "example": "",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "updatedBy": {
+                  "example": "qWoUF",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "vCPUs": {
+                  "format": "int32",
+                  "maximum": 999999,
+                  "minimum": 0,
+                  "type": "integer"
+               },
+               "workspaceId": {
+                  "example": "04-8473942",
+                  "readOnly": true,
+                  "type": "string"
+               }
+            },
+            "required": [
+               "vCPUs"
+            ],
+            "type": "object"
+         },
+         "HTCProjectLimits": {
+            "items": {
+               "$ref": "#/components/schemas/HTCProjectLimit"
+            },
+            "type": "array"
+         },
+         "HTCProjectUpdate": {
+            "properties": {
+               "regions": {
+                  "example": [
+                     "AWS_US_EAST_2",
+                     "AWS_US_WEST_2"
+                  ],
+                  "items": {
+                     "$ref": "#/components/schemas/RescaleRegion"
+                  },
+                  "type": "array"
+               }
+            },
+            "type": "object"
+         },
+         "HTCProjectsResponse": {
+            "properties": {
+               "items": {
+                  "items": {
+                     "$ref": "#/components/schemas/HTCProject"
+                  },
+                  "type": "array"
+               },
+               "next": {
+                  "example": "https://page2.com",
+                  "format": "uri",
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "HTCRegionAdminSettings": {
+            "properties": {
+               "cloudProvider": {
+                  "$ref": "#/components/schemas/CloudProvider"
+               },
+               "enabled": {
+                  "type": "boolean"
+               },
+               "region": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/RescaleRegion"
+                     }
+                  ],
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "supportedArchitectures": {
+                  "items": {
+                     "$ref": "#/components/schemas/Architecture"
+                  },
+                  "type": "array",
+                  "uniqueItems": true
+               },
+               "updatedAt": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/Instant"
+                     }
+                  ],
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "updatedBy": {
+                  "example": "qWoUF",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "weight": {
+                  "example": 4,
+                  "type": "number"
+               }
+            },
+            "type": "object"
+         },
+         "HTCRegionComputeSettings": {
+            "properties": {
+               "computeRegion": {
+                  "$ref": "#/components/schemas/RescaleRegion"
+               }
+            },
+            "type": "object"
+         },
+         "HTCRegionSettings": {
+            "properties": {
+               "computeSettings": {
+                  "$ref": "#/components/schemas/HTCRegionComputeSettings"
+               },
+               "storageSettings": {
+                  "$ref": "#/components/schemas/HTCRegionStorageSettings"
+               }
+            },
+            "required": [
+               "computeSettings",
+               "storageSettings"
+            ],
+            "type": "object"
+         },
+         "HTCRegionStorageSettings": {
+            "properties": {
+               "storageRegion": {
+                  "$ref": "#/components/schemas/RescaleRegion"
+               }
+            },
+            "type": "object"
+         },
+         "HTCRepository": {
+            "properties": {
+               "createdBy": {
+                  "example": "qWoUF",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "projectId": {
+                  "example": "project-12345",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "registryURI": {
+                  "example": "123456789.dkr.ecr.us-west-2.amazonaws.com/rescale/project-12345/",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "repositoryName": {
+                  "example": "repo1",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "successfullyCreated": {
+                  "example": true,
+                  "type": "boolean"
+               },
+               "workspaceId": {
+                  "example": "04-8473942",
+                  "readOnly": true,
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "HTCRequestError": {
+            "properties": {
+               "errorDescription": {
+                  "type": "string"
+               },
+               "errorType": {
+                  "type": "string"
+               },
+               "message": {
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "HTCRetryStrategy": {
+            "properties": {
+               "maxRetries": {
+                  "format": "int32",
+                  "maximum": 10,
+                  "minimum": 0,
+                  "type": "integer"
+               }
+            },
+            "type": "object"
+         },
+         "HTCTask": {
+            "properties": {
+               "archivedAt": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/Instant"
+                     }
+                  ],
+                  "nullable": true,
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "createdAt": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/Instant"
+                     }
+                  ],
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "createdBy": {
+                  "example": "qWoUF",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "deletedAt": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/Instant"
+                     }
+                  ],
+                  "nullable": true,
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "lastActiveAt": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/Instant"
+                     }
+                  ],
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "lifecycleStatus": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/LifecycleStatus"
+                     }
+                  ],
+                  "example": "ACTIVE",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "projectId": {
+                  "example": "project-12345",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "taskDescription": {
+                  "example": "my sample task",
+                  "type": "string"
+               },
+               "taskFolderPath": {
+                  "example": "projects/project-12345/tasks/task-12345",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "taskId": {
+                  "example": "task-12345",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "taskName": {
+                  "example": "my-task",
+                  "type": "string"
+               },
+               "workspaceId": {
+                  "example": "04-8473942",
+                  "readOnly": true,
+                  "type": "string"
+               }
+            },
+            "required": [
+               "taskName",
+               "taskDescription"
+            ],
+            "type": "object"
+         },
+         "HTCTaskUpdate": {
+            "properties": {
+               "lifecycleStatus": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/LifecycleStatus"
+                     }
+                  ],
+                  "example": "ARCHIVED",
+                  "type": "string"
+               }
+            },
+            "required": [
+               "lifecycleStatus"
+            ],
+            "type": "object"
+         },
+         "HTCTasksResponse": {
+            "properties": {
+               "items": {
+                  "items": {
+                     "$ref": "#/components/schemas/HTCTask"
+                  },
+                  "type": "array"
+               },
+               "next": {
+                  "example": "https://page2.com",
+                  "format": "uri",
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "HTCToken": {
+            "properties": {
+               "expiresIn": {
+                  "description": "Number of seconds until this token expires",
+                  "format": "int64",
+                  "type": "integer"
+               },
+               "tokenValue": {
+                  "description": "JWT Token",
+                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "HTCTokenPayload": {
+            "type": "string"
+         },
+         "HTCWorkspaceLimit": {
+            "properties": {
+               "createdAt": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/Instant"
+                     }
+                  ],
+                  "example": "",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "createdBy": {
+                  "example": "qWoUF",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "updatedAt": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/Instant"
+                     }
+                  ],
+                  "example": "",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "updatedBy": {
+                  "example": "qWoUF",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "vCPUs": {
+                  "format": "int32",
+                  "maximum": 999999,
+                  "minimum": 0,
+                  "type": "integer"
+               },
+               "workspaceId": {
+                  "example": "04-8473942",
+                  "readOnly": true,
+                  "type": "string"
+               }
+            },
+            "required": [
+               "vCPUs"
+            ],
+            "type": "object"
+         },
+         "InstanceLabels": {
+            "properties": {
+               "accountId": {
+                  "type": "string"
+               },
+               "csp": {
+                  "type": "string"
+               },
+               "instanceArchitecture": {
+                  "type": "string"
+               },
+               "instanceType": {
+                  "type": "string"
+               },
+               "priority": {
+                  "type": "string"
+               },
+               "region": {
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "Instant": {
+            "example": "2022-03-10T16:15:50Z",
+            "format": "date-time",
+            "type": "string"
+         },
+         "JobExecutionEnvironment": {
+            "properties": {
+               "architecture": {
+                  "example": 2,
+                  "type": "number"
+               },
+               "instanceId": {
+                  "example": "123456789",
+                  "type": "string"
+               },
+               "instanceType": {
+                  "example": "c7g.medium",
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "JobPriority": {
+            "enum": [
+               "ON_DEMAND_PRIORITY",
+               "ON_DEMAND_ECONOMY"
+            ],
+            "type": "string"
+         },
+         "JobStatusSummary": {
+            "properties": {
+               "group": {
+                  "example": "my-job-group",
+                  "type": "string"
+               },
+               "jobStatuses": {
+                  "enum": [
+                     "SUBMITTED_TO_RESCALE",
+                     "SUBMITTED_TO_PROVIDER",
+                     "RUNNABLE",
+                     "STARTING",
+                     "RUNNING",
+                     "SUCCEEDED",
+                     "FAILED",
+                     "POD_SUCCEEDED",
+                     "POD_FAILED"
+                  ],
+                  "properties": {
+                     "FAILED": {
+                        "example": 5,
+                        "type": "integer"
+                     },
+                     "RUNNABLE": {
+                        "example": 5,
+                        "type": "integer"
+                     },
+                     "RUNNING": {
+                        "example": 5,
+                        "type": "integer"
+                     },
+                     "STARTING": {
+                        "example": 5,
+                        "type": "integer"
+                     },
+                     "SUBMITTED_TO_PROVIDER": {
+                        "example": 5,
+                        "type": "integer"
+                     },
+                     "SUBMITTED_TO_RESCALE": {
+                        "example": 5,
+                        "type": "integer"
+                     },
+                     "SUCCEEDED": {
+                        "example": 5,
+                        "type": "integer"
+                     }
+                  },
+                  "type": "object"
+               }
+            },
+            "type": "object"
+         },
+         "JsonWebKey": {
+            "properties": {
+               "algorithm": {
+                  "type": "string"
+               },
+               "key": {
+                  "$ref": "#/components/schemas/Key"
+               },
+               "keyId": {
+                  "type": "string"
+               },
+               "keyOps": {
+                  "items": {
+                     "type": "string"
+                  },
+                  "type": "array"
+               },
+               "keyType": {
+                  "type": "string"
+               },
+               "otherParameters": {
+                  "additionalProperties": { },
+                  "type": "object"
+               },
+               "publicKey": {
+                  "$ref": "#/components/schemas/PublicKey"
+               },
+               "use": {
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "JsonWebKeySet": {
+            "properties": {
+               "jsonWebKeys": {
+                  "items": {
+                     "$ref": "#/components/schemas/JsonWebKey"
+                  },
+                  "type": "array"
+               },
+               "keys": {
+                  "items": {
+                     "$ref": "#/components/schemas/JsonWebKey"
+                  },
+                  "type": "array"
+               }
+            },
+            "type": "object"
+         },
+         "Key": {
+            "properties": {
+               "algorithm": {
+                  "type": "string"
+               },
+               "encoded": {
+                  "format": "binary",
+                  "type": "string"
+               },
+               "format": {
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "LifecycleStatus": {
+            "enum": [
+               "DELETED",
+               "ACTIVE",
+               "ARCHIVED"
+            ],
+            "type": "string"
+         },
+         "ModifierRole": {
+            "enum": [
+               "WORKSPACE_ADMIN",
+               "PROJECT_ADMIN"
+            ],
+            "type": "string"
+         },
+         "NameValuePair": {
+            "properties": {
+               "name": {
+                  "type": "string"
+               },
+               "value": {
+                  "type": "string"
+               }
+            },
+            "required": [
+               "name",
+               "value"
+            ],
+            "type": "object"
+         },
+         "OAuth2ErrorResponse": {
+            "properties": {
+               "error": {
+                  "type": "string"
+               },
+               "errorDescription": {
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "OAuth2Token": {
+            "properties": {
+               "access_token": {
+                  "type": "string"
+               },
+               "expires_in": {
+                  "format": "int64",
+                  "type": "integer"
+               },
+               "token_type": {
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "Organization": {
+            "properties": {
+               "canViewOrganizationJobs": {
+                  "example": true,
+                  "type": "boolean"
+               },
+               "code": {
+                  "example": "849506",
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "PresignedPutUrlResponse": {
+            "properties": {
+               "expiration": {
+                  "$ref": "#/components/schemas/Instant"
+               },
+               "region": {
+                  "$ref": "#/components/schemas/RescaleRegion"
+               },
+               "storageName": {
+                  "example": "my-storage",
+                  "type": "string"
+               },
+               "url": {
+                  "example": "https://presigned-put-url/my-storage",
+                  "properties": {
+                     "authority": {
+                        "type": "string"
+                     },
+                     "content": { },
+                     "defaultPort": {
+                        "format": "int32",
+                        "type": "integer"
+                     },
+                     "file": {
+                        "type": "string"
+                     },
+                     "hashCode": {
+                        "format": "int32",
+                        "type": "integer"
+                     },
+                     "host": {
+                        "type": "string"
+                     },
+                     "port": {
+                        "format": "int32",
+                        "type": "integer"
+                     },
+                     "protocol": {
+                        "type": "string"
+                     },
+                     "ref": {
+                        "type": "string"
+                     },
+                     "serializedHashCode": {
+                        "format": "int32",
+                        "type": "integer"
+                     }
+                  },
+                  "type": "object"
+               }
+            },
+            "type": "object"
+         },
+         "PublicKey": {
+            "properties": {
+               "algorithm": {
+                  "type": "string"
+               },
+               "encoded": {
+                  "format": "binary",
+                  "type": "string"
+               },
+               "format": {
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "RegionStorageOption": {
+            "properties": {
+               "provider": {
+                  "$ref": "#/components/schemas/CloudProvider"
+               },
+               "region": {
+                  "$ref": "#/components/schemas/RescaleRegion"
+               },
+               "storageName": {
+                  "example": "my-storage",
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "RegionalStorageResponse": {
+            "properties": {
+               "regionalStores": {
+                  "items": {
+                     "$ref": "#/components/schemas/RegionalStore"
+                  },
+                  "type": "array"
+               },
+               "rescaleRegion": {
+                  "$ref": "#/components/schemas/RescaleRegion"
+               }
+            },
+            "type": "object"
+         },
+         "RegionalStore": {
+            "properties": {
+               "credentials": {
+                  "additionalProperties": {
+                     "type": "string"
+                  },
+                  "type": "object"
+               },
+               "projectPath": {
+                  "type": "string"
+               },
+               "provider": {
+                  "$ref": "#/components/schemas/CloudProvider"
+               },
+               "region": {
+                  "$ref": "#/components/schemas/RescaleRegion"
+               },
+               "taskPath": {
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "RescaleFlag": {
+            "properties": {
+               "name": {
+                  "type": "string"
+               },
+               "value": {
+                  "type": "boolean"
+               }
+            },
+            "type": "object"
+         },
+         "RescaleJobStatus": {
+            "enum": [
+               "SUBMITTED_TO_RESCALE",
+               "SUBMITTED_TO_PROVIDER",
+               "RUNNABLE",
+               "STARTING",
+               "RUNNING",
+               "SUCCEEDED",
+               "FAILED",
+               "POD_SUCCEEDED",
+               "POD_FAILED"
+            ],
+            "type": "string"
+         },
+         "RescaleJobStatusEvent": {
+            "properties": {
+               "container": {
+                  "$ref": "#/components/schemas/ContainerDetails"
+               },
+               "dateTime": {
+                  "$ref": "#/components/schemas/Instant"
+               },
+               "eventId": {
+                  "example": "event-13",
+                  "type": "string"
+               },
+               "instanceId": {
+                  "type": "string"
+               },
+               "instanceLabels": {
+                  "$ref": "#/components/schemas/InstanceLabels"
+               },
+               "jobId": {
+                  "example": "job-12345",
+                  "type": "string"
+               },
+               "status": {
+                  "$ref": "#/components/schemas/RescaleJobStatus"
+               },
+               "statusReason": {
+                  "example": "Completed",
+                  "type": "string"
+               },
+               "userCancelledEvent": {
+                  "type": "boolean"
+               }
+            },
+            "type": "object"
+         },
+         "RescaleRegion": {
+            "enum": [
+               "AWS_AP_SOUTHEAST_1",
+               "AWS_CA_CENTRAL_1",
+               "AWS_EU_NORTH_1",
+               "AWS_EU_CENTRAL_1",
+               "AWS_EU_WEST_1",
+               "AWS_EU_WEST_2",
+               "AWS_EU_WEST_3",
+               "AWS_SA_EAST_1",
+               "AWS_US_EAST_2",
+               "AWS_US_WEST_2",
+               "AWS_US_EAST_1",
+               "GCP_ASIA_SOUTHEAST_1",
+               "GCP_US_CENTRAL_1",
+               "GCP_US_EAST_1",
+               "GCP_US_EAST_2",
+               "GCP_US_EAST_4",
+               "GCP_US_WEST_1",
+               "GCP_US_WEST_4",
+               "GCP_EU_WEST_1",
+               "GCP_EU_WEST_2",
+               "GCP_EU_WEST_3",
+               "GCP_EU_WEST_4",
+               "GCP_CA_CENTRAL_1",
+               "NGC_ENOCH_1",
+               "AZURE_US_WEST_2",
+               "AZURE_US_EAST_2",
+               "AZURE_US_SOUTHCENTRAL",
+               "AZURE_EU_NORTH",
+               "RC_ICELAND_1",
+               "UNASSIGNED"
+            ],
+            "type": "string"
+         },
+         "RescaleUser": {
+            "properties": {
+               "email": {
+                  "example": "user1@rescale.com",
+                  "type": "string"
+               },
+               "fullName": {
+                  "example": "Juliet Doe",
+                  "type": "string"
+               },
+               "isOrganizationAdmin": {
+                  "example": true,
+                  "type": "boolean"
+               },
+               "isRescaleAdmin": {
+                  "example": true,
+                  "type": "boolean"
+               },
+               "isSuperuser": {
+                  "example": true,
+                  "type": "boolean"
+               },
+               "isWorkspaceAdmin": {
+                  "example": true,
+                  "type": "boolean"
+               },
+               "organization": {
+                  "$ref": "#/components/schemas/Organization"
+               },
+               "organizationAdmin": {
+                  "type": "boolean"
+               },
+               "rescaleAdmin": {
+                  "type": "boolean"
+               },
+               "superuser": {
+                  "type": "boolean"
+               },
+               "userId": {
+                  "example": "qWoUF",
+                  "type": "string"
+               },
+               "workspace": {
+                  "$ref": "#/components/schemas/Workspace"
+               },
+               "workspaceAdmin": {
+                  "type": "boolean"
+               }
+            },
+            "type": "object"
+         },
+         "Status": {
+            "enum": [
+               "READY",
+               "PENDING"
+            ],
+            "type": "string"
+         },
+         "Status1": {
+            "enum": [
+               "PASS",
+               "FAIL"
+            ],
+            "type": "string"
+         },
+         "StorageAccessToken": {
+            "properties": {
+               "credentials": {
+                  "additionalProperties": {
+                     "type": "string"
+                  },
+                  "example": {
+                     "AWS_ACCESS_KEY_ID": "key-12345",
+                     "AWS_SECRET_ACCESS_KEY": "secret-key-12345789",
+                     "AWS_SESSION_TOKEN": "token-12345////12345"
+                  },
+                  "type": "object"
+               },
+               "expiration": {
+                  "$ref": "#/components/schemas/Instant"
+               },
+               "projectId": {
+                  "example": "project-12345",
+                  "type": "string"
+               },
+               "projectSharedStoragePath": {
+                  "example": "s3://my-storage/projects/project-12345/shared/",
+                  "type": "string"
+               },
+               "provider": {
+                  "$ref": "#/components/schemas/CloudProvider"
+               },
+               "region": {
+                  "$ref": "#/components/schemas/RescaleRegion"
+               },
+               "storageName": {
+                  "example": "my-storage",
+                  "type": "string"
+               },
+               "user": {
+                  "example": "123456789:qWoUF",
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "StorageAccessTokens": {
+            "properties": {
+               "defaultRegion": {
+                  "$ref": "#/components/schemas/RescaleRegion"
+               },
+               "regionStores": {
+                  "items": {
+                     "$ref": "#/components/schemas/StorageAccessToken"
+                  },
+                  "type": "array"
+               }
+            },
+            "type": "object"
+         },
+         "SupportedRescaleRegion": {
+            "enum": [
+               "AWS_AP_SOUTHEAST_1",
+               "AWS_CA_CENTRAL_1",
+               "AWS_EU_NORTH_1",
+               "AWS_EU_CENTRAL_1",
+               "AWS_EU_WEST_1",
+               "AWS_EU_WEST_2",
+               "AWS_EU_WEST_3",
+               "AWS_SA_EAST_1",
+               "AWS_US_EAST_2",
+               "AWS_US_WEST_2",
+               "AWS_US_EAST_1",
+               "GCP_ASIA_SOUTHEAST_1",
+               "GCP_US_CENTRAL_1",
+               "GCP_US_EAST_1",
+               "GCP_US_EAST_2",
+               "GCP_US_EAST_4",
+               "GCP_US_WEST_1",
+               "GCP_US_WEST_4",
+               "GCP_EU_WEST_1",
+               "GCP_EU_WEST_2",
+               "GCP_EU_WEST_3",
+               "GCP_EU_WEST_4",
+               "GCP_CA_CENTRAL_1",
+               "AZURE_US_WEST_2",
+               "AZURE_US_SOUTHCENTRAL"
+            ],
+            "type": "string"
+         },
+         "Tag": {
+            "properties": {
+               "key": {
+                  "example": "HOME",
+                  "type": "string"
+               },
+               "value": {
+                  "example": "/home/users/",
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "TaskRetentionPolicy": {
+            "properties": {
+               "archiveAfter": {
+                  "description": "The time in hours of inactivity after which an active task is automatically archived. Setting this to `0` turns off auto-archiving, leaving the task active indefinitely.",
+                  "example": 168,
+                  "format": "int32",
+                  "minimum": 0,
+                  "type": "integer"
+               },
+               "createdAt": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/Instant"
+                     }
+                  ],
+                  "description": "When this TaskRetentionPolicy was applied to this project.",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "deleteAfter": {
+                  "description": "The time in hours before an archived task is deleted. A value of `0` disables auto-deletion, keeping the task archived indefinitely.",
+                  "example": 24,
+                  "format": "int32",
+                  "minimum": 0,
+                  "type": "integer"
+               },
+               "projectId": {
+                  "example": "project-12345",
+                  "readOnly": true,
+                  "type": "string"
+               }
+            },
+            "required": [
+               "deleteAfter",
+               "archiveAfter"
+            ],
+            "type": "object"
+         },
+         "ViewType": {
+            "enum": [
+               "FULL",
+               "SIMPLE"
+            ],
+            "type": "string"
+         },
+         "WhoAmI": {
+            "properties": {
+               "user": {
+                  "$ref": "#/components/schemas/RescaleUser"
+               },
+               "userFeatures": {
+                  "$ref": "#/components/schemas/FeatureFlagsResult"
+               }
+            },
+            "type": "object"
+         },
+         "Workspace": {
+            "properties": {
+               "id": {
+                  "example": "04-8473942",
+                  "type": "string"
+               },
+               "name": {
+                  "example": "Juliet's Workspace",
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
+         "WorkspaceTaskRetentionPolicy": {
+            "properties": {
+               "archiveAfter": {
+                  "description": "The time in hours of inactivity after which an active task is automatically archived. Setting this to `0` turns off auto-archiving, leaving the task active indefinitely.",
+                  "example": 168,
+                  "format": "int32",
+                  "minimum": 0,
+                  "type": "integer"
+               },
+               "createdAt": {
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/Instant"
+                     }
+                  ],
+                  "description": "When this TaskRetentionPolicy was applied to this workspace.",
+                  "readOnly": true,
+                  "type": "string"
+               },
+               "deleteAfter": {
+                  "description": "The time in hours before an archived task is deleted. A value of `0` disables auto-deletion, keeping the task archived indefinitely.",
+                  "example": 24,
+                  "format": "int32",
+                  "minimum": 0,
+                  "type": "integer"
+               },
+               "workspaceId": {
+                  "example": "workspace-12345",
+                  "readOnly": true,
+                  "type": "string"
+               }
+            },
+            "required": [
+               "deleteAfter",
+               "archiveAfter"
+            ],
+            "type": "object"
+         }
+      },
+      "securitySchemes": {
+         "SecurityScheme": {
+            "bearerFormat": "JWT",
+            "description": "Authentication",
+            "scheme": "bearer",
+            "type": "http"
+         }
+      }
+   },
+   "info": {
+      "description": "### Changelog\n#### 2024-10-15\n- Fixed an issue where non-existent images would incorrectly return a PENDING status instead of a 404 response when checking image availability across cloud providers. (ENK-1139)\n#### 2024-10-07\n- Added improvements and optimizations for GCP image validation on job submit. (ENK-2158)\n#### 2024-10-02\n- Added improvements and optimizations for processing job submit requests in limited projects and workspaces. (ENK-1844)\n#### 2024-09-10\n- Added additional validation for the HTCJobDefinition during job submission. (ENK-2155)\n#### 2024-09-09\n- Added additional metrics for vCPU scheduling. (ENK-2039)\n#### 2024-08-26\n- Added additional metrics for swap and disk usage. (ENK-2023, ENK-2044, ENK-2045, ENK-2120)\n#### 2024-08-19\n- Added support for jobs in GCP to use the experimental real swap feature for workspaces where swap infrastructure has been configured. The amount of swap provided is approximately equal to the memory requested by the job. This feature can be enabled by setting the experimental.kubernetesSwap field to true in the Job submit request (ENK-2065)\n#### 2024-08-14\n- Updated job cancellation to correctly update job status. (ENK-2069)\n#### 2024-08-09\n- Updated the response from `/htc/gcp/clusters/{workspaceId}` to include the cluster's autoscaling profile and subnetwork name. (ENK-2042)\n#### 2024-07-22\n- Fixed issue where jobs in multi-region projects were all getting routed to a single region instead of being spread out\n#### 2024-07-18\n- Added htc_job_limit_vcpus metric to response from /htc/metrics\n#### 2024-07-08\n- Allow workspace and organization admin to cancel jobs, view job logs and view job events\n#### 2024-04-23\n- Workspaces can now also be configured with a task retention policy which governs the auto-archival and auto-deletion of tasks. The project task retention policy is prioritized.\n#### 2024-03-01\n- Projects can now be configured with a task retention policy which governs the auto-archival and auto-deletion of tasks.\n- The API now supports manual archival of tasks.\n#### 2024-01-31\n- Added pagination support for GET /htc/projects/{projectId}/tasks/{taskId}/groups endpoint.\n#### 2024-01-26\n- Added workspace dimensions endpoint to enable viewing of predefined computing environment options for a workspace.\n- Added project dimensions endpoints to enable inspection of a project's current computing environment configuration as well as facilitate customization and adjustment of a project's computing environment settings.\n#### 2023-09-25\n- Introduced new `/limits` API endpoints for resource limit management at workspace and project levels.\n- If limits are set for both workspace and project, jobs within the project may be throttled based on resource consumption across either.\n#### 2023-06-20\n- Do not allow jobs submission to deleted tasks \n#### 2023-05-05\n- Fixed issue where jobs would be stuck in running despite completing successfully \n#### 2023-04-20\n- Added clearer error messages for jobs that failed because they exceeded disk space limits \n#### 2023-04-06\n- Added support for validating HTC Bearer tokens using JWKs \n#### 2023-03-07\n- Added support for adding user-defined claims to job bearer tokens during job submission\n- Limited the scope of API endpoints that job bearer tokens are allowed to access \n#### 2023-01-10\n- Added support for extending an existing project with additional regions.\n- Note: this does not currently consolidate images and objects in storage to new regions.\n#### 2022-11-30\n- Updated maxSwap minimum value to 0.\n- If maxSwap is 0 it will not be set in the job definition.\n#### 2022-11-23\n- Changed maxDiskGb field to maxDiskGiB. Fix GCP to use MiB and GiB instead of MB and GB to be consistent with AWS.  \n#### 2022-11-21\n- Updated job submit request body to allow maxDiskGb to be optionally set by the user for GCP only. \n#### 2022-11-18\n- Updated job submit request body to include only maxSwap to be optionally set by user. See HTCJobDefinition model for more details.\n- maxSwap defaults to 2000MB if no value is provided.\n- maxSwap is currently only supported on AWS.\n#### 2022-10-17\n- Added endpoint to return group names associated with a task.\n#### 2022-08-01\n - Added validation for system environment variables during job submission.\n#### 2022-07-25\n - Added support for image tags on GCP. Images pushed to ECR with a tag will be replicated with the tag attached to GCP, and can be submitted in the same way as AWS\n- Resolved bug where log lines were duplicated several times.\n#### 2022-07-08\n - Added validation for image name during job submission\n#### 2022-06-30\n - Added capability to run AARCH64 jobs (specified on the job definition endpoint) on <em>GCP_US_CENTRAL_1</em> and <em>GCP_EU_WEST_4</em> for all users.\n- Added capability to run jobs in GCP region <em>GCP_US_CENTRAL_1</em> for all users.\n#### 2022-06-23\n - Added capability to run jobs in GCP region <em>GCP_EU_WEST_4</em> for all users. This is set during project creation.",
+      "title": "Rescale HTC API",
+      "version": "Beta V1"
+   },
+   "openapi": "3.0.3",
+   "paths": {
+      "/.well-known/jwks.json": {
+         "get": {
+            "description": "This endpoint will get the public keys used to verify JWT",
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/JsonWebKeySet"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                        }
+                     }
+                  },
+                  "description": "Unauthorized"
+               }
+            },
+            "summary": "Get JWKS",
+            "tags": [
+               "Token Resource"
+            ]
+         }
+      },
+      "/auth/token": {
+         "get": {
+            "description": "This endpoint will get a JWT token given an API key",
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCToken"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                        }
+                     }
+                  },
+                  "description": "Unauthorized"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get JWT Token",
+            "tags": [
+               "Token Resource"
+            ]
+         }
+      },
+      "/auth/token/whoami": {
+         "get": {
+            "description": "This endpoint will get a JWT token payload given a bearer token.",
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCTokenPayload"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                        }
+                     }
+                  },
+                  "description": "Unauthorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get JWT Token Payload",
+            "tags": [
+               "Token Resource"
+            ]
+         }
+      },
+      "/auth/whoami": {
+         "get": {
+            "description": "This endpoint will get Rescale user information given a Rescale API key.",
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/WhoAmI"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                        }
+                     }
+                  },
+                  "description": "Unauthorized"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Rescale User",
+            "tags": [
+               "Token Resource"
+            ]
+         }
+      },
+      "/htc/gcp/clusters/{workspaceId}": {
+         "get": {
+            "description": "This endpoint returns details about all GCP clusters that can run jobs for the specified HTC workspace",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "workspaceId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCClusterStatusResponse"
+                        }
+                     }
+                  },
+                  "description": "OK"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               },
+               "404": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                        }
+                     }
+                  },
+                  "description": "Not Found"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Status of GCP Cluster",
+            "tags": [
+               "Provider Resource"
+            ]
+         }
+      },
+      "/htc/metrics": {
+         "get": {
+            "description": "Get all HTC Metrics for a workspace",
+            "parameters": [
+               {
+                  "in": "header",
+                  "name": "Accept-Encoding",
+                  "schema": {
+                     "items": {
+                        "type": "string"
+                     },
+                     "type": "array",
+                     "uniqueItems": true
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "text/plain": {
+                        "schema": {
+                           "type": "string"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Metrics",
+            "tags": [
+               "Metrics Resource"
+            ]
+         }
+      },
+      "/htc/projects": {
+         "get": {
+            "description": "This endpoint will get all projects",
+            "parameters": [
+               {
+                  "in": "query",
+                  "name": "onlyMyProjects",
+                  "schema": {
+                     "type": "boolean"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "pageIndex",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "pageSize",
+                  "schema": {
+                     "default": 100,
+                     "format": "int32",
+                     "type": "integer"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCProjectsResponse"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get All Projects",
+            "tags": [
+               "Project Resource"
+            ]
+         },
+         "post": {
+            "description": "This endpoint will create a project. A project is a collection of tasks and container images used to run jobs. Several projects can belong to a single workspace.",
+            "requestBody": {
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "$ref": "#/components/schemas/HTCProject"
+                     }
+                  }
+               }
+            },
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCProject"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Create Project",
+            "tags": [
+               "Project Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}": {
+         "get": {
+            "description": "This endpoint will get a project by id",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCProject"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Project",
+            "tags": [
+               "Project Resource"
+            ]
+         },
+         "patch": {
+            "description": "This endpoint allows for updating a project's regions.",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "requestBody": {
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "$ref": "#/components/schemas/HTCProjectUpdate"
+                     }
+                  }
+               }
+            },
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCProject"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Update Project Regions",
+            "tags": [
+               "Project Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/container-registry/images": {
+         "get": {
+            "description": "This endpoint will list all images for a project",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCImages"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get All Images",
+            "tags": [
+               "Container Registry Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/container-registry/images/{imageName}": {
+         "get": {
+            "description": "Retrieves the current status of an image across cloud providers. The status indicates whether the image is ready for use or still being processed. Returns READY when the image is available in all cloud providers, PENDING while the image is being replicated, and a 404 if the image does not exist.",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "imageName",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCImageStatus"
+                        }
+                     }
+                  },
+                  "description": "Successfully retrieved image status"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               },
+               "404": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "example": {
+                              "error": "IMAGE_UNAVAILABLE",
+                              "message": "Image my-app:latest is unavailable. Please check the image name. If the image was pushed recently, try again at a later time"
+                           },
+                           "properties": {
+                              "errorDescription": {
+                                 "type": "string"
+                              },
+                              "errorType": {
+                                 "type": "string"
+                              }
+                           },
+                           "type": "object"
+                        }
+                     }
+                  },
+                  "description": "Image not found in registry"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get image status",
+            "tags": [
+               "Container Registry Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/container-registry/repo/{repoName}": {
+         "post": {
+            "description": "This endpoint will create a private container repository belonging to this project\n\nPrivate container registries are collections of repositories, and private repositories are collections of container images. These images are referenced when running jobs within this project. In order to upload an image to a repository, you will need the `registryURI`, the `repositoryName`, and the token (see `/htc/projects/:projectId/container-registry/token`).",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "description": "must match the regex '(?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*'",
+                  "in": "path",
+                  "name": "repoName",
+                  "required": true,
+                  "schema": {
+                     "pattern": "(?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*",
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCRepository"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Create a Private Repo",
+            "tags": [
+               "Container Registry Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/container-registry/token": {
+         "get": {
+            "description": "This endpoint will get a container registry authorization token.\n\n To use this token run `docker login --username AWS --password {TOKEN} {CONTAINER_REGISTRY_DOMAIN}`.\n\ne.g. `docker login --username AWS --password \"eyJwYXlsb2FkIjoiZHhtSzJuQ0x...\" 183929446192.dkr.ecr.us-west-2.amazonaws.com`",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "*/*": {
+                        "schema": {
+                           "example": "registry-token-12345",
+                           "type": "string"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Container Registry Token",
+            "tags": [
+               "Container Registry Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/dimensions": {
+         "get": {
+            "description": "This endpoint is designed to retrieve the current set of dimension combinations configured for a specific project so that users can understand the existing computing environment constraints of a project. It returns a list of dimension combinations such as pricing priority, geographical region, compute scaling policy, and hyperthreading options.\n\nAny user who _belongs to the workspace this project belongs to_ can use this endpoint to verify or audit the current configuration of a project. This can be helpful in ensuring that the project's settings align with expectations.\n\nThe payload also includes a read-only set of `derived` dimensions which help describe the currently configured `machineType`",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCProjectDimensions"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Project Dimensions",
+            "tags": [
+               "Project Resource"
+            ]
+         },
+         "put": {
+            "description": "This endpoint allows _workspace_, _organization_, and _Rescale administrators_ to _create_, _update_, or _delete_ the dimension combinations for a project. It accepts a list of dimension combinations, each specifying a unique set of computing environment attributes to tailor the computing environment(s) of a project to match specific job requirements.\n\nFor example, a project’s dimensions can be configured to require jobs to run on a particular type of processor architecture, within a certain region, and with or without hyperthreading.\n\nIt's important to note that the dimensions set through this endpoint must align with the available dimensions at the workspace level.\n\n**In the event that a project's dimension requirements need to be reset to allow for a broader range of job types, sending an empty list to this endpoint will remove all existing dimension restrictions, returning the project to a state where it can accommodate any dimension available in the workspace.**",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "requestBody": {
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "items": {
+                           "$ref": "#/components/schemas/HTCComputeEnvironment"
+                        },
+                        "type": "array"
+                     }
+                  }
+               }
+            },
+            "responses": {
+               "201": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "items": {
+                              "$ref": "#/components/schemas/HTCComputeEnvironment"
+                           },
+                           "type": "array"
+                        }
+                     }
+                  },
+                  "description": "Created"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Modify Project Dimensions",
+            "tags": [
+               "Project Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/limits": {
+         "delete": {
+            "description": "This endpoint will remove all resource limits associated with this project.\n\nAny jobs `SUBMITTED_TO_RESCALE` will transition to `SUBMITTED_TO_PROVIDER` if no other limits apply",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "204": {
+                  "description": "No Content"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Delete Project Limits",
+            "tags": [
+               "Project Resource"
+            ]
+         },
+         "get": {
+            "description": "This endpoint will list all resource limitations associated with this project.\n\nA job running in this project will be subject to all resulting limits as well as any associated with the workspace (see `/htc/workspaces/{workspaceId}/limits`)",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCProjectLimits"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Project Limits",
+            "tags": [
+               "Project Resource"
+            ]
+         },
+         "post": {
+            "description": "This endpoint will add a new limit to this project or overwrite an existing limit if one already exists with the provided `modifierRole`.\n\nJobs submitted to this project will only run when the active resource count falls below the minimum of all limits associated with this project.\n\nAny user who belongs the project's workspace can modify the `PROJECT_ADMIN` limit. Higher permissions are required to modify the `WORKSPACE_ADMIN` limit",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "requestBody": {
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "$ref": "#/components/schemas/HTCLimitCreate"
+                     }
+                  }
+               }
+            },
+            "responses": {
+               "201": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCProjectLimit"
+                        }
+                     }
+                  },
+                  "description": "Created"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Create a Project Limit",
+            "tags": [
+               "Project Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/limits/{id}": {
+         "delete": {
+            "description": "This endpoint will remove a single resource limit associated with this project if it exists",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "id",
+                  "required": true,
+                  "schema": {
+                     "format": "int32",
+                     "type": "integer"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "204": {
+                  "description": "No Content"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Delete a Project Limit",
+            "tags": [
+               "Project Resource"
+            ]
+         },
+         "get": {
+            "description": "This endpoint will get either the `PROJECT_ADMIN` or `WORKSPACE_ADMIN` limit for this project",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "id",
+                  "required": true,
+                  "schema": {
+                     "format": "int32",
+                     "type": "integer"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCProjectLimit"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Project Limit",
+            "tags": [
+               "Project Resource"
+            ]
+         },
+         "patch": {
+            "description": "This endpoint will update one of the existing resource limits associated with this project.\n\nAny user who belongs the project's workspace can modify the `PROJECT_ADMIN` limit. Higher permissions are required to modify the `WORKSPACE_ADMIN` limit",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "id",
+                  "required": true,
+                  "schema": {
+                     "format": "int32",
+                     "type": "integer"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "requestBody": {
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "$ref": "#/components/schemas/HTCLimitUpdate"
+                     }
+                  }
+               }
+            },
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCProjectLimit"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Update Project Limit",
+            "tags": [
+               "Project Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/storage/presigned-url": {
+         "get": {
+            "description": "This endpoint will get a presigned url for project storage",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "filePath",
+                  "required": true,
+                  "schema": {
+                     "minLength": 1,
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/PresignedPutUrlResponse"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Project Storage Presigned URL",
+            "tags": [
+               "Project Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/storage/token": {
+         "get": {
+            "description": "This endpoint will get temporary access information for a project storage",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/StorageAccessToken"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Project Storage Token",
+            "tags": [
+               "Project Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/storage/token/{region}": {
+         "get": {
+            "description": "This endpoint will get temporary access information for a project storage given a region",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "region",
+                  "required": true,
+                  "schema": {
+                     "$ref": "#/components/schemas/SupportedRescaleRegion"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/StorageAccessToken"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Project Storage Token for a Region",
+            "tags": [
+               "Project Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/storage/tokens": {
+         "get": {
+            "description": "This endpoint will get temporary access information for all project storages",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/StorageAccessTokens"
+                        }
+                     }
+                  },
+                  "description": "OK"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get All Project Storage Tokens",
+            "tags": [
+               "Project Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/task-retention-policy": {
+         "delete": {
+            "description": "This endpoint allows users to delete the task retention policy for the specified project. When a project-level policy is deleted, the auto-archival and auto-deletion behavior for tasks within the project will fall back to the workspace-level policy (if any). If no workspace-level policy is set, tasks within the project will not be subject to any auto-archival or auto-deletion.",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "204": {
+                  "description": "No Content"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Delete Project Task Retention Policy",
+            "tags": [
+               "Project Resource"
+            ]
+         },
+         "get": {
+            "description": "This endpoint is used to retrieve the current task retention policy of a specific project. The task retention policy is necessary in managing the lifecycle of tasks within a project. The task retention policy includes two key aspects:\n\n* **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after which an archived task is automatically deleted. Archived tasks can be unarchived during this period, protecting users from prematurely deleting task resources.\n\n* **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours) of inactivity after which an active task is automatically archived. This feature helps in keeping the project organized by archiving active tasks, ensuring that storage resources are freed optimistically.\n\nSetting either value to `0` will result in disabling of that feature. For example, a project's task retention policy with `deleteAfter` set to `0` will result in tasks within that project never auto-deleting. \n\nIf no policy is set at the project level (i.e., the response is a 404), the policy at the workspace level will apply. If the policy has archiveAfter or deleteAfter set to 0, it means that auto-archival or auto-deletion is disabled at the project level and any workspace level policy is ignored",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/TaskRetentionPolicy"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Project Task Retention Policy",
+            "tags": [
+               "Project Resource"
+            ]
+         },
+         "put": {
+            "description": "This endpoint enables project administrators to define or update the task retention policy for a specific project. The task retention policy includes two key aspects:\n\n* **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in hours) after which an archived task is automatically deleted. This control allows for flexibility in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before being permanently deleted. Archived tasks can be unarchived during this period, protecting users from prematurely deleting task resources\n\n* **Auto-Archive After Inactivity**: The `archiveAfter` field allows administrators to specify the duration (in hours) of inactivity after which an active task is automatically archived. This feature helps in keeping the project organized by archiving active tasks, ensuring that storage resources are freed optimistically.\n\nSetting either value to `0` will result in disabling of that feature. For example, a project's task retention policy with `deleteAfter` set to `0` will result in tasks within that project never auto-deleting.If no policy is set at the project level, the workspace-level policy (if any) will be applied to the project.",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "requestBody": {
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "$ref": "#/components/schemas/TaskRetentionPolicy"
+                     }
+                  }
+               }
+            },
+            "responses": {
+               "201": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/TaskRetentionPolicy"
+                        }
+                     }
+                  },
+                  "description": "Created"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Modify Project Task Retention Policy",
+            "tags": [
+               "Project Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/tasks": {
+         "get": {
+            "description": "This endpoint will get all tasks in a project",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "pageIndex",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "pageSize",
+                  "schema": {
+                     "default": 100,
+                     "format": "int32",
+                     "type": "integer"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCTasksResponse"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get All Tasks for a Project",
+            "tags": [
+               "Task Resource"
+            ]
+         },
+         "post": {
+            "description": "This endpoint will create a task for a project",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "requestBody": {
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "$ref": "#/components/schemas/HTCTask"
+                     }
+                  }
+               }
+            },
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCTask"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Create a Task",
+            "tags": [
+               "Task Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/tasks/{taskId}": {
+         "delete": {
+            "description": "This endpoint will delete a task by ID",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "taskId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "properties": {
+                              "archivedAt": {
+                                 "allOf": [
+                                    {
+                                       "$ref": "#/components/schemas/Instant"
+                                    }
+                                 ],
+                                 "readOnly": true,
+                                 "type": "string"
+                              },
+                              "createdAt": {
+                                 "allOf": [
+                                    {
+                                       "$ref": "#/components/schemas/Instant"
+                                    }
+                                 ],
+                                 "readOnly": true,
+                                 "type": "string"
+                              },
+                              "createdBy": {
+                                 "example": "qWoUF",
+                                 "readOnly": true,
+                                 "type": "string"
+                              },
+                              "deletedAt": {
+                                 "allOf": [
+                                    {
+                                       "$ref": "#/components/schemas/Instant"
+                                    }
+                                 ],
+                                 "readOnly": true,
+                                 "type": "string"
+                              },
+                              "lastActiveAt": {
+                                 "allOf": [
+                                    {
+                                       "$ref": "#/components/schemas/Instant"
+                                    }
+                                 ],
+                                 "readOnly": true,
+                                 "type": "string"
+                              },
+                              "lifecycleStatus": {
+                                 "allOf": [
+                                    {
+                                       "$ref": "#/components/schemas/LifecycleStatus"
+                                    }
+                                 ],
+                                 "enum": [
+                                    "DELETED",
+                                    "ACTIVE",
+                                    "ARCHIVED"
+                                 ],
+                                 "example": "DELETED",
+                                 "readOnly": true,
+                                 "type": "string"
+                              },
+                              "projectId": {
+                                 "example": "project-12345",
+                                 "readOnly": true,
+                                 "type": "string"
+                              },
+                              "taskDescription": {
+                                 "example": "my sample task",
+                                 "type": "string"
+                              },
+                              "taskFolderPath": {
+                                 "example": "projects/project-12345/tasks/task-12345",
+                                 "readOnly": true,
+                                 "type": "string"
+                              },
+                              "taskId": {
+                                 "example": "task-12345",
+                                 "readOnly": true,
+                                 "type": "string"
+                              },
+                              "taskName": {
+                                 "example": "my-task",
+                                 "type": "string"
+                              },
+                              "workspaceId": {
+                                 "example": "04-8473942",
+                                 "readOnly": true,
+                                 "type": "string"
+                              }
+                           },
+                           "required": [
+                              "taskName",
+                              "taskDescription"
+                           ],
+                           "type": "object"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Delete Task",
+            "tags": [
+               "Task Resource"
+            ]
+         },
+         "get": {
+            "description": "This endpoint will get a task by ID",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "taskId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCTask"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Task",
+            "tags": [
+               "Task Resource"
+            ]
+         },
+         "patch": {
+            "description": "This endpoint allows for managing the lifecycle of tasks. Users may set the `LifecycleStatus` of an HTCTask in accordance with their data retention requirements.\n\nArchiving a Task: To archive an active task, submit a PATCH request with \"lifecycleStatus\": \"ARCHIVED\". This action is permissible only if the task is currently active and has no running jobs. Once archived, the task enters a state where it is no longer operational, but its data is retained. An archived task will be automatically scheduled for deletion after a period defined in the project's task retention policy.\n\nUnarchiving a Task: If a task is in an archived state and you wish to defer its automatic deletion, you can restore it to an active state. To unarchive a task, PATCH it with \"lifecycleStatus\": \"ACTIVE\". This action reactivates the task, making it modifiable and operational again. Note that this action is only applicable to tasks in the ARCHIVED state.\n\nRestrictions: Tasks in a DELETED state are immutable and cannot be transitioned to any other state using this endpoint. Similarly, tasks can only be archived if they are in an ACTIVE state and do not have any running jobs.",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "taskId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "requestBody": {
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "$ref": "#/components/schemas/HTCTaskUpdate"
+                     }
+                  }
+               }
+            },
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCTask"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Archive or Unarchive a Task",
+            "tags": [
+               "Task Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/tasks/{taskId}/group-summary-statistics": {
+         "get": {
+            "description": "This endpoint will get job status summary statistics for each group in a task.",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "taskId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "group",
+                  "schema": {
+                     "items": {
+                        "type": "string"
+                     },
+                     "type": "array"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "pageIndex",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "pageSize",
+                  "schema": {
+                     "default": 100,
+                     "format": "int32",
+                     "type": "integer"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "properties": {
+                              "items": {
+                                 "items": {
+                                    "$ref": "#/components/schemas/JobStatusSummary"
+                                 },
+                                 "type": "array"
+                              },
+                              "next": {
+                                 "example": "https://page2.com",
+                                 "format": "uri",
+                                 "type": "string"
+                              }
+                           }
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Task Group Summary Statistics",
+            "tags": [
+               "Task Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/tasks/{taskId}/groups": {
+         "get": {
+            "description": "This endpoint will get task groups",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "taskId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "pageIndex",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "pageSize",
+                  "schema": {
+                     "default": 100,
+                     "format": "int32",
+                     "type": "integer"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "example": [
+                           "group1",
+                           "group2"
+                        ],
+                        "schema": {
+                           "items": {
+                              "type": "string"
+                           },
+                           "type": "array"
+                        }
+                     }
+                  },
+                  "description": "OK"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Task Groups",
+            "tags": [
+               "Task Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/tasks/{taskId}/jobs": {
+         "get": {
+            "description": "This endpoint will get all jobs for a task",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "taskId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "group",
+                  "required": false,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "jobId",
+                  "schema": {
+                     "items": {
+                        "type": "string"
+                     },
+                     "type": "array"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "pageIndex",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "pageSize",
+                  "schema": {
+                     "default": 100,
+                     "format": "int32",
+                     "type": "integer"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "status",
+                  "required": false,
+                  "schema": {
+                     "$ref": "#/components/schemas/RescaleJobStatus"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "viewType",
+                  "required": false,
+                  "schema": {
+                     "$ref": "#/components/schemas/ViewType"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCJobs"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get All Jobs For a Task",
+            "tags": [
+               "Job Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/tasks/{taskId}/jobs/batch": {
+         "post": {
+            "description": "This endpoint will submit a batch of jobs for a task",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "taskId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "group",
+                  "required": false,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "requestBody": {
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "items": {
+                           "$ref": "#/components/schemas/HTCJobSubmitRequest"
+                        },
+                        "type": "array"
+                     }
+                  }
+               },
+               "description": "Job submit requests",
+               "required": true
+            },
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCJobSubmitRequests"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "400": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCRequestError"
+                        }
+                     }
+                  }
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Submit Jobs",
+            "tags": [
+               "Job Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/tasks/{taskId}/jobs/cancel": {
+         "post": {
+            "description": "This endpoint will attempt to cancel submitted jobs.\n\nNote a 200 response status code does not mean all jobs were cancelled.",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "taskId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "group",
+                  "required": false,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Cancel Jobs",
+            "tags": [
+               "Job Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}": {
+         "get": {
+            "description": "This endpoint will get a job by id",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "jobId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "taskId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCJob"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Job",
+            "tags": [
+               "Job Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events": {
+         "get": {
+            "description": "This endpoint will get events for a job",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "jobId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "taskId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "pageIndex",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "pageSize",
+                  "schema": {
+                     "default": 100,
+                     "format": "int32",
+                     "type": "integer"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "properties": {
+                              "items": {
+                                 "items": {
+                                    "$ref": "#/components/schemas/RescaleJobStatusEvent"
+                                 },
+                                 "type": "array"
+                              },
+                              "next": {
+                                 "example": "https://page2.com",
+                                 "format": "uri",
+                                 "type": "string"
+                              }
+                           }
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Job Events",
+            "tags": [
+               "Job Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/logs": {
+         "get": {
+            "description": "This endpoint will get job logs",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "jobId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "taskId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "pageIndex",
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "description": "Maximum value: 10000",
+                  "in": "query",
+                  "name": "pageSize",
+                  "schema": {
+                     "default": 100,
+                     "format": "int32",
+                     "type": "integer"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "properties": {
+                              "items": {
+                                 "items": {
+                                    "$ref": "#/components/schemas/HTCLogEvent"
+                                 },
+                                 "type": "array"
+                              },
+                              "next": {
+                                 "example": "https://page2.com",
+                                 "format": "uri",
+                                 "type": "string"
+                              }
+                           }
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Job Logs",
+            "tags": [
+               "Job Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/tasks/{taskId}/storage/presigned-url": {
+         "get": {
+            "description": "This endpoint will get a presigned url for task storage",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "taskId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "filePath",
+                  "required": true,
+                  "schema": {
+                     "minLength": 1,
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/PresignedPutUrlResponse"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Task Storage Presigned URL",
+            "tags": [
+               "Task Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/tasks/{taskId}/storage/regional-storage": {
+         "get": {
+            "description": "This endpoint will get temporary access information for all task storages",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "taskId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/RegionalStorageResponse"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get All Task Storage Tokens",
+            "tags": [
+               "Task Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/tasks/{taskId}/storage/token": {
+         "get": {
+            "description": "This endpoint will get temporary access information for a task storage",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "taskId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/StorageAccessToken"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Task Storage Token",
+            "tags": [
+               "Task Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/tasks/{taskId}/storage/token/{region}": {
+         "get": {
+            "description": "This endpoint will get temporary access information for a task storage given a region",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "region",
+                  "required": true,
+                  "schema": {
+                     "$ref": "#/components/schemas/SupportedRescaleRegion"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "taskId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/StorageAccessToken"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Task Storage Token for a Region",
+            "tags": [
+               "Task Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/tasks/{taskId}/storage/tokens": {
+         "get": {
+            "description": "This endpoint will get temporary access information for all task storages",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "taskId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/StorageAccessTokens"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get All Task Storage Tokens",
+            "tags": [
+               "Task Resource"
+            ]
+         }
+      },
+      "/htc/projects/{projectId}/tasks/{taskId}/summary-statistics": {
+         "get": {
+            "description": "This endpoint will get task summary statistics",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "projectId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               },
+               {
+                  "in": "path",
+                  "name": "taskId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/JobStatusSummary"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Task Summary Statistics",
+            "tags": [
+               "Task Resource"
+            ]
+         }
+      },
+      "/htc/regions": {
+         "get": {
+            "description": "This endpoint will get HTC region settings for all regions",
+            "parameters": [
+               {
+                  "in": "query",
+                  "name": "cloudProvider",
+                  "schema": {
+                     "$ref": "#/components/schemas/CloudProvider"
+                  }
+               },
+               {
+                  "in": "query",
+                  "name": "enabled",
+                  "schema": {
+                     "type": "boolean"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCInfraResource"
+                        }
+                     }
+                  },
+                  "description": "OK"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               },
+               "404": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                        }
+                     }
+                  },
+                  "description": "Not Found"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Region Settings For All Regions",
+            "tags": [
+               "Provider Resource"
+            ]
+         }
+      },
+      "/htc/regions/{region}": {
+         "get": {
+            "description": "This endpoint will get HTC region settings for a specific region",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "region",
+                  "required": true,
+                  "schema": {
+                     "$ref": "#/components/schemas/SupportedRescaleRegion"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCRegionAdminSettings"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               },
+               "404": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                        }
+                     }
+                  },
+                  "description": "Not Found"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Region Settings for a Region",
+            "tags": [
+               "Provider Resource"
+            ]
+         }
+      },
+      "/htc/storage": {
+         "get": {
+            "description": "This endpoint will get storages in all enabled regions",
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "items": {
+                              "$ref": "#/components/schemas/RegionStorageOption"
+                           },
+                           "type": "array"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Regional Storages",
+            "tags": [
+               "Storage Resource"
+            ]
+         }
+      },
+      "/htc/storage/region/{region}": {
+         "get": {
+            "description": "This endpoint will get a storage for a region",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "region",
+                  "required": true,
+                  "schema": {
+                     "$ref": "#/components/schemas/SupportedRescaleRegion"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/RegionStorageOption"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Regional Storage",
+            "tags": [
+               "Storage Resource"
+            ]
+         }
+      },
+      "/htc/workspaces/{workspaceId}/dimensions": {
+         "get": {
+            "description": "This endpoint provides a comprehensive view of the various hardware configurations and environments available within a specific workspace. This read-only API is primarily designed for users who need to understand the different \"dimensions\" or attributes that describe the hardware and other aspects of job runs within their workspace. By offering insights into available environments, it aids users in selecting the most suitable configuration for their jobs, especially when performance testing across different hardware setups.\n\nNormal users can access this endpoint for the workspace they belong to\n\nRescale personnel are required in order to modify any of these dimensions.",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "workspaceId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "items": {
+                              "$ref": "#/components/schemas/HTCComputeEnvironment"
+                           },
+                           "type": "array"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Workspace Dimensions",
+            "tags": [
+               "Workspace Resource"
+            ]
+         }
+      },
+      "/htc/workspaces/{workspaceId}/limits": {
+         "get": {
+            "description": "This endpoint will get the resource limit applied to this workspace",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "workspaceId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCWorkspaceLimit"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Workspace Limit",
+            "tags": [
+               "Workspace Resource"
+            ]
+         }
+      },
+      "/htc/workspaces/{workspaceId}/task-retention-policy": {
+         "get": {
+            "description": "This endpoint is used to retrieve the current task retention policy of a specific Workspace. The task retention policy is necessary in managing the lifecycle of tasks within a Workspace. The task retention policy includes two key aspects:\n\n* **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after which an archived task is automatically deleted. Archived tasks can be unarchived during this period, protecting users from prematurely deleting task resources.\n\n* **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours) of inactivity after which an active task is automatically archived. This feature helps in keeping the project organized by archiving active tasks, ensuring that storage resources are freed optimistically.\n\nSetting either value to `0` will result in disabling of that feature. For example, a project's task retention policy with `deleteAfter` set to `0` will result in tasks within that project never auto-deleting.",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "workspaceId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/WorkspaceTaskRetentionPolicy"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Get Workspace Task Retention Policy",
+            "tags": [
+               "Workspace Resource"
+            ]
+         },
+         "put": {
+            "description": "This endpoint enables Workspace administrators to define or update the task retention policy for a specific workspace. The task retention policy includes two key aspects:\n\n* **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in hours) after which an archived task is automatically deleted. This control allows for flexibility in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before being permanently deleted. Archived tasks can be unarchived during this period, protecting users from prematurely deleting task resources\n\n* **Auto-Archive After Inactivity**: The `archiveAfter` field allows administrators to specify the duration (in hours) of inactivity after which an active task is automatically archived. This feature helps in keeping the project organized by archiving active tasks, ensuring that storage resources are freed optimistically.\n\nSetting either value to `0` will result in disabling of that feature. For example, a workspace's task retention policy with `deleteAfter` set to `0` will result in tasks within that project never auto-deleting. The policy applies to all projects within the workspace that do not have their own project-level policy defined. If a project within the workspace has its own retention policy defined, the project-level policy takes precedence over the workspace-level policy.",
+            "parameters": [
+               {
+                  "in": "path",
+                  "name": "workspaceId",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "requestBody": {
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "$ref": "#/components/schemas/WorkspaceTaskRetentionPolicy"
+                     }
+                  }
+               }
+            },
+            "responses": {
+               "201": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/WorkspaceTaskRetentionPolicy"
+                        }
+                     }
+                  },
+                  "description": "Created"
+               },
+               "401": {
+                  "description": "Not Authorized"
+               },
+               "403": {
+                  "description": "Not Allowed"
+               }
+            },
+            "security": [
+               {
+                  "SecurityScheme": [ ]
+               }
+            ],
+            "summary": "Modify Workspace Task Retention Policy",
+            "tags": [
+               "Workspace Resource"
+            ]
+         }
+      },
+      "/oauth2/token": {
+         "post": {
+            "description": "This endpoint will get an OAuth access token",
+            "responses": {
+               "200": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/OAuth2Token"
+                        }
+                     }
+                  },
+                  "description": "Ok"
+               },
+               "400": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                        }
+                     }
+                  },
+                  "description": "Bad request"
+               }
+            },
+            "summary": "Get OAuth Access Token",
+            "tags": [
+               "Token Resource"
+            ]
+         }
+      }
+   },
+   "servers": [
+      {
+         "url": "https://htc.rescale.com/api/v1"
+      }
+   ]
+}

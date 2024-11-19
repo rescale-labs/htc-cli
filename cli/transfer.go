@@ -17,36 +17,34 @@ type TransferPath struct {
 	dest string
 }
 
-func NewTransfer(src string, dest string) *TransferPath {
-	return &TransferPath{src, dest}
-}
-
 type TransferFile interface {
 	Transfer(ctx context.Context) error
 }
 
-func (transfer *TransferPath) Transfer(ctx context.Context) error {
-	if strings.HasPrefix(transfer.src, "gs://") {
+func (transfer *Transfer) Transfer(ctx context.Context) error {
+	if strings.HasPrefix(transfer.sources[0], "gs://") {
 		client, err := GetGoogleClient(ctx)
 		if err != nil {
 			return err
 		}
 		defer client.Close()
-		return Download(ctx, client, transfer.src, transfer.dest)
-	} else if strings.HasPrefix(transfer.dest, "gs://") {
+		return Download(ctx, client, transfer)
+	} else if strings.HasPrefix(transfer.destination, "gs://") {
 		client, err := GetGoogleClient(ctx)
 		if err != nil {
 			return err
 		}
 		defer client.Close()
-		return Upload(ctx, client, transfer.src, transfer.dest)
+		return Upload(ctx, client, transfer)
 	} else {
-		return localTransfer(transfer.src, transfer.dest)
+		return localTransfer(transfer)
 	}
 }
 
-func localTransfer(src string, dest string) error {
+func localTransfer(transfer *Transfer) error {
 	var failedCopies []string
+	src := transfer.sources[0]
+	dest := transfer.destination
 
 	stat, err := os.Stat(src)
 	if stat.IsDir() {
@@ -70,7 +68,9 @@ func localTransfer(src string, dest string) error {
 			return errors.New(fmt.Sprintf("The following files failed to copy: %s", pathNames))
 		}
 	} else {
-		copyFile(src, dest)
+		for _, filename := range transfer.sources {
+			copyFile(filename, dest)
+		}
 	}
 	return err
 }
@@ -101,4 +101,10 @@ func copyFile(src, dest string) error {
 
 	log.Printf("File %s copied to %s.\n", src, dest)
 	return err
+}
+
+type TransferResult struct {
+	source      string
+	destination string
+	err         error
 }
