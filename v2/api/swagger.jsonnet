@@ -105,6 +105,19 @@ local patches = {
         },
       },
     },
+    '/htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}'+: {
+      get+: {
+        responses+: {
+          '404': {
+            content: {
+              'application/json': {
+                schema: { '$ref': '#/components/schemas/HTCRequestError' },
+              },
+            },
+          },
+        },
+      },
+    },
     '/htc/projects/{projectId}/tasks/{taskId}/jobs/batch'+: {
       post+: {
         responses+: {
@@ -131,11 +144,17 @@ local patches = {
     schemas+: {
       HTCJob+: {
         properties+: {
+          completedAt: {
+            '$ref': '#/components/schemas/NullableInstant',
+          },
           failureCode+: {
             nullable: true,
           },
           statusReason+: {
             nullable: true,
+          },
+          startedAt: {
+            '$ref': '#/components/schemas/NullableInstant',
           },
         },
       },
@@ -240,6 +259,13 @@ local patches = {
         },
       },
       HTCTokenPayload: { type: 'string' },
+      NullableInstant: {
+        example: '2022-03-10T16:15:50Z',
+        format: 'date-time',
+        type: 'string',
+        nullable: true,
+      },
+
     },
   },
 };

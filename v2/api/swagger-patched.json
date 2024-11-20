@@ -281,7 +281,7 @@
                   "type": "array"
                },
                "completedAt": {
-                  "$ref": "#/components/schemas/Instant"
+                  "$ref": "#/components/schemas/NullableInstant"
                },
                "container": {
                   "$ref": "#/components/schemas/ContainerDetails"
@@ -361,7 +361,7 @@
                   "$ref": "#/components/schemas/RescaleRegion"
                },
                "startedAt": {
-                  "$ref": "#/components/schemas/Instant"
+                  "$ref": "#/components/schemas/NullableInstant"
                },
                "status": {
                   "$ref": "#/components/schemas/RescaleJobStatus"
@@ -1391,6 +1391,12 @@
                "value"
             ],
             "type": "object"
+         },
+         "NullableInstant": {
+            "example": "2022-03-10T16:15:50Z",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
          },
          "OAuth2ErrorResponse": {
             "properties": {
@@ -4039,6 +4045,15 @@
                },
                "403": {
                   "description": "Not Allowed"
+               },
+               "404": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCRequestError"
+                        }
+                     }
+                  }
                }
             },
             "security": [
