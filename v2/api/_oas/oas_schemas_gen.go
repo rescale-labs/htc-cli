@@ -1034,7 +1034,7 @@ func (*HTCInfraResource) htcRegionsGetRes() {}
 type HTCJob struct {
 	Architecture            OptArchitecture            `json:"architecture"`
 	Commands                []string                   `json:"commands"`
-	CompletedAt             OptInstant                 `json:"completedAt"`
+	CompletedAt             OptNilNullableInstant      `json:"completedAt"`
 	Container               OptContainerDetails        `json:"container"`
 	CreatedAt               OptInstant                 `json:"createdAt"`
 	CreatedBy               OptString                  `json:"createdBy"`
@@ -1054,7 +1054,7 @@ type HTCJob struct {
 	ProjectId               OptString                  `json:"projectId"`
 	ProviderJobId           OptString                  `json:"providerJobId"`
 	Region                  OptRescaleRegion           `json:"region"`
-	StartedAt               OptInstant                 `json:"startedAt"`
+	StartedAt               OptNilNullableInstant      `json:"startedAt"`
 	Status                  OptRescaleJobStatus        `json:"status"`
 	StatusReason            OptNilString               `json:"statusReason"`
 	Tags                    []Tag                      `json:"tags"`
@@ -1074,7 +1074,7 @@ func (s *HTCJob) GetCommands() []string {
 }
 
 // GetCompletedAt returns the value of CompletedAt.
-func (s *HTCJob) GetCompletedAt() OptInstant {
+func (s *HTCJob) GetCompletedAt() OptNilNullableInstant {
 	return s.CompletedAt
 }
 
@@ -1174,7 +1174,7 @@ func (s *HTCJob) GetRegion() OptRescaleRegion {
 }
 
 // GetStartedAt returns the value of StartedAt.
-func (s *HTCJob) GetStartedAt() OptInstant {
+func (s *HTCJob) GetStartedAt() OptNilNullableInstant {
 	return s.StartedAt
 }
 
@@ -1219,7 +1219,7 @@ func (s *HTCJob) SetCommands(val []string) {
 }
 
 // SetCompletedAt sets the value of CompletedAt.
-func (s *HTCJob) SetCompletedAt(val OptInstant) {
+func (s *HTCJob) SetCompletedAt(val OptNilNullableInstant) {
 	s.CompletedAt = val
 }
 
@@ -1319,7 +1319,7 @@ func (s *HTCJob) SetRegion(val OptRescaleRegion) {
 }
 
 // SetStartedAt sets the value of StartedAt.
-func (s *HTCJob) SetStartedAt(val OptInstant) {
+func (s *HTCJob) SetStartedAt(val OptNilNullableInstant) {
 	s.StartedAt = val
 }
 
@@ -2741,6 +2741,7 @@ func (s *HTCRequestError) SetMessage(val OptString) {
 }
 
 func (*HTCRequestError) htcProjectsProjectIdTasksTaskIdJobsBatchPostRes() {}
+func (*HTCRequestError) htcProjectsProjectIdTasksTaskIdJobsJobIdGetRes()  {}
 
 // Ref: #/components/schemas/HTCRetryStrategy
 type HTCRetryStrategy struct {
@@ -4415,6 +4416,8 @@ func (s *NameValuePair) SetName(val string) {
 func (s *NameValuePair) SetValue(val string) {
 	s.Value = val
 }
+
+type NullableInstant time.Time
 
 // Ref: #/components/schemas/OAuth2ErrorResponse
 type OAuth2ErrorResponse struct {
@@ -6220,6 +6223,69 @@ func (o OptNilHTCJobFailureCode) Get() (v HTCJobFailureCode, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilHTCJobFailureCode) Or(d HTCJobFailureCode) HTCJobFailureCode {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilNullableInstant returns new OptNilNullableInstant with value set to v.
+func NewOptNilNullableInstant(v NullableInstant) OptNilNullableInstant {
+	return OptNilNullableInstant{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilNullableInstant is optional nullable NullableInstant.
+type OptNilNullableInstant struct {
+	Value NullableInstant
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilNullableInstant was set.
+func (o OptNilNullableInstant) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilNullableInstant) Reset() {
+	var v NullableInstant
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilNullableInstant) SetTo(v NullableInstant) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilNullableInstant) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilNullableInstant) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v NullableInstant
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilNullableInstant) Get() (v NullableInstant, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilNullableInstant) Or(d NullableInstant) NullableInstant {
 	if v, ok := o.Get(); ok {
 		return v
 	}
