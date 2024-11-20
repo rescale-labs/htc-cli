@@ -8,9 +8,9 @@ As things check off, please remember to copy to
 ## Soon
 
 Essential API operations:
+  * project create
   * `project retention-policy get` returns error on 404 instead of nothing
   * Jobs:
-    * GET /jobs/{jobId}
     * GET /jobs/{jobId}/events
     * GET /jobs/{jobId}/logs
     * POST /jobs/cancel
@@ -18,7 +18,8 @@ Essential API operations:
     * GET /tasks/summary-statistics
   * Limits:
     * `workspace dimensions get`
-    * all the CRUD
+    * `workspace limits get`
+    * CRUD for both project + workspace limits
   * `clusters get`
 
 Warts:

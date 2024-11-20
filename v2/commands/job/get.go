@@ -3,6 +3,7 @@ package job
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -31,6 +32,27 @@ func getJobs(ctx context.Context, c *oapi.Client, params *oapi.HtcProjectsProjec
 	return nil, fmt.Errorf("Unknown response type: %s", res)
 }
 
+func getJob(ctx context.Context, c *oapi.Client, projectId, taskId, jobId string) (*oapi.HTCJob, error) {
+	params := oapi.HtcProjectsProjectIdTasksTaskIdJobsJobIdGetParams{
+		ProjectId: projectId,
+		TaskId:    taskId,
+		JobId:     jobId,
+	}
+	log.Printf("getJob: %s %s %s", projectId, taskId, jobId)
+	res, err := c.HtcProjectsProjectIdTasksTaskIdJobsJobIdGet(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+	switch res := res.(type) {
+	case *oapi.HTCJob:
+		return res, nil
+	case *oapi.HtcProjectsProjectIdTasksTaskIdJobsJobIdGetUnauthorized,
+		*oapi.HtcProjectsProjectIdTasksTaskIdJobsJobIdGetForbidden:
+		return nil, fmt.Errorf("forbidden: %s", res)
+	}
+	return nil, fmt.Errorf("Unknown response type: %s", res)
+}
+
 func Get(cmd *cobra.Command, args []string) error {
 	runner, err := common.NewRunnerWithToken(cmd, time.Now())
 	if err != nil {
@@ -42,48 +64,57 @@ func Get(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	limit, err := cmd.Flags().GetInt("limit")
-	if err != nil {
-		return config.UsageErrorf("Error setting limit: %w", err)
-	}
-
-	group, err := cmd.Flags().GetString("group")
-	if err != nil {
-		return config.UsageErrorf("Error setting group: %w", err)
-	}
-
 	ctx := context.Background()
-	var items []oapi.HTCJob
-	params := oapi.HtcProjectsProjectIdTasksTaskIdJobsGetParams{
-		ProjectId: p.ProjectId,
-		TaskId:    p.TaskId,
-		Group:     oapi.NewOptString(group),
-		PageSize:  oapi.NewOptInt32(pageSize),
-	}
-	for {
-		res, err := getJobs(ctx, runner.Client, &params)
+	if len(args) == 0 {
+		limit, err := cmd.Flags().GetInt("limit")
 		if err != nil {
-			return err
-		}
-		items = append(items, res.Items...)
-		if limit > 0 && len(items) >= limit {
-			items = items[:limit]
-			break
+			return config.UsageErrorf("Error setting limit: %w", err)
 		}
 
-		params.PageIndex = oapi.NewOptString(
-			res.Next.Value.Query().Get("pageIndex"))
-		if params.PageIndex.Value == "" {
-			break
+		group, err := cmd.Flags().GetString("group")
+		if err != nil {
+			return config.UsageErrorf("Error setting group: %w", err)
 		}
+
+		var items []oapi.HTCJob
+		params := oapi.HtcProjectsProjectIdTasksTaskIdJobsGetParams{
+			ProjectId: p.ProjectId,
+			TaskId:    p.TaskId,
+			Group:     oapi.NewOptString(group),
+			PageSize:  oapi.NewOptInt32(pageSize),
+		}
+		for {
+			res, err := getJobs(ctx, runner.Client, &params)
+			if err != nil {
+				return err
+			}
+			items = append(items, res.Items...)
+			if limit > 0 && len(items) >= limit {
+				items = items[:limit]
+				break
+			}
+
+			params.PageIndex = oapi.NewOptString(
+				res.Next.Value.Query().Get("pageIndex"))
+			if params.PageIndex.Value == "" {
+				break
+			}
+		}
+		return runner.PrintResult(tabler.HTCJobs(items), os.Stdout)
 	}
-	return runner.PrintResult(tabler.HTCJobs(items), os.Stdout)
+
+	job, err := getJob(ctx, runner.Client, p.ProjectId, p.TaskId, args[0])
+	if err != nil {
+		return err
+	}
+	return runner.PrintResult(tabler.HTCJob(*job), os.Stdout)
 }
 
 var GetCmd = &cobra.Command{
 	Use:   "get",
 	Short: "Returns HTC jobs in a given task.",
 	Run:   common.WrapRunE(Get),
+	Args:  cobra.RangeArgs(0, 1),
 }
 
 func init() {
