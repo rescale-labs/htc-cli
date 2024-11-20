@@ -24,7 +24,7 @@ var RootCmd = &cobra.Command{
 func init() {
 	// cobra.OnInitialize(initConfig)
 	RootCmd.PersistentFlags().StringP("output", "o", "text", "output format")
-	RootCmd.PersistentFlags().String("context", "", "config context to use (\"default\" if not provided)")
+	RootCmd.PersistentFlags().String("context", "", "config context to use (default \"default\")")
 
 	// auth
 	authCmd := &cobra.Command{

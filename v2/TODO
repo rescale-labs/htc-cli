@@ -49,6 +49,8 @@ Automation:
         * https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/storing-and-sharing-data-from-a-workflow
         * https://github.com/actions/upload-artifact?tab=readme-ov-file#where-does-the-upload-go
     * prepare releases when tagged with https://github.com/softprops/action-gh-release
+    * Brian would like to be able to add extra columns to tabular output.
+    * Brian would like `htc config edit` that drops into an editor.
 
 
 ## stuff from Alistair 2024-10-22
