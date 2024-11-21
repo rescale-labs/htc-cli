@@ -16,11 +16,17 @@ var htcJobFields = []Field{
 
 type HTCJob oapi.HTCJob
 
-func (j HTCJob) Fields() []Field {
+func (j *HTCJob) Fields() []Field {
 	return htcJobFields
 }
 
-func (j HTCJob) WriteRows(rowFmt string, w io.Writer) error {
+// json output depends on using the concrete type's UnmarshalJSON.
+func (j *HTCJob) MarshalJSON() ([]byte, error) {
+	c := (*oapi.HTCJob)(j)
+	return c.MarshalJSON()
+}
+
+func (j *HTCJob) WriteRows(rowFmt string, w io.Writer) error {
 	_, err := fmt.Fprintf(
 		w, rowFmt,
 		j.JobUUID.Value,
@@ -39,7 +45,7 @@ func (s HTCJobs) Fields() []Field {
 
 func (s HTCJobs) WriteRows(rowFmt string, w io.Writer) error {
 	for _, j := range s {
-		if err := HTCJob(j).WriteRows(rowFmt, w); err != nil {
+		if err := (*HTCJob)(&j).WriteRows(rowFmt, w); err != nil {
 			return err
 		}
 	}

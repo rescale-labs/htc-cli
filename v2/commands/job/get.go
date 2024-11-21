@@ -108,7 +108,7 @@ func Get(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	return runner.PrintResult(tabler.HTCJob(*job), os.Stdout)
+	return runner.PrintResult((*tabler.HTCJob)(job), os.Stdout)
 }
 
 var GetCmd = &cobra.Command{
