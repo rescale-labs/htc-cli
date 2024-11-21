@@ -80,8 +80,9 @@ func Get(cmd *cobra.Command, args []string) error {
 		params := oapi.HtcProjectsProjectIdTasksTaskIdJobsGetParams{
 			ProjectId: p.ProjectId,
 			TaskId:    p.TaskId,
-			Group:     oapi.NewOptString(group),
+			Group:     oapi.OptString{group, group != ""},
 			PageSize:  oapi.NewOptInt32(pageSize),
+			ViewType:  oapi.NewOptViewType(oapi.ViewTypeFULL),
 		}
 		for {
 			res, err := getJobs(ctx, runner.Client, &params)
