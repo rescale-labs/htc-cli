@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"reflect"
 	"strings"
 	"time"
 
@@ -201,32 +202,60 @@ func (r *Runner) GetIds(p *IDParams) error {
 	return nil
 }
 
-func (r *Runner) PrintResult(res interface{}, w io.Writer) error {
-	switch r.Config.OutputFormat {
-	case "yaml":
-		// NB: YAML encoding doesn't work properly for ogen's OptString,
-		// OptInt, etc. types, and there's not an easy way to fix that
-		// without us adding code to the same package as what we
-		// generate. (Though, I guess that'd be OK to do. We probably
-		// have to do the same eventually anyway for plain text output
-		// of various entities.)
-		e := yaml.NewEncoder(w)
-		defer e.Close()
-		return e.Encode(res)
-
-	case "json":
-		e := json.NewEncoder(w)
-		e.SetIndent("", "  ")
-		return e.Encode(res)
-
-	case "text":
+func (r *Runner) PrintResult(res any, w io.Writer) error {
+	// Text output is the default and happy path. Use it when we can.
+	if r.Config.OutputFormat == "text" {
 		if t, ok := res.(tabler.Tabler); ok {
 			return tabler.WriteTable(t, w)
 		}
-		e := json.NewEncoder(w)
-		e.SetIndent("", "  ")
-		return e.Encode(res)
 	}
 
-	return fmt.Errorf("Unsupported output format %q", r.Config.OutputFormat)
+	type Encoder interface {
+		Encode(any) error
+	}
+	var e Encoder
+
+	switch r.Config.OutputFormat {
+	case "yaml":
+		// NB: YAML encoding doesn't work properly for ogen's
+		// OptString, OptInt, etc. types, and there's not an
+		// easy way to fix that without us adding code to the
+		// same package as what we generate, or else just
+		// serializing to JSON, pulling back into go, and then
+		// serializing to JSON again. (Though, I guess either of
+		// those could be OK to do.)
+		//
+		// YAML encoding also flat out fails for things like
+		// tabler.HTCJob since it only has interfaces for
+		// json.Marshaler.
+		yamlEnc := yaml.NewEncoder(w)
+		defer yamlEnc.Close()
+		e = yamlEnc
+
+	case "text", "json":
+		// Text falls back to JSON encoding for output.
+		jsonEnc := json.NewEncoder(w)
+		jsonEnc.SetIndent("", "  ")
+		e = jsonEnc
+
+	default:
+		return fmt.Errorf("Unsupported output format %q", r.Config.OutputFormat)
+	}
+
+	// Skip output for empty slices, which often enough would be
+	// `null` instead of `[]`.
+	if v := reflect.ValueOf(res); v.Kind() == reflect.Slice || v.Kind() == reflect.Array {
+		if v.Len() == 0 {
+			return nil
+		}
+	}
+
+	// If res has a MarshalJSON() method available in it, use it. This
+	// is key for serializing oapi structs, where letting go reflection
+	// do its thing causes us to serialize fields that are empty, and
+	// thus breaks JSON output.
+	if t, ok := res.(json.Marshaler); ok {
+		return e.Encode(t)
+	}
+	return e.Encode(res)
 }

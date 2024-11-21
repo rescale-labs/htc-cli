@@ -8,18 +8,25 @@ As things check off, please remember to copy to
 ## Soon
 
 Essential API operations:
+  * project create
   * `project retention-policy get` returns error on 404 instead of nothing
+  * Limits:
+    * `workspace dimensions get`
+    * `workspace limits get`
+    * CRUD for both project + workspace limits
+  * `clusters get`
+	* Fix JSON output:
+		* Make runner.PrintResult should require `tabler.Tabler` interface
+		* Make tabler.Tabler interface include `MarshalJSON([]byte) error`
+    * Document in the interface why this is important (because for non-slice
+      types, we need to use oapi's `MarshalJSON()` implementation, otherwise
+      JSON encoding can fail, as it did quite unpleasantly with tabler.HTCJob.
   * Jobs:
-    * GET /jobs/{jobId}
     * GET /jobs/{jobId}/events
     * GET /jobs/{jobId}/logs
     * POST /jobs/cancel
   * Tasks:
     * GET /tasks/summary-statistics
-  * Limits:
-    * `workspace dimensions get`
-    * all the CRUD
-  * `clusters get`
 
 Warts:
   * We now have `--project-id` on CLI, `project_id` in TOML, and `projectId` in some (but not all!) JSON. Will need to ask for Enkis' thoughts on this.
@@ -48,6 +55,8 @@ Automation:
         * https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/storing-and-sharing-data-from-a-workflow
         * https://github.com/actions/upload-artifact?tab=readme-ov-file#where-does-the-upload-go
     * prepare releases when tagged with https://github.com/softprops/action-gh-release
+    * Brian would like to be able to add extra columns to tabular output.
+    * Brian would like `htc config edit` that drops into an editor.
 
 
 ## stuff from Alistair 2024-10-22

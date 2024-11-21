@@ -1,5 +1,11 @@
 # Changelog
 
+## Next release
+
+* Extend `htc job get` so it takes optional job UUID
+* Fix `htc job get` so it lists jobs that have not yet started or
+  completed. (ENK-2318)
+
 ## v.0.03
 
 * Extend `htc config context get` to report workspace name, workspace

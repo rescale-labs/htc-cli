@@ -13,7 +13,9 @@ import (
 // sense to keep it.
 
 // First name the union so we can use it in a few places.
-type anyTime interface{ time.Time | oapi.Instant }
+type anyTime interface {
+	time.Time | oapi.Instant | oapi.NullableInstant
+}
 
 // Then construct the generic interface as a type constraint.
 type TimeGet[T anyTime] interface {
