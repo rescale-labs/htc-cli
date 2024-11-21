@@ -1,12 +1,13 @@
 # Changelog
 
-## Next release
+## v0.0.4
 
 * Extend `htc job get` so it takes optional job UUID
 * Fix `htc job get` so it lists jobs that have not yet started or
   completed. (ENK-2318)
+* Fix JSON output issue in `htc job get`.
 
-## v.0.03
+## v.0.0.3
 
 * Extend `htc config context get` to report workspace name, workspace
   id, and the email address associated with this context's credential.
