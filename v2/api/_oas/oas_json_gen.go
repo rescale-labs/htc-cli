@@ -1646,23 +1646,13 @@ func (s *HTCJob) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Envs != nil {
-			e.FieldStart("envs")
-			e.ArrStart()
-			for _, elem := range s.Envs {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
-		}
-	}
-	{
 		if s.ExecTimeoutSeconds.Set {
 			e.FieldStart("execTimeoutSeconds")
 			s.ExecTimeoutSeconds.Encode(e)
 		}
 	}
 	{
-		if s.FailureCode.Set {
+		if s.FailureCode != nil {
 			e.FieldStart("failureCode")
 			s.FailureCode.Encode(e)
 		}
@@ -1689,12 +1679,6 @@ func (s *HTCJob) encodeFields(e *jx.Encoder) {
 		if s.InstanceLabels.Set {
 			e.FieldStart("instanceLabels")
 			s.InstanceLabels.Encode(e)
-		}
-	}
-	{
-		if s.JobExecutionEnvironment.Set {
-			e.FieldStart("jobExecutionEnvironment")
-			s.JobExecutionEnvironment.Encode(e)
 		}
 	}
 	{
@@ -1793,36 +1777,34 @@ func (s *HTCJob) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfHTCJob = [29]string{
+var jsonFieldsNameOfHTCJob = [27]string{
 	0:  "architecture",
 	1:  "commands",
 	2:  "completedAt",
 	3:  "container",
 	4:  "createdAt",
 	5:  "createdBy",
-	6:  "envs",
-	7:  "execTimeoutSeconds",
-	8:  "failureCode",
-	9:  "group",
-	10: "imageName",
-	11: "instanceId",
-	12: "instanceLabels",
-	13: "jobExecutionEnvironment",
-	14: "jobUUID",
-	15: "maxDiskGiB",
-	16: "maxMemory",
-	17: "maxSwap",
-	18: "maxVCpus",
-	19: "projectId",
-	20: "providerJobId",
-	21: "region",
-	22: "startedAt",
-	23: "status",
-	24: "statusReason",
-	25: "tags",
-	26: "taskId",
-	27: "updatedAt",
-	28: "workspaceId",
+	6:  "execTimeoutSeconds",
+	7:  "failureCode",
+	8:  "group",
+	9:  "imageName",
+	10: "instanceId",
+	11: "instanceLabels",
+	12: "jobUUID",
+	13: "maxDiskGiB",
+	14: "maxMemory",
+	15: "maxSwap",
+	16: "maxVCpus",
+	17: "projectId",
+	18: "providerJobId",
+	19: "region",
+	20: "startedAt",
+	21: "status",
+	22: "statusReason",
+	23: "tags",
+	24: "taskId",
+	25: "updatedAt",
+	26: "workspaceId",
 }
 
 // Decode decodes HTCJob from json.
@@ -1902,23 +1884,6 @@ func (s *HTCJob) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"createdBy\"")
 			}
-		case "envs":
-			if err := func() error {
-				s.Envs = make([]EnvPair, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem EnvPair
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.Envs = append(s.Envs, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"envs\"")
-			}
 		case "execTimeoutSeconds":
 			if err := func() error {
 				s.ExecTimeoutSeconds.Reset()
@@ -1931,10 +1896,12 @@ func (s *HTCJob) Decode(d *jx.Decoder) error {
 			}
 		case "failureCode":
 			if err := func() error {
-				s.FailureCode.Reset()
-				if err := s.FailureCode.Decode(d); err != nil {
+				s.FailureCode = nil
+				var elem NilHTCJobFailureCode
+				if err := elem.Decode(d); err != nil {
 					return err
 				}
+				s.FailureCode = &elem
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"failureCode\"")
@@ -1978,16 +1945,6 @@ func (s *HTCJob) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"instanceLabels\"")
-			}
-		case "jobExecutionEnvironment":
-			if err := func() error {
-				s.JobExecutionEnvironment.Reset()
-				if err := s.JobExecutionEnvironment.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"jobExecutionEnvironment\"")
 			}
 		case "jobUUID":
 			if err := func() error {
@@ -6900,103 +6857,6 @@ func (s *Instant) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode implements json.Marshaler.
-func (s *JobExecutionEnvironment) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *JobExecutionEnvironment) encodeFields(e *jx.Encoder) {
-	{
-		if s.Architecture.Set {
-			e.FieldStart("architecture")
-			s.Architecture.Encode(e)
-		}
-	}
-	{
-		if s.InstanceId.Set {
-			e.FieldStart("instanceId")
-			s.InstanceId.Encode(e)
-		}
-	}
-	{
-		if s.InstanceType.Set {
-			e.FieldStart("instanceType")
-			s.InstanceType.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfJobExecutionEnvironment = [3]string{
-	0: "architecture",
-	1: "instanceId",
-	2: "instanceType",
-}
-
-// Decode decodes JobExecutionEnvironment from json.
-func (s *JobExecutionEnvironment) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode JobExecutionEnvironment to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "architecture":
-			if err := func() error {
-				s.Architecture.Reset()
-				if err := s.Architecture.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"architecture\"")
-			}
-		case "instanceId":
-			if err := func() error {
-				s.InstanceId.Reset()
-				if err := s.InstanceId.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"instanceId\"")
-			}
-		case "instanceType":
-			if err := func() error {
-				s.InstanceType.Reset()
-				if err := s.InstanceType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"instanceType\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode JobExecutionEnvironment")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *JobExecutionEnvironment) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *JobExecutionEnvironment) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes JobPriority as json.
 func (s JobPriority) Encode(e *jx.Encoder) {
 	e.Str(string(s))
@@ -7638,6 +7498,50 @@ func (s *NameValuePair) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *NameValuePair) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes HTCJobFailureCode as json.
+func (o NilHTCJobFailureCode) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes HTCJobFailureCode from json.
+func (o *NilHTCJobFailureCode) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilHTCJobFailureCode to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v HTCJobFailureCode
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilHTCJobFailureCode) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilHTCJobFailureCode) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -8893,39 +8797,6 @@ func (s *OptInt64) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes JobExecutionEnvironment as json.
-func (o OptJobExecutionEnvironment) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes JobExecutionEnvironment from json.
-func (o *OptJobExecutionEnvironment) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptJobExecutionEnvironment to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptJobExecutionEnvironment) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptJobExecutionEnvironment) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes JobPriority as json.
 func (o OptJobPriority) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -9075,55 +8946,6 @@ func (s OptNilDateTime) MarshalJSON() ([]byte, error) {
 func (s *OptNilDateTime) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d, json.DecodeDateTime)
-}
-
-// Encode encodes HTCJobFailureCode as json.
-func (o OptNilHTCJobFailureCode) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes HTCJobFailureCode from json.
-func (o *OptNilHTCJobFailureCode) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilHTCJobFailureCode to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v HTCJobFailureCode
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilHTCJobFailureCode) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilHTCJobFailureCode) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
 }
 
 // Encode encodes NullableInstant as json.

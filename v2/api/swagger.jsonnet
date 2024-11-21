@@ -147,9 +147,6 @@ local patches = {
           completedAt: {
             '$ref': '#/components/schemas/NullableInstant',
           },
-          failureCode+: {
-            nullable: true,
-          },
           statusReason+: {
             nullable: true,
           },
@@ -157,6 +154,9 @@ local patches = {
             '$ref': '#/components/schemas/NullableInstant',
           },
         },
+      },
+      HTCJobErrorCodeName+: {
+        nullable: true,
       },
       HTCJobs: {
         type: 'object',

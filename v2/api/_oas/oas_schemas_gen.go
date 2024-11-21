@@ -1032,35 +1032,33 @@ func (*HTCInfraResource) htcRegionsGetRes() {}
 
 // Ref: #/components/schemas/HTCJob
 type HTCJob struct {
-	Architecture            OptArchitecture            `json:"architecture"`
-	Commands                []string                   `json:"commands"`
-	CompletedAt             OptNilNullableInstant      `json:"completedAt"`
-	Container               OptContainerDetails        `json:"container"`
-	CreatedAt               OptInstant                 `json:"createdAt"`
-	CreatedBy               OptString                  `json:"createdBy"`
-	Envs                    []EnvPair                  `json:"envs"`
-	ExecTimeoutSeconds      OptInt32                   `json:"execTimeoutSeconds"`
-	FailureCode             OptNilHTCJobFailureCode    `json:"failureCode"`
-	Group                   OptString                  `json:"group"`
-	ImageName               OptString                  `json:"imageName"`
-	InstanceId              OptString                  `json:"instanceId"`
-	InstanceLabels          OptInstanceLabels          `json:"instanceLabels"`
-	JobExecutionEnvironment OptJobExecutionEnvironment `json:"jobExecutionEnvironment"`
-	JobUUID                 OptString                  `json:"jobUUID"`
-	MaxDiskGiB              OptInt32                   `json:"maxDiskGiB"`
-	MaxMemory               OptInt32                   `json:"maxMemory"`
-	MaxSwap                 OptInt32                   `json:"maxSwap"`
-	MaxVCpus                OptInt32                   `json:"maxVCpus"`
-	ProjectId               OptString                  `json:"projectId"`
-	ProviderJobId           OptString                  `json:"providerJobId"`
-	Region                  OptRescaleRegion           `json:"region"`
-	StartedAt               OptNilNullableInstant      `json:"startedAt"`
-	Status                  OptRescaleJobStatus        `json:"status"`
-	StatusReason            OptNilString               `json:"statusReason"`
-	Tags                    []Tag                      `json:"tags"`
-	TaskId                  OptString                  `json:"taskId"`
-	UpdatedAt               OptInstant                 `json:"updatedAt"`
-	WorkspaceId             OptString                  `json:"workspaceId"`
+	Architecture       OptArchitecture       `json:"architecture"`
+	Commands           []string              `json:"commands"`
+	CompletedAt        OptNilNullableInstant `json:"completedAt"`
+	Container          OptContainerDetails   `json:"container"`
+	CreatedAt          OptInstant            `json:"createdAt"`
+	CreatedBy          OptString             `json:"createdBy"`
+	ExecTimeoutSeconds OptInt32              `json:"execTimeoutSeconds"`
+	FailureCode        *NilHTCJobFailureCode `json:"failureCode"`
+	Group              OptString             `json:"group"`
+	ImageName          OptString             `json:"imageName"`
+	InstanceId         OptString             `json:"instanceId"`
+	InstanceLabels     OptInstanceLabels     `json:"instanceLabels"`
+	JobUUID            OptString             `json:"jobUUID"`
+	MaxDiskGiB         OptInt32              `json:"maxDiskGiB"`
+	MaxMemory          OptInt32              `json:"maxMemory"`
+	MaxSwap            OptInt32              `json:"maxSwap"`
+	MaxVCpus           OptInt32              `json:"maxVCpus"`
+	ProjectId          OptString             `json:"projectId"`
+	ProviderJobId      OptString             `json:"providerJobId"`
+	Region             OptRescaleRegion      `json:"region"`
+	StartedAt          OptNilNullableInstant `json:"startedAt"`
+	Status             OptRescaleJobStatus   `json:"status"`
+	StatusReason       OptNilString          `json:"statusReason"`
+	Tags               []Tag                 `json:"tags"`
+	TaskId             OptString             `json:"taskId"`
+	UpdatedAt          OptInstant            `json:"updatedAt"`
+	WorkspaceId        OptString             `json:"workspaceId"`
 }
 
 // GetArchitecture returns the value of Architecture.
@@ -1093,18 +1091,13 @@ func (s *HTCJob) GetCreatedBy() OptString {
 	return s.CreatedBy
 }
 
-// GetEnvs returns the value of Envs.
-func (s *HTCJob) GetEnvs() []EnvPair {
-	return s.Envs
-}
-
 // GetExecTimeoutSeconds returns the value of ExecTimeoutSeconds.
 func (s *HTCJob) GetExecTimeoutSeconds() OptInt32 {
 	return s.ExecTimeoutSeconds
 }
 
 // GetFailureCode returns the value of FailureCode.
-func (s *HTCJob) GetFailureCode() OptNilHTCJobFailureCode {
+func (s *HTCJob) GetFailureCode() *NilHTCJobFailureCode {
 	return s.FailureCode
 }
 
@@ -1126,11 +1119,6 @@ func (s *HTCJob) GetInstanceId() OptString {
 // GetInstanceLabels returns the value of InstanceLabels.
 func (s *HTCJob) GetInstanceLabels() OptInstanceLabels {
 	return s.InstanceLabels
-}
-
-// GetJobExecutionEnvironment returns the value of JobExecutionEnvironment.
-func (s *HTCJob) GetJobExecutionEnvironment() OptJobExecutionEnvironment {
-	return s.JobExecutionEnvironment
 }
 
 // GetJobUUID returns the value of JobUUID.
@@ -1238,18 +1226,13 @@ func (s *HTCJob) SetCreatedBy(val OptString) {
 	s.CreatedBy = val
 }
 
-// SetEnvs sets the value of Envs.
-func (s *HTCJob) SetEnvs(val []EnvPair) {
-	s.Envs = val
-}
-
 // SetExecTimeoutSeconds sets the value of ExecTimeoutSeconds.
 func (s *HTCJob) SetExecTimeoutSeconds(val OptInt32) {
 	s.ExecTimeoutSeconds = val
 }
 
 // SetFailureCode sets the value of FailureCode.
-func (s *HTCJob) SetFailureCode(val OptNilHTCJobFailureCode) {
+func (s *HTCJob) SetFailureCode(val *NilHTCJobFailureCode) {
 	s.FailureCode = val
 }
 
@@ -1271,11 +1254,6 @@ func (s *HTCJob) SetInstanceId(val OptString) {
 // SetInstanceLabels sets the value of InstanceLabels.
 func (s *HTCJob) SetInstanceLabels(val OptInstanceLabels) {
 	s.InstanceLabels = val
-}
-
-// SetJobExecutionEnvironment sets the value of JobExecutionEnvironment.
-func (s *HTCJob) SetJobExecutionEnvironment(val OptJobExecutionEnvironment) {
-	s.JobExecutionEnvironment = val
 }
 
 // SetJobUUID sets the value of JobUUID.
@@ -4102,43 +4080,6 @@ func (s *InstanceLabels) SetRegion(val OptString) {
 
 type Instant time.Time
 
-// Ref: #/components/schemas/JobExecutionEnvironment
-type JobExecutionEnvironment struct {
-	Architecture OptFloat64 `json:"architecture"`
-	InstanceId   OptString  `json:"instanceId"`
-	InstanceType OptString  `json:"instanceType"`
-}
-
-// GetArchitecture returns the value of Architecture.
-func (s *JobExecutionEnvironment) GetArchitecture() OptFloat64 {
-	return s.Architecture
-}
-
-// GetInstanceId returns the value of InstanceId.
-func (s *JobExecutionEnvironment) GetInstanceId() OptString {
-	return s.InstanceId
-}
-
-// GetInstanceType returns the value of InstanceType.
-func (s *JobExecutionEnvironment) GetInstanceType() OptString {
-	return s.InstanceType
-}
-
-// SetArchitecture sets the value of Architecture.
-func (s *JobExecutionEnvironment) SetArchitecture(val OptFloat64) {
-	s.Architecture = val
-}
-
-// SetInstanceId sets the value of InstanceId.
-func (s *JobExecutionEnvironment) SetInstanceId(val OptString) {
-	s.InstanceId = val
-}
-
-// SetInstanceType sets the value of InstanceType.
-func (s *JobExecutionEnvironment) SetInstanceType(val OptString) {
-	s.InstanceType = val
-}
-
 // Ref: #/components/schemas/JobPriority
 type JobPriority string
 
@@ -4415,6 +4356,51 @@ func (s *NameValuePair) SetName(val string) {
 // SetValue sets the value of Value.
 func (s *NameValuePair) SetValue(val string) {
 	s.Value = val
+}
+
+// NewNilHTCJobFailureCode returns new NilHTCJobFailureCode with value set to v.
+func NewNilHTCJobFailureCode(v HTCJobFailureCode) NilHTCJobFailureCode {
+	return NilHTCJobFailureCode{
+		Value: v,
+	}
+}
+
+// NilHTCJobFailureCode is nullable HTCJobFailureCode.
+type NilHTCJobFailureCode struct {
+	Value HTCJobFailureCode
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilHTCJobFailureCode) SetTo(v HTCJobFailureCode) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o NilHTCJobFailureCode) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *NilHTCJobFailureCode) SetToNull() {
+	o.Null = true
+	var v HTCJobFailureCode
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilHTCJobFailureCode) Get() (v HTCJobFailureCode, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilHTCJobFailureCode) Or(d HTCJobFailureCode) HTCJobFailureCode {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
 }
 
 type NullableInstant time.Time
@@ -5919,52 +5905,6 @@ func (o OptInt64) Or(d int64) int64 {
 	return d
 }
 
-// NewOptJobExecutionEnvironment returns new OptJobExecutionEnvironment with value set to v.
-func NewOptJobExecutionEnvironment(v JobExecutionEnvironment) OptJobExecutionEnvironment {
-	return OptJobExecutionEnvironment{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptJobExecutionEnvironment is optional JobExecutionEnvironment.
-type OptJobExecutionEnvironment struct {
-	Value JobExecutionEnvironment
-	Set   bool
-}
-
-// IsSet returns true if OptJobExecutionEnvironment was set.
-func (o OptJobExecutionEnvironment) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptJobExecutionEnvironment) Reset() {
-	var v JobExecutionEnvironment
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptJobExecutionEnvironment) SetTo(v JobExecutionEnvironment) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptJobExecutionEnvironment) Get() (v JobExecutionEnvironment, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptJobExecutionEnvironment) Or(d JobExecutionEnvironment) JobExecutionEnvironment {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptJobPriority returns new OptJobPriority with value set to v.
 func NewOptJobPriority(v JobPriority) OptJobPriority {
 	return OptJobPriority{
@@ -6160,69 +6100,6 @@ func (o OptNilDateTime) Get() (v time.Time, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilDateTime) Or(d time.Time) time.Time {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilHTCJobFailureCode returns new OptNilHTCJobFailureCode with value set to v.
-func NewOptNilHTCJobFailureCode(v HTCJobFailureCode) OptNilHTCJobFailureCode {
-	return OptNilHTCJobFailureCode{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilHTCJobFailureCode is optional nullable HTCJobFailureCode.
-type OptNilHTCJobFailureCode struct {
-	Value HTCJobFailureCode
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilHTCJobFailureCode was set.
-func (o OptNilHTCJobFailureCode) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilHTCJobFailureCode) Reset() {
-	var v HTCJobFailureCode
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilHTCJobFailureCode) SetTo(v HTCJobFailureCode) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsSet returns true if value is Null.
-func (o OptNilHTCJobFailureCode) IsNull() bool { return o.Null }
-
-// SetNull sets value to null.
-func (o *OptNilHTCJobFailureCode) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v HTCJobFailureCode
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilHTCJobFailureCode) Get() (v HTCJobFailureCode, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilHTCJobFailureCode) Or(d HTCJobFailureCode) HTCJobFailureCode {
 	if v, ok := o.Get(); ok {
 		return v
 	}

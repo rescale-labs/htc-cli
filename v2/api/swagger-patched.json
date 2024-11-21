@@ -293,12 +293,6 @@
                   "example": "qWoUF",
                   "type": "string"
                },
-               "envs": {
-                  "items": {
-                     "$ref": "#/components/schemas/EnvPair"
-                  },
-                  "type": "array"
-               },
                "execTimeoutSeconds": {
                   "format": "int32",
                   "type": "integer"
@@ -310,7 +304,6 @@
                      }
                   ],
                   "example": "ErrorTimeout",
-                  "nullable": true,
                   "type": "string"
                },
                "group": {
@@ -325,9 +318,6 @@
                },
                "instanceLabels": {
                   "$ref": "#/components/schemas/InstanceLabels"
-               },
-               "jobExecutionEnvironment": {
-                  "$ref": "#/components/schemas/JobExecutionEnvironment"
                },
                "jobUUID": {
                   "example": "155f18d4",
@@ -490,6 +480,7 @@
                "ErrorProviderDown",
                "ErrorProviderRegionDown"
             ],
+            "nullable": true,
             "type": "string"
          },
          "HTCJobStatusEvent": {
