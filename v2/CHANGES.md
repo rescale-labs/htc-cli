@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.0.5
+
+* Add `htc image push`
+
 ## v0.0.4
 
 * Extend `htc job get` so it takes optional job UUID
