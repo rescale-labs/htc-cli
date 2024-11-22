@@ -12,24 +12,6 @@ import (
 	"github.com/rescale/htc-storage-cli/v2/common"
 )
 
-func getImages(ctx context.Context, c *oapi.Client, projectId string) (*oapi.HTCImages, error) {
-	res, err := c.HtcProjectsProjectIdContainerRegistryImagesGet(ctx,
-		oapi.HtcProjectsProjectIdContainerRegistryImagesGetParams{
-			ProjectId: projectId,
-		})
-	if err != nil {
-		return nil, err
-	}
-
-	switch res := res.(type) {
-	case *oapi.HTCImages:
-		return res, nil
-	case *oapi.HtcProjectsProjectIdContainerRegistryImagesGetUnauthorized:
-		return nil, fmt.Errorf("forbidden: %s", res)
-	}
-	return nil, fmt.Errorf("Unknown response type: %s", res)
-}
-
 func getImage(ctx context.Context, c *oapi.Client, projectId, imageName string) (*oapi.HTCImageStatus, error) {
 	res, err := c.HtcProjectsProjectIdContainerRegistryImagesImageNameGet(ctx,
 		oapi.HtcProjectsProjectIdContainerRegistryImagesImageNameGetParams{

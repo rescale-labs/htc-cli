@@ -7,6 +7,9 @@ As things check off, please remember to copy to
 
 ## Soon
 
+* send password by stdin into docker login to make it not complain about security
+* get container registry location by getting project, not getting images
+
 Essential API operations:
   * project create
   * `project retention-policy get` returns error on 404 instead of nothing
@@ -38,6 +41,7 @@ Testing:
 
 Usability:
   * Print the env vars expected, if any, in usage.
+  * For `htc job submit --group`, it might be nice if it automatically ran `htc config set group GROUP`
   * Decide on whether we need the YAML encoder. It doesn't handle OptString, etc properly, e.g.:
     ```
     $ go run cmd/htc/main.go  task get --project-id e8dee146-5606-407e-8e51-3f28070ece6e -l 1  -o yaml
