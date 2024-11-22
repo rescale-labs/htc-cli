@@ -13,4 +13,5 @@ func init() {
 	ImageCmd.AddCommand(GetCmd)
 	ImageCmd.AddCommand(CreateRepoCmd)
 	ImageCmd.AddCommand(LoginRepoCmd)
+	ImageCmd.AddCommand(PushCmd)
 }

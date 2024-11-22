@@ -52,8 +52,8 @@ func CreateRepo(cmd *cobra.Command, args []string) error {
 }
 
 var CreateRepoCmd = &cobra.Command{
-	Use:   "create-repo",
-	Short: "Creates a private container repository for ",
+	Use:   "create-repo IMAGE_NAME",
+	Short: "Creates a private container repository of a given name, within a given project.",
 	// Long:
 	Run:  common.WrapRunE(CreateRepo),
 	Args: cobra.ExactArgs(1),
