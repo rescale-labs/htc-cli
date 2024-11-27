@@ -1,5 +1,13 @@
 # Changelog
 
+## Pending next release
+
+* Update `htc image login-repo` to feed token to docker/podman over
+  stdin instead of as a command arg.
+* Update `htc image push` to get ECR name using `GET
+  /.../projects/{projectId}` instead of fetching all images in a
+  project.
+
 ## v0.0.5
 
 * Add `htc image push`
