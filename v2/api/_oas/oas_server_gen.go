@@ -8,24 +8,18 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
-	// AuthTokenGet implements GET /auth/token operation.
-	//
-	// This endpoint will get a JWT token given an API key.
-	//
-	// GET /auth/token
-	AuthTokenGet(ctx context.Context) (AuthTokenGetRes, error)
+	AuthHandler
+	ImageHandler
+	JobHandler
+	MetricsHandler
+	ProjectHandler
+	TaskHandler
 	// AuthTokenWhoamiGet implements GET /auth/token/whoami operation.
 	//
 	// This endpoint will get a JWT token payload given a bearer token.
 	//
 	// GET /auth/token/whoami
 	AuthTokenWhoamiGet(ctx context.Context) (AuthTokenWhoamiGetRes, error)
-	// AuthWhoamiGet implements GET /auth/whoami operation.
-	//
-	// This endpoint will get Rescale user information given a Rescale API key.
-	//
-	// GET /auth/whoami
-	AuthWhoamiGet(ctx context.Context) (AuthWhoamiGetRes, error)
 	// HtcGcpClustersWorkspaceIdGet implements GET /htc/gcp/clusters/{workspaceId} operation.
 	//
 	// This endpoint returns details about all GCP clusters that can run jobs for the specified HTC
@@ -33,18 +27,6 @@ type Handler interface {
 	//
 	// GET /htc/gcp/clusters/{workspaceId}
 	HtcGcpClustersWorkspaceIdGet(ctx context.Context, params HtcGcpClustersWorkspaceIdGetParams) (HtcGcpClustersWorkspaceIdGetRes, error)
-	// HtcMetricsGet implements GET /htc/metrics operation.
-	//
-	// Get all HTC Metrics for a workspace.
-	//
-	// GET /htc/metrics
-	HtcMetricsGet(ctx context.Context, params HtcMetricsGetParams) (HtcMetricsGetRes, error)
-	// HtcProjectsGet implements GET /htc/projects operation.
-	//
-	// This endpoint will get all projects.
-	//
-	// GET /htc/projects
-	HtcProjectsGet(ctx context.Context, params HtcProjectsGetParams) (HtcProjectsGetRes, error)
 	// HtcProjectsPost implements POST /htc/projects operation.
 	//
 	// This endpoint will create a project. A project is a collection of tasks and container images used
@@ -52,54 +34,6 @@ type Handler interface {
 	//
 	// POST /htc/projects
 	HtcProjectsPost(ctx context.Context, req OptHTCProject) (HtcProjectsPostRes, error)
-	// HtcProjectsProjectIdContainerRegistryImagesGet implements GET /htc/projects/{projectId}/container-registry/images operation.
-	//
-	// This endpoint will list all images for a project.
-	//
-	// GET /htc/projects/{projectId}/container-registry/images
-	HtcProjectsProjectIdContainerRegistryImagesGet(ctx context.Context, params HtcProjectsProjectIdContainerRegistryImagesGetParams) (HtcProjectsProjectIdContainerRegistryImagesGetRes, error)
-	// HtcProjectsProjectIdContainerRegistryImagesImageNameGet implements GET /htc/projects/{projectId}/container-registry/images/{imageName} operation.
-	//
-	// Retrieves the current status of an image across cloud providers. The status indicates whether the
-	// image is ready for use or still being processed. Returns READY when the image is available in all
-	// cloud providers, PENDING while the image is being replicated, and a 404 if the image does not
-	// exist.
-	//
-	// GET /htc/projects/{projectId}/container-registry/images/{imageName}
-	HtcProjectsProjectIdContainerRegistryImagesImageNameGet(ctx context.Context, params HtcProjectsProjectIdContainerRegistryImagesImageNameGetParams) (HtcProjectsProjectIdContainerRegistryImagesImageNameGetRes, error)
-	// HtcProjectsProjectIdContainerRegistryRepoRepoNamePost implements POST /htc/projects/{projectId}/container-registry/repo/{repoName} operation.
-	//
-	// This endpoint will create a private container repository belonging to this project
-	// Private container registries are collections of repositories, and private repositories are
-	// collections of container images. These images are referenced when running jobs within this project.
-	//  In order to upload an image to a repository, you will need the `registryURI`, the
-	// `repositoryName`, and the token (see `/htc/projects/:projectId/container-registry/token`).
-	//
-	// POST /htc/projects/{projectId}/container-registry/repo/{repoName}
-	HtcProjectsProjectIdContainerRegistryRepoRepoNamePost(ctx context.Context, params HtcProjectsProjectIdContainerRegistryRepoRepoNamePostParams) (HtcProjectsProjectIdContainerRegistryRepoRepoNamePostRes, error)
-	// HtcProjectsProjectIdContainerRegistryTokenGet implements GET /htc/projects/{projectId}/container-registry/token operation.
-	//
-	// This endpoint will get a container registry authorization token.
-	// To use this token run `docker login --username AWS --password {TOKEN} {CONTAINER_REGISTRY_DOMAIN}`.
-	// e.g. `docker login --username AWS --password "eyJwYXlsb2FkIjoiZHhtSzJuQ0x..." 183929446192.dkr.ecr.
-	// us-west-2.amazonaws.com`.
-	//
-	// GET /htc/projects/{projectId}/container-registry/token
-	HtcProjectsProjectIdContainerRegistryTokenGet(ctx context.Context, params HtcProjectsProjectIdContainerRegistryTokenGetParams) (HtcProjectsProjectIdContainerRegistryTokenGetRes, error)
-	// HtcProjectsProjectIdDimensionsGet implements GET /htc/projects/{projectId}/dimensions operation.
-	//
-	// This endpoint is designed to retrieve the current set of dimension combinations configured for a
-	// specific project so that users can understand the existing computing environment constraints of a
-	// project. It returns a list of dimension combinations such as pricing priority, geographical region,
-	//  compute scaling policy, and hyperthreading options.
-	// Any user who _belongs to the workspace this project belongs to_ can use this endpoint to verify or
-	// audit the current configuration of a project. This can be helpful in ensuring that the project's
-	// settings align with expectations.
-	// The payload also includes a read-only set of `derived` dimensions which help describe the
-	// currently configured `machineType`.
-	//
-	// GET /htc/projects/{projectId}/dimensions
-	HtcProjectsProjectIdDimensionsGet(ctx context.Context, params HtcProjectsProjectIdDimensionsGetParams) (HtcProjectsProjectIdDimensionsGetRes, error)
 	// HtcProjectsProjectIdDimensionsPut implements PUT /htc/projects/{projectId}/dimensions operation.
 	//
 	// This endpoint allows _workspace_, _organization_, and _Rescale administrators_ to _create_,
@@ -117,12 +51,6 @@ type Handler interface {
 	//
 	// PUT /htc/projects/{projectId}/dimensions
 	HtcProjectsProjectIdDimensionsPut(ctx context.Context, req []HTCComputeEnvironment, params HtcProjectsProjectIdDimensionsPutParams) (HtcProjectsProjectIdDimensionsPutRes, error)
-	// HtcProjectsProjectIdGet implements GET /htc/projects/{projectId} operation.
-	//
-	// This endpoint will get a project by id.
-	//
-	// GET /htc/projects/{projectId}
-	HtcProjectsProjectIdGet(ctx context.Context, params HtcProjectsProjectIdGetParams) (HtcProjectsProjectIdGetRes, error)
 	// HtcProjectsProjectIdLimitsDelete implements DELETE /htc/projects/{projectId}/limits operation.
 	//
 	// This endpoint will remove all resource limits associated with this project.
@@ -130,14 +58,6 @@ type Handler interface {
 	//
 	// DELETE /htc/projects/{projectId}/limits
 	HtcProjectsProjectIdLimitsDelete(ctx context.Context, params HtcProjectsProjectIdLimitsDeleteParams) (HtcProjectsProjectIdLimitsDeleteRes, error)
-	// HtcProjectsProjectIdLimitsGet implements GET /htc/projects/{projectId}/limits operation.
-	//
-	// This endpoint will list all resource limitations associated with this project.
-	// A job running in this project will be subject to all resulting limits as well as any associated
-	// with the workspace (see `/htc/workspaces/{workspaceId}/limits`).
-	//
-	// GET /htc/projects/{projectId}/limits
-	HtcProjectsProjectIdLimitsGet(ctx context.Context, params HtcProjectsProjectIdLimitsGetParams) (HtcProjectsProjectIdLimitsGetRes, error)
 	// HtcProjectsProjectIdLimitsIDDelete implements DELETE /htc/projects/{projectId}/limits/{id} operation.
 	//
 	// This endpoint will remove a single resource limit associated with this project if it exists.
@@ -250,18 +170,6 @@ type Handler interface {
 	//
 	// PUT /htc/projects/{projectId}/task-retention-policy
 	HtcProjectsProjectIdTaskRetentionPolicyPut(ctx context.Context, req OptTaskRetentionPolicy, params HtcProjectsProjectIdTaskRetentionPolicyPutParams) (HtcProjectsProjectIdTaskRetentionPolicyPutRes, error)
-	// HtcProjectsProjectIdTasksGet implements GET /htc/projects/{projectId}/tasks operation.
-	//
-	// This endpoint will get all tasks in a project.
-	//
-	// GET /htc/projects/{projectId}/tasks
-	HtcProjectsProjectIdTasksGet(ctx context.Context, params HtcProjectsProjectIdTasksGetParams) (HtcProjectsProjectIdTasksGetRes, error)
-	// HtcProjectsProjectIdTasksPost implements POST /htc/projects/{projectId}/tasks operation.
-	//
-	// This endpoint will create a task for a project.
-	//
-	// POST /htc/projects/{projectId}/tasks
-	HtcProjectsProjectIdTasksPost(ctx context.Context, req OptHTCTask, params HtcProjectsProjectIdTasksPostParams) (HtcProjectsProjectIdTasksPostRes, error)
 	// HtcProjectsProjectIdTasksTaskIdDelete implements DELETE /htc/projects/{projectId}/tasks/{taskId} operation.
 	//
 	// This endpoint will delete a task by ID.
@@ -286,12 +194,6 @@ type Handler interface {
 	//
 	// GET /htc/projects/{projectId}/tasks/{taskId}/groups
 	HtcProjectsProjectIdTasksTaskIdGroupsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdGroupsGetParams) (HtcProjectsProjectIdTasksTaskIdGroupsGetRes, error)
-	// HtcProjectsProjectIdTasksTaskIdJobsBatchPost implements POST /htc/projects/{projectId}/tasks/{taskId}/jobs/batch operation.
-	//
-	// This endpoint will submit a batch of jobs for a task.
-	//
-	// POST /htc/projects/{projectId}/tasks/{taskId}/jobs/batch
-	HtcProjectsProjectIdTasksTaskIdJobsBatchPost(ctx context.Context, req []HTCJobSubmitRequest, params HtcProjectsProjectIdTasksTaskIdJobsBatchPostParams) (HtcProjectsProjectIdTasksTaskIdJobsBatchPostRes, error)
 	// HtcProjectsProjectIdTasksTaskIdJobsCancelPost implements POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel operation.
 	//
 	// This endpoint will attempt to cancel submitted jobs.
@@ -299,24 +201,12 @@ type Handler interface {
 	//
 	// POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel
 	HtcProjectsProjectIdTasksTaskIdJobsCancelPost(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsCancelPostParams) (HtcProjectsProjectIdTasksTaskIdJobsCancelPostRes, error)
-	// HtcProjectsProjectIdTasksTaskIdJobsGet implements GET /htc/projects/{projectId}/tasks/{taskId}/jobs operation.
-	//
-	// This endpoint will get all jobs for a task.
-	//
-	// GET /htc/projects/{projectId}/tasks/{taskId}/jobs
-	HtcProjectsProjectIdTasksTaskIdJobsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsGetParams) (HtcProjectsProjectIdTasksTaskIdJobsGetRes, error)
 	// HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet implements GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events operation.
 	//
 	// This endpoint will get events for a job.
 	//
 	// GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events
 	HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetParams) (HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes, error)
-	// HtcProjectsProjectIdTasksTaskIdJobsJobIdGet implements GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId} operation.
-	//
-	// This endpoint will get a job by id.
-	//
-	// GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}
-	HtcProjectsProjectIdTasksTaskIdJobsJobIdGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsJobIdGetParams) (HtcProjectsProjectIdTasksTaskIdJobsJobIdGetRes, error)
 	// HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGet implements GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/logs operation.
 	//
 	// This endpoint will get job logs.
@@ -466,6 +356,158 @@ type Handler interface {
 	//
 	// GET /.well-known/jwks.json
 	WellKnownJwksJSONGet(ctx context.Context) (WellKnownJwksJSONGetRes, error)
+}
+
+// AuthHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Auth
+type AuthHandler interface {
+	// GetToken implements getToken operation.
+	//
+	// This endpoint will get a JWT token given an API key.
+	//
+	// GET /auth/token
+	GetToken(ctx context.Context) (GetTokenRes, error)
+	// WhoAmI implements whoAmI operation.
+	//
+	// This endpoint will get Rescale user information given a Rescale API key.
+	//
+	// GET /auth/whoami
+	WhoAmI(ctx context.Context) (WhoAmIRes, error)
+}
+
+// ImageHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Image
+type ImageHandler interface {
+	// CreateRepo implements createRepo operation.
+	//
+	// This endpoint will create a private container repository belonging to this project
+	// Private container registries are collections of repositories, and private repositories are
+	// collections of container images. These images are referenced when running jobs within this project.
+	//  In order to upload an image to a repository, you will need the `registryURI`, the
+	// `repositoryName`, and the token (see `/htc/projects/:projectId/container-registry/token`).
+	//
+	// POST /htc/projects/{projectId}/container-registry/repo/{repoName}
+	CreateRepo(ctx context.Context, params CreateRepoParams) (CreateRepoRes, error)
+	// GetImage implements getImage operation.
+	//
+	// Retrieves the current status of an image across cloud providers. The status indicates whether the
+	// image is ready for use or still being processed. Returns READY when the image is available in all
+	// cloud providers, PENDING while the image is being replicated, and a 404 if the image does not
+	// exist.
+	//
+	// GET /htc/projects/{projectId}/container-registry/images/{imageName}
+	GetImage(ctx context.Context, params GetImageParams) (GetImageRes, error)
+	// GetImages implements getImages operation.
+	//
+	// This endpoint will list all images for a project.
+	//
+	// GET /htc/projects/{projectId}/container-registry/images
+	GetImages(ctx context.Context, params GetImagesParams) (GetImagesRes, error)
+	// GetRegistryToken implements getRegistryToken operation.
+	//
+	// This endpoint will get a container registry authorization token.
+	// To use this token run `docker login --username AWS --password {TOKEN} {CONTAINER_REGISTRY_DOMAIN}`.
+	// e.g. `docker login --username AWS --password "eyJwYXlsb2FkIjoiZHhtSzJuQ0x..." 183929446192.dkr.ecr.
+	// us-west-2.amazonaws.com`.
+	//
+	// GET /htc/projects/{projectId}/container-registry/token
+	GetRegistryToken(ctx context.Context, params GetRegistryTokenParams) (GetRegistryTokenRes, error)
+}
+
+// JobHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Job
+type JobHandler interface {
+	// GetJob implements getJob operation.
+	//
+	// This endpoint will get a job by id.
+	//
+	// GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}
+	GetJob(ctx context.Context, params GetJobParams) (GetJobRes, error)
+	// GetJobs implements getJobs operation.
+	//
+	// This endpoint will get all jobs for a task.
+	//
+	// GET /htc/projects/{projectId}/tasks/{taskId}/jobs
+	GetJobs(ctx context.Context, params GetJobsParams) (GetJobsRes, error)
+	// SubmitJobs implements submitJobs operation.
+	//
+	// This endpoint will submit a batch of jobs for a task.
+	//
+	// POST /htc/projects/{projectId}/tasks/{taskId}/jobs/batch
+	SubmitJobs(ctx context.Context, req []HTCJobSubmitRequest, params SubmitJobsParams) (SubmitJobsRes, error)
+}
+
+// MetricsHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Metrics
+type MetricsHandler interface {
+	// GetMetrics implements getMetrics operation.
+	//
+	// Get all HTC Metrics for a workspace.
+	//
+	// GET /htc/metrics
+	GetMetrics(ctx context.Context, params GetMetricsParams) (GetMetricsRes, error)
+}
+
+// ProjectHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Project
+type ProjectHandler interface {
+	// GetDimensions implements getDimensions operation.
+	//
+	// This endpoint is designed to retrieve the current set of dimension combinations configured for a
+	// specific project so that users can understand the existing computing environment constraints of a
+	// project. It returns a list of dimension combinations such as pricing priority, geographical region,
+	//  compute scaling policy, and hyperthreading options.
+	// Any user who _belongs to the workspace this project belongs to_ can use this endpoint to verify or
+	// audit the current configuration of a project. This can be helpful in ensuring that the project's
+	// settings align with expectations.
+	// The payload also includes a read-only set of `derived` dimensions which help describe the
+	// currently configured `machineType`.
+	//
+	// GET /htc/projects/{projectId}/dimensions
+	GetDimensions(ctx context.Context, params GetDimensionsParams) (GetDimensionsRes, error)
+	// GetLimits implements getLimits operation.
+	//
+	// This endpoint will list all resource limitations associated with this project.
+	// A job running in this project will be subject to all resulting limits as well as any associated
+	// with the workspace (see `/htc/workspaces/{workspaceId}/limits`).
+	//
+	// GET /htc/projects/{projectId}/limits
+	GetLimits(ctx context.Context, params GetLimitsParams) (GetLimitsRes, error)
+	// GetProject implements getProject operation.
+	//
+	// This endpoint will get a project by id.
+	//
+	// GET /htc/projects/{projectId}
+	GetProject(ctx context.Context, params GetProjectParams) (GetProjectRes, error)
+	// GetProjects implements getProjects operation.
+	//
+	// This endpoint will get all projects.
+	//
+	// GET /htc/projects
+	GetProjects(ctx context.Context, params GetProjectsParams) (GetProjectsRes, error)
+}
+
+// TaskHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Task
+type TaskHandler interface {
+	// CreateTask implements createTask operation.
+	//
+	// This endpoint will create a task for a project.
+	//
+	// POST /htc/projects/{projectId}/tasks
+	CreateTask(ctx context.Context, req OptHTCTask, params CreateTaskParams) (CreateTaskRes, error)
+	// GetTasks implements getTasks operation.
+	//
+	// This endpoint will get all tasks in a project.
+	//
+	// GET /htc/projects/{projectId}/tasks
+	GetTasks(ctx context.Context, params GetTasksParams) (GetTasksRes, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and
