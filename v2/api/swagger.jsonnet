@@ -16,6 +16,8 @@ local patches = {
   paths+: {
     '/auth/token'+: {
       get+: {
+        'x-ogen-operation-group': 'Auth',
+        operationId: 'getToken',
         security: securityScheme,
       },
     },
@@ -23,6 +25,8 @@ local patches = {
     // Use named component for response and require token.
     '/auth/whoami'+: {
       get+: {
+        'x-ogen-operation-group': 'Auth',
+        operationId: 'whoAmI',
         responses+: {
           '200'+: {
             content+: {
@@ -35,8 +39,16 @@ local patches = {
         security: securityScheme,
       },
     },
+    '/htc/metrics'+: {
+      get+: {
+        'x-ogen-operation-group': 'Metrics',
+        operationId: 'getMetrics',
+      },
+    },
     '/htc/projects'+: {
       get+: {
+        'x-ogen-operation-group': 'Project',
+        operationId: 'getProjects',
         responses+: {
           '200'+: {
             content+: {
@@ -50,8 +62,40 @@ local patches = {
         },
       },
     },
+    '/htc/projects/{projectId}'+: {
+      get+: {
+        'x-ogen-operation-group': 'Project',
+        operationId: 'getProject',
+      },
+    },
+    '/htc/projects/{projectId}/container-registry/images'+: {
+      get+: {
+        'x-ogen-operation-group': 'Image',
+        operationId: 'getImages',
+      },
+    },
+    '/htc/projects/{projectId}/container-registry/images/{imageName}'+: {
+      get+: {
+        'x-ogen-operation-group': 'Image',
+        operationId: 'getImage',
+      },
+    },
+    '/htc/projects/{projectId}/container-registry/repo/{repoName}'+: {
+      post+: {
+        'x-ogen-operation-group': 'Image',
+        operationId: 'createRepo',
+      },
+    },
+    '/htc/projects/{projectId}/container-registry/token'+: {
+      get+: {
+        'x-ogen-operation-group': 'Image',
+        operationId: 'getRegistryToken',
+      },
+    },
     '/htc/projects/{projectId}/dimensions'+: {
       get+: {
+        'x-ogen-operation-group': 'Project',
+        operationId: 'getDimensions',
         responses+: {
           '200'+: {
             content+: {
@@ -65,6 +109,8 @@ local patches = {
     },
     '/htc/projects/{projectId}/limits'+: {
       get+: {
+        'x-ogen-operation-group': 'Project',
+        operationId: 'getLimits',
         responses+: {
           '200'+: {
             content+: {
@@ -78,6 +124,8 @@ local patches = {
     },
     '/htc/projects/{projectId}/tasks'+: {
       get+: {
+        'x-ogen-operation-group': 'Task',
+        operationId: 'getTasks',
         responses+: {
           '200'+: {
             content+: {
@@ -90,9 +138,15 @@ local patches = {
           },
         },
       },
+      post+: {
+        'x-ogen-operation-group': 'Task',
+        operationId: 'createTask',
+      },
     },
     '/htc/projects/{projectId}/tasks/{taskId}/jobs'+: {
       get+: {
+        'x-ogen-operation-group': 'Job',
+        operationId: 'getJobs',
         responses+: {
           '200'+: {
             content+: {
@@ -107,6 +161,8 @@ local patches = {
     },
     '/htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}'+: {
       get+: {
+        'x-ogen-operation-group': 'Job',
+        operationId: 'getJob',
         responses+: {
           '404': {
             content: {
@@ -120,6 +176,8 @@ local patches = {
     },
     '/htc/projects/{projectId}/tasks/{taskId}/jobs/batch'+: {
       post+: {
+        'x-ogen-operation-group': 'Job',
+        operationId: 'submitJobs',
         responses+: {
           '200'+: {
             content+: {
