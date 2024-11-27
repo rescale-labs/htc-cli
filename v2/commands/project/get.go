@@ -16,9 +16,9 @@ import (
 
 const pageSize = 500
 
-func getProjects(ctx context.Context, c *oapi.Client, pageIndex string) (*oapi.HTCProjectsResponse, error) {
+func getProjects(ctx context.Context, c oapi.ProjectInvoker, pageIndex string) (*oapi.HTCProjectsResponse, error) {
 	log.Printf("HtcProjectsGet: pageIndex=%s pageSize=%d", pageIndex, pageSize)
-	res, err := c.HtcProjectsGet(ctx, oapi.HtcProjectsGetParams{
+	res, err := c.GetProjects(ctx, oapi.GetProjectsParams{
 		OnlyMyProjects: oapi.NewOptBool(false),
 		PageIndex:      oapi.NewOptString(pageIndex),
 		PageSize:       oapi.NewOptInt32(pageSize),
@@ -31,8 +31,8 @@ func getProjects(ctx context.Context, c *oapi.Client, pageIndex string) (*oapi.H
 	case *oapi.HTCProjectsResponse:
 		return res, nil
 		// runner.PrintResult(res.Items, os.Stdout)
-	case *oapi.HtcProjectsGetForbidden,
-		*oapi.HtcProjectsGetUnauthorized:
+	case *oapi.GetProjectsForbidden,
+		*oapi.GetProjectsUnauthorized:
 		return nil, fmt.Errorf("forbidden: %s", res)
 	}
 

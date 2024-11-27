@@ -17,9 +17,9 @@ import (
 
 const pageSize = 500
 
-func getTasks(ctx context.Context, c *oapi.Client, projectId string, pageIndex string) (*oapi.HTCTasksResponse, error) {
-	log.Printf("HtcProjectsProjectIdTasksGet: projectId=%s pageIndex=%s pageSize=%d", projectId, pageIndex, pageSize)
-	res, err := c.HtcProjectsProjectIdTasksGet(ctx, oapi.HtcProjectsProjectIdTasksGetParams{
+func getTasks(ctx context.Context, c oapi.TaskInvoker, projectId string, pageIndex string) (*oapi.HTCTasksResponse, error) {
+	log.Printf("GetProjects: projectId=%s pageIndex=%s pageSize=%d", projectId, pageIndex, pageSize)
+	res, err := c.GetTasks(ctx, oapi.GetTasksParams{
 		ProjectId: projectId,
 		PageIndex: oapi.NewOptString(pageIndex),
 		PageSize:  oapi.NewOptInt32(pageSize),
@@ -30,8 +30,8 @@ func getTasks(ctx context.Context, c *oapi.Client, projectId string, pageIndex s
 	switch res := res.(type) {
 	case *oapi.HTCTasksResponse:
 		return res, nil
-	case *oapi.HtcProjectsProjectIdTasksGetForbidden,
-		*oapi.HtcProjectsProjectIdTasksGetUnauthorized:
+	case *oapi.GetTasksForbidden,
+		*oapi.GetTasksUnauthorized:
 		return nil, fmt.Errorf("forbidden: %s", res)
 	}
 	return nil, fmt.Errorf("Unknown response type: %s", res)

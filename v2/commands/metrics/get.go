@@ -13,8 +13,8 @@ import (
 	"github.com/rescale/htc-storage-cli/v2/common"
 )
 
-func getMetrics(ctx context.Context, c *oapi.Client) (io.Reader, error) {
-	res, err := c.HtcMetricsGet(ctx, oapi.HtcMetricsGetParams{
+func getMetrics(ctx context.Context, c oapi.MetricsInvoker) (io.Reader, error) {
+	res, err := c.GetMetrics(ctx, oapi.GetMetricsParams{
 		AcceptEncoding: []string{"text/plain"},
 	})
 	if err != nil {
@@ -22,10 +22,10 @@ func getMetrics(ctx context.Context, c *oapi.Client) (io.Reader, error) {
 	}
 
 	switch res := res.(type) {
-	case *oapi.HtcMetricsGetOK:
+	case *oapi.GetMetricsOK:
 		return res.Data, nil
-	case *oapi.HtcMetricsGetForbidden,
-		*oapi.HtcMetricsGetUnauthorized:
+	case *oapi.GetMetricsForbidden,
+		*oapi.GetMetricsUnauthorized:
 		return nil, fmt.Errorf("forbidden: %s", res)
 	}
 	return nil, fmt.Errorf("Unknown response type: %s", res)

@@ -18,9 +18,9 @@ import (
 //
 
 // Returns repo name and all images for a project from HTC API
-func getImages(ctx context.Context, c *oapi.Client, projectId string) (*oapi.HTCImages, error) {
-	res, err := c.HtcProjectsProjectIdContainerRegistryImagesGet(ctx,
-		oapi.HtcProjectsProjectIdContainerRegistryImagesGetParams{
+func getImages(ctx context.Context, c oapi.ImageInvoker, projectId string) (*oapi.HTCImages, error) {
+	res, err := c.GetImages(ctx,
+		oapi.GetImagesParams{
 			ProjectId: projectId,
 		})
 	if err != nil {
@@ -30,16 +30,21 @@ func getImages(ctx context.Context, c *oapi.Client, projectId string) (*oapi.HTC
 	switch res := res.(type) {
 	case *oapi.HTCImages:
 		return res, nil
-	case *oapi.HtcProjectsProjectIdContainerRegistryImagesGetUnauthorized:
+	case *oapi.GetImagesUnauthorized:
 		return nil, fmt.Errorf("forbidden: %s", res)
 	}
 	return nil, fmt.Errorf("Unknown response type: %s", res)
 }
 
+type imageProjectInvoker interface {
+	oapi.ImageInvoker
+	oapi.ProjectInvoker
+}
+
 // Returns repository name from HTCImages
-func getRegistry(ctx context.Context, c *oapi.Client, projectId string) (string, error) {
-	res, err := c.HtcProjectsProjectIdGet(ctx,
-		oapi.HtcProjectsProjectIdGetParams{
+func getRegistry(ctx context.Context, c imageProjectInvoker, projectId string) (string, error) {
+	res, err := c.GetProject(ctx,
+		oapi.GetProjectParams{
 			ProjectId: projectId,
 		})
 	if err != nil {
@@ -50,16 +55,16 @@ func getRegistry(ctx context.Context, c *oapi.Client, projectId string) (string,
 	case *oapi.HTCProject:
 		// Removing trailing / from registry; docker/podman won't accept it.
 		return strings.TrimRight(res.ContainerRegistry.Value, "/"), nil
-	case *oapi.HtcProjectsProjectIdGetUnauthorized, *oapi.HtcProjectsProjectIdGetForbidden:
+	case *oapi.GetProjectUnauthorized, *oapi.GetProjectForbidden:
 		return "", fmt.Errorf("forbidden: %s", res)
 	}
 	return "", fmt.Errorf("Unknown response type: %s", res)
 
 }
 
-func getToken(ctx context.Context, c *oapi.Client, projectId string) ([]byte, error) {
-	res, err := c.HtcProjectsProjectIdContainerRegistryTokenGet(ctx,
-		oapi.HtcProjectsProjectIdContainerRegistryTokenGetParams{
+func getToken(ctx context.Context, c oapi.ImageInvoker, projectId string) ([]byte, error) {
+	res, err := c.GetRegistryToken(ctx,
+		oapi.GetRegistryTokenParams{
 			ProjectId: projectId,
 		})
 	if err != nil {
@@ -67,14 +72,14 @@ func getToken(ctx context.Context, c *oapi.Client, projectId string) ([]byte, er
 	}
 
 	switch res := res.(type) {
-	case *oapi.HtcProjectsProjectIdContainerRegistryTokenGetOKHeaders:
+	case *oapi.GetRegistryTokenOKHeaders:
 		data, err := ioutil.ReadAll(res.Response.Data)
 		if err != nil {
 			return nil, err
 		}
 		return data, nil
-	case *oapi.HtcProjectsProjectIdContainerRegistryTokenGetUnauthorized,
-		*oapi.HtcProjectsProjectIdContainerRegistryTokenGetForbidden:
+	case *oapi.GetRegistryTokenUnauthorized,
+		*oapi.GetRegistryTokenForbidden:
 		return nil, fmt.Errorf("forbidden: %s", res)
 	}
 	return nil, fmt.Errorf("Unknown response type: %s", res)
@@ -119,7 +124,7 @@ func getLoginArgs(registry string) ([]string, error) {
 }
 
 // Logs docker/podman into ECR registry. Returns registry name.
-func login(ctx context.Context, c *oapi.Client, projectId string) (string, error) {
+func login(ctx context.Context, c imageProjectInvoker, projectId string) (string, error) {
 	token, err := getToken(ctx, c, projectId)
 	if err != nil {
 		return "", err

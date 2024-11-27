@@ -24,8 +24,8 @@ func DimensionsGet(cmd *cobra.Command, args []string) error {
 	}
 
 	ctx := context.Background()
-	res, err := runner.Client.HtcProjectsProjectIdDimensionsGet(ctx,
-		oapi.HtcProjectsProjectIdDimensionsGetParams{ProjectId: p.ProjectId})
+	res, err := runner.Client.GetDimensions(ctx,
+		oapi.GetDimensionsParams{ProjectId: p.ProjectId})
 	if err != nil {
 		return err
 	}
@@ -33,8 +33,8 @@ func DimensionsGet(cmd *cobra.Command, args []string) error {
 	switch res := res.(type) {
 	case *oapi.HTCProjectDimensions:
 		return runner.PrintResult(res, os.Stdout)
-	case *oapi.HtcProjectsProjectIdDimensionsGetForbidden,
-		*oapi.HtcProjectsProjectIdDimensionsGetUnauthorized:
+	case *oapi.GetDimensionsForbidden,
+		*oapi.GetDimensionsUnauthorized:
 		return fmt.Errorf("forbidden: %s", res)
 	}
 

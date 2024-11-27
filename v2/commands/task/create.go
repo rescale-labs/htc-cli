@@ -12,18 +12,18 @@ import (
 	"github.com/rescale/htc-storage-cli/v2/common"
 )
 
-func createTask(ctx context.Context, c *oapi.Client, projectId, name, desc string) (*oapi.HTCTask, error) {
-	res, err := c.HtcProjectsProjectIdTasksPost(ctx,
+func createTask(ctx context.Context, c oapi.TaskInvoker, projectId, name, desc string) (*oapi.HTCTask, error) {
+	res, err := c.CreateTask(ctx,
 		oapi.NewOptHTCTask(oapi.HTCTask{TaskName: name, TaskDescription: desc}),
-		oapi.HtcProjectsProjectIdTasksPostParams{ProjectId: projectId})
+		oapi.CreateTaskParams{ProjectId: projectId})
 	if err != nil {
 		return nil, err
 	}
 	switch res := res.(type) {
 	case *oapi.HTCTask:
 		return res, nil
-	case *oapi.HtcProjectsProjectIdTasksPostForbidden,
-		*oapi.HtcProjectsProjectIdTasksPostUnauthorized:
+	case *oapi.CreateTaskForbidden,
+		*oapi.CreateTaskUnauthorized:
 		return nil, fmt.Errorf("forbidden: %s", res)
 	}
 	return nil, fmt.Errorf("Unknown response type: %s", res)

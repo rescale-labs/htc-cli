@@ -12,9 +12,9 @@ import (
 	"github.com/rescale/htc-storage-cli/v2/common"
 )
 
-func createRepo(ctx context.Context, c *oapi.Client, projectId, repoName string) (*oapi.HTCRepository, error) {
-	res, err := c.HtcProjectsProjectIdContainerRegistryRepoRepoNamePost(ctx,
-		oapi.HtcProjectsProjectIdContainerRegistryRepoRepoNamePostParams{
+func createRepo(ctx context.Context, c oapi.ImageInvoker, projectId, repoName string) (*oapi.HTCRepository, error) {
+	res, err := c.CreateRepo(ctx,
+		oapi.CreateRepoParams{
 			ProjectId: projectId,
 			RepoName:  repoName,
 		})
@@ -25,8 +25,8 @@ func createRepo(ctx context.Context, c *oapi.Client, projectId, repoName string)
 	switch res := res.(type) {
 	case *oapi.HTCRepository:
 		return res, nil
-	case *oapi.HtcProjectsProjectIdContainerRegistryRepoRepoNamePostUnauthorized,
-		*oapi.HtcProjectsProjectIdContainerRegistryRepoRepoNamePostForbidden:
+	case *oapi.CreateRepoUnauthorized,
+		*oapi.CreateRepoForbidden:
 		return nil, fmt.Errorf("forbidden: %s", res)
 	}
 	return nil, fmt.Errorf("Unknown response type: %s", res)

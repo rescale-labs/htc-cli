@@ -18,7 +18,7 @@ func WhoAmI(cmd *cobra.Command, args []string) error {
 	}
 
 	ctx := context.Background()
-	res, err := runner.Client.AuthWhoamiGet(ctx)
+	res, err := runner.Client.WhoAmI(ctx)
 	if err != nil {
 		return err
 	}
