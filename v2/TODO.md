@@ -38,6 +38,7 @@ Testing:
 
 Usability:
   * Print the env vars expected, if any, in usage.
+  * Are we setting User-Agent?
   * For `htc job submit --group`, it might be nice if it automatically ran `htc config set group GROUP`
   * Decide on whether we need the YAML encoder. It doesn't handle OptString, etc properly, e.g.:
     ```
