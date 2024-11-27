@@ -1,6 +1,7 @@
 package image
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io/ioutil"
@@ -36,9 +37,24 @@ func getImages(ctx context.Context, c *oapi.Client, projectId string) (*oapi.HTC
 }
 
 // Returns repository name from HTCImages
-func getRepo(images *oapi.HTCImages) string {
-	// Removing trailing / from registry; docker/podman won't accept it.
-	return strings.TrimRight(images.ContainerRegistry.Value, "/")
+func getRegistry(ctx context.Context, c *oapi.Client, projectId string) (string, error) {
+	res, err := c.HtcProjectsProjectIdGet(ctx,
+		oapi.HtcProjectsProjectIdGetParams{
+			ProjectId: projectId,
+		})
+	if err != nil {
+		return "", err
+	}
+
+	switch res := res.(type) {
+	case *oapi.HTCProject:
+		// Removing trailing / from registry; docker/podman won't accept it.
+		return strings.TrimRight(res.ContainerRegistry.Value, "/"), nil
+	case *oapi.HtcProjectsProjectIdGetUnauthorized, *oapi.HtcProjectsProjectIdGetForbidden:
+		return "", fmt.Errorf("forbidden: %s", res)
+	}
+	return "", fmt.Errorf("Unknown response type: %s", res)
+
 }
 
 func getToken(ctx context.Context, c *oapi.Client, projectId string) ([]byte, error) {
@@ -89,7 +105,7 @@ func getDocker() (string, error) {
 	return _docker, nil
 }
 
-func getLoginArgs(token []byte, registry string) ([]string, error) {
+func getLoginArgs(registry string) ([]string, error) {
 	docker, err := getDocker()
 	if err != nil {
 		return nil, err
@@ -97,7 +113,7 @@ func getLoginArgs(token []byte, registry string) ([]string, error) {
 	return []string{
 		docker, "login",
 		"--username", "AWS",
-		"--password", string(token),
+		"--password-stdin",
 		registry,
 	}, nil
 }
@@ -109,18 +125,17 @@ func login(ctx context.Context, c *oapi.Client, projectId string) (string, error
 		return "", err
 	}
 
-	images, err := getImages(ctx, c, projectId)
+	registry, err := getRegistry(ctx, c, projectId)
 	if err != nil {
 		return "", err
 	}
-
-	registry := getRepo(images)
-	loginArgs, err := getLoginArgs(token, registry)
+	loginArgs, err := getLoginArgs(registry)
 	if err != nil {
 		return "", err
 	}
 
 	loginCmd := exec.CommandContext(ctx, loginArgs[0], loginArgs[1:]...)
+	loginCmd.Stdin = bytes.NewReader(token)
 	loginCmd.Stdout = os.Stdout
 	loginCmd.Stderr = os.Stderr
 	if err := loginCmd.Run(); err != nil {

@@ -7,9 +7,6 @@ As things check off, please remember to copy to
 
 ## Soon
 
-* send password by stdin into docker login to make it not complain about security
-* get container registry location by getting project, not getting images
-
 Essential API operations:
   * project create
   * `project retention-policy get` returns error on 404 instead of nothing
