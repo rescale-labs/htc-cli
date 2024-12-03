@@ -15,24 +15,33 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-// HtcGcpClustersWorkspaceIdGetParams is parameters of GET /htc/gcp/clusters/{workspaceId} operation.
-type HtcGcpClustersWorkspaceIdGetParams struct {
-	WorkspaceId string
+// CreateRepoParams is parameters of createRepo operation.
+type CreateRepoParams struct {
+	ProjectId string
+	// Must match the regex '(?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*'.
+	RepoName string
 }
 
-func unpackHtcGcpClustersWorkspaceIdGetParams(packed middleware.Parameters) (params HtcGcpClustersWorkspaceIdGetParams) {
+func unpackCreateRepoParams(packed middleware.Parameters) (params CreateRepoParams) {
 	{
 		key := middleware.ParameterKey{
-			Name: "workspaceId",
+			Name: "projectId",
 			In:   "path",
 		}
-		params.WorkspaceId = packed[key].(string)
+		params.ProjectId = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "repoName",
+			In:   "path",
+		}
+		params.RepoName = packed[key].(string)
 	}
 	return params
 }
 
-func decodeHtcGcpClustersWorkspaceIdGetParams(args [1]string, argsEscaped bool, r *http.Request) (params HtcGcpClustersWorkspaceIdGetParams, _ error) {
-	// Decode path: workspaceId.
+func decodeCreateRepoParams(args [2]string, argsEscaped bool, r *http.Request) (params CreateRepoParams, _ error) {
+	// Decode path: projectId.
 	if err := func() error {
 		param := args[0]
 		if argsEscaped {
@@ -44,7 +53,7 @@ func decodeHtcGcpClustersWorkspaceIdGetParams(args [1]string, argsEscaped bool, 
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "workspaceId",
+				Param:   "projectId",
 				Value:   param,
 				Style:   uri.PathStyleSimple,
 				Explode: false,
@@ -61,7 +70,7 @@ func decodeHtcGcpClustersWorkspaceIdGetParams(args [1]string, argsEscaped bool, 
 					return err
 				}
 
-				params.WorkspaceId = c
+				params.ProjectId = c
 				return nil
 			}(); err != nil {
 				return err
@@ -72,7 +81,68 @@ func decodeHtcGcpClustersWorkspaceIdGetParams(args [1]string, argsEscaped bool, 
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "workspaceId",
+			Name: "projectId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode path: repoName.
+	if err := func() error {
+		param := args[1]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[1])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "repoName",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.RepoName = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+			if err := func() error {
+				if err := (validate.String{
+					MinLength:    0,
+					MinLengthSet: false,
+					MaxLength:    0,
+					MaxLengthSet: false,
+					Email:        false,
+					Hostname:     false,
+					Regex:        regexMap["(?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*"],
+				}).Validate(string(params.RepoName)); err != nil {
+					return errors.Wrap(err, "string")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "repoName",
 			In:   "path",
 			Err:  err,
 		}
@@ -80,12 +150,1023 @@ func decodeHtcGcpClustersWorkspaceIdGetParams(args [1]string, argsEscaped bool, 
 	return params, nil
 }
 
-// HtcMetricsGetParams is parameters of GET /htc/metrics operation.
-type HtcMetricsGetParams struct {
+// CreateTaskParams is parameters of createTask operation.
+type CreateTaskParams struct {
+	ProjectId string
+}
+
+func unpackCreateTaskParams(packed middleware.Parameters) (params CreateTaskParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "projectId",
+			In:   "path",
+		}
+		params.ProjectId = packed[key].(string)
+	}
+	return params
+}
+
+func decodeCreateTaskParams(args [1]string, argsEscaped bool, r *http.Request) (params CreateTaskParams, _ error) {
+	// Decode path: projectId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "projectId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.ProjectId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "projectId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// GetDimensionsParams is parameters of getDimensions operation.
+type GetDimensionsParams struct {
+	ProjectId string
+}
+
+func unpackGetDimensionsParams(packed middleware.Parameters) (params GetDimensionsParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "projectId",
+			In:   "path",
+		}
+		params.ProjectId = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetDimensionsParams(args [1]string, argsEscaped bool, r *http.Request) (params GetDimensionsParams, _ error) {
+	// Decode path: projectId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "projectId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.ProjectId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "projectId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// GetImageParams is parameters of getImage operation.
+type GetImageParams struct {
+	ImageName string
+	ProjectId string
+}
+
+func unpackGetImageParams(packed middleware.Parameters) (params GetImageParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "imageName",
+			In:   "path",
+		}
+		params.ImageName = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "projectId",
+			In:   "path",
+		}
+		params.ProjectId = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetImageParams(args [2]string, argsEscaped bool, r *http.Request) (params GetImageParams, _ error) {
+	// Decode path: imageName.
+	if err := func() error {
+		param := args[1]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[1])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "imageName",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.ImageName = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "imageName",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode path: projectId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "projectId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.ProjectId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "projectId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// GetImagesParams is parameters of getImages operation.
+type GetImagesParams struct {
+	ProjectId string
+}
+
+func unpackGetImagesParams(packed middleware.Parameters) (params GetImagesParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "projectId",
+			In:   "path",
+		}
+		params.ProjectId = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetImagesParams(args [1]string, argsEscaped bool, r *http.Request) (params GetImagesParams, _ error) {
+	// Decode path: projectId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "projectId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.ProjectId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "projectId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// GetJobParams is parameters of getJob operation.
+type GetJobParams struct {
+	JobId     string
+	ProjectId string
+	TaskId    string
+}
+
+func unpackGetJobParams(packed middleware.Parameters) (params GetJobParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "jobId",
+			In:   "path",
+		}
+		params.JobId = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "projectId",
+			In:   "path",
+		}
+		params.ProjectId = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "taskId",
+			In:   "path",
+		}
+		params.TaskId = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetJobParams(args [3]string, argsEscaped bool, r *http.Request) (params GetJobParams, _ error) {
+	// Decode path: jobId.
+	if err := func() error {
+		param := args[2]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[2])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "jobId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.JobId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "jobId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode path: projectId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "projectId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.ProjectId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "projectId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode path: taskId.
+	if err := func() error {
+		param := args[1]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[1])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "taskId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.TaskId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "taskId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// GetJobsParams is parameters of getJobs operation.
+type GetJobsParams struct {
+	ProjectId string
+	TaskId    string
+	Group     OptString
+	JobId     []string
+	PageIndex OptString
+	PageSize  OptInt32
+	Status    OptRescaleJobStatus
+	ViewType  OptViewType
+}
+
+func unpackGetJobsParams(packed middleware.Parameters) (params GetJobsParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "projectId",
+			In:   "path",
+		}
+		params.ProjectId = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "taskId",
+			In:   "path",
+		}
+		params.TaskId = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "group",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Group = v.(OptString)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "jobId",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.JobId = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "pageIndex",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.PageIndex = v.(OptString)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "pageSize",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.PageSize = v.(OptInt32)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "status",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Status = v.(OptRescaleJobStatus)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "viewType",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.ViewType = v.(OptViewType)
+		}
+	}
+	return params
+}
+
+func decodeGetJobsParams(args [2]string, argsEscaped bool, r *http.Request) (params GetJobsParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode path: projectId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "projectId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.ProjectId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "projectId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode path: taskId.
+	if err := func() error {
+		param := args[1]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[1])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "taskId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.TaskId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "taskId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode query: group.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "group",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotGroupVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotGroupVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Group.SetTo(paramsDotGroupVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "group",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: jobId.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "jobId",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotJobIdVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotJobIdVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.JobId = append(params.JobId, paramsDotJobIdVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "jobId",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: pageIndex.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "pageIndex",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotPageIndexVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotPageIndexVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.PageIndex.SetTo(paramsDotPageIndexVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "pageIndex",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Set default value for query: pageSize.
+	{
+		val := int32(100)
+		params.PageSize.SetTo(val)
+	}
+	// Decode query: pageSize.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "pageSize",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotPageSizeVal int32
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToInt32(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotPageSizeVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.PageSize.SetTo(paramsDotPageSizeVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "pageSize",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: status.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "status",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotStatusVal RescaleJobStatus
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotStatusVal = RescaleJobStatus(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Status.SetTo(paramsDotStatusVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Status.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "status",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: viewType.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "viewType",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotViewTypeVal ViewType
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotViewTypeVal = ViewType(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.ViewType.SetTo(paramsDotViewTypeVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.ViewType.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "viewType",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// GetLimitsParams is parameters of getLimits operation.
+type GetLimitsParams struct {
+	ProjectId string
+}
+
+func unpackGetLimitsParams(packed middleware.Parameters) (params GetLimitsParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "projectId",
+			In:   "path",
+		}
+		params.ProjectId = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetLimitsParams(args [1]string, argsEscaped bool, r *http.Request) (params GetLimitsParams, _ error) {
+	// Decode path: projectId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "projectId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.ProjectId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "projectId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// GetMetricsParams is parameters of getMetrics operation.
+type GetMetricsParams struct {
 	AcceptEncoding []string
 }
 
-func unpackHtcMetricsGetParams(packed middleware.Parameters) (params HtcMetricsGetParams) {
+func unpackGetMetricsParams(packed middleware.Parameters) (params GetMetricsParams) {
 	{
 		key := middleware.ParameterKey{
 			Name: "Accept-Encoding",
@@ -98,7 +1179,7 @@ func unpackHtcMetricsGetParams(packed middleware.Parameters) (params HtcMetricsG
 	return params
 }
 
-func decodeHtcMetricsGetParams(args [0]string, argsEscaped bool, r *http.Request) (params HtcMetricsGetParams, _ error) {
+func decodeGetMetricsParams(args [0]string, argsEscaped bool, r *http.Request) (params GetMetricsParams, _ error) {
 	h := uri.NewHeaderDecoder(r.Header)
 	// Decode header: Accept-Encoding.
 	if err := func() error {
@@ -160,14 +1241,79 @@ func decodeHtcMetricsGetParams(args [0]string, argsEscaped bool, r *http.Request
 	return params, nil
 }
 
-// HtcProjectsGetParams is parameters of GET /htc/projects operation.
-type HtcProjectsGetParams struct {
+// GetProjectParams is parameters of getProject operation.
+type GetProjectParams struct {
+	ProjectId string
+}
+
+func unpackGetProjectParams(packed middleware.Parameters) (params GetProjectParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "projectId",
+			In:   "path",
+		}
+		params.ProjectId = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetProjectParams(args [1]string, argsEscaped bool, r *http.Request) (params GetProjectParams, _ error) {
+	// Decode path: projectId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "projectId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.ProjectId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "projectId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// GetProjectsParams is parameters of getProjects operation.
+type GetProjectsParams struct {
 	OnlyMyProjects OptBool
 	PageIndex      OptString
 	PageSize       OptInt32
 }
 
-func unpackHtcProjectsGetParams(packed middleware.Parameters) (params HtcProjectsGetParams) {
+func unpackGetProjectsParams(packed middleware.Parameters) (params GetProjectsParams) {
 	{
 		key := middleware.ParameterKey{
 			Name: "onlyMyProjects",
@@ -198,7 +1344,7 @@ func unpackHtcProjectsGetParams(packed middleware.Parameters) (params HtcProject
 	return params
 }
 
-func decodeHtcProjectsGetParams(args [0]string, argsEscaped bool, r *http.Request) (params HtcProjectsGetParams, _ error) {
+func decodeGetProjectsParams(args [0]string, argsEscaped bool, r *http.Request) (params GetProjectsParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode query: onlyMyProjects.
 	if err := func() error {
@@ -331,12 +1477,12 @@ func decodeHtcProjectsGetParams(args [0]string, argsEscaped bool, r *http.Reques
 	return params, nil
 }
 
-// HtcProjectsProjectIdContainerRegistryImagesGetParams is parameters of GET /htc/projects/{projectId}/container-registry/images operation.
-type HtcProjectsProjectIdContainerRegistryImagesGetParams struct {
+// GetRegistryTokenParams is parameters of getRegistryToken operation.
+type GetRegistryTokenParams struct {
 	ProjectId string
 }
 
-func unpackHtcProjectsProjectIdContainerRegistryImagesGetParams(packed middleware.Parameters) (params HtcProjectsProjectIdContainerRegistryImagesGetParams) {
+func unpackGetRegistryTokenParams(packed middleware.Parameters) (params GetRegistryTokenParams) {
 	{
 		key := middleware.ParameterKey{
 			Name: "projectId",
@@ -347,7 +1493,7 @@ func unpackHtcProjectsProjectIdContainerRegistryImagesGetParams(packed middlewar
 	return params
 }
 
-func decodeHtcProjectsProjectIdContainerRegistryImagesGetParams(args [1]string, argsEscaped bool, r *http.Request) (params HtcProjectsProjectIdContainerRegistryImagesGetParams, _ error) {
+func decodeGetRegistryTokenParams(args [1]string, argsEscaped bool, r *http.Request) (params GetRegistryTokenParams, _ error) {
 	// Decode path: projectId.
 	if err := func() error {
 		param := args[0]
@@ -396,20 +1542,14 @@ func decodeHtcProjectsProjectIdContainerRegistryImagesGetParams(args [1]string, 
 	return params, nil
 }
 
-// HtcProjectsProjectIdContainerRegistryImagesImageNameGetParams is parameters of GET /htc/projects/{projectId}/container-registry/images/{imageName} operation.
-type HtcProjectsProjectIdContainerRegistryImagesImageNameGetParams struct {
-	ImageName string
+// GetTasksParams is parameters of getTasks operation.
+type GetTasksParams struct {
 	ProjectId string
+	PageIndex OptString
+	PageSize  OptInt32
 }
 
-func unpackHtcProjectsProjectIdContainerRegistryImagesImageNameGetParams(packed middleware.Parameters) (params HtcProjectsProjectIdContainerRegistryImagesImageNameGetParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "imageName",
-			In:   "path",
-		}
-		params.ImageName = packed[key].(string)
-	}
+func unpackGetTasksParams(packed middleware.Parameters) (params GetTasksParams) {
 	{
 		key := middleware.ParameterKey{
 			Name: "projectId",
@@ -417,55 +1557,29 @@ func unpackHtcProjectsProjectIdContainerRegistryImagesImageNameGetParams(packed 
 		}
 		params.ProjectId = packed[key].(string)
 	}
+	{
+		key := middleware.ParameterKey{
+			Name: "pageIndex",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.PageIndex = v.(OptString)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "pageSize",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.PageSize = v.(OptInt32)
+		}
+	}
 	return params
 }
 
-func decodeHtcProjectsProjectIdContainerRegistryImagesImageNameGetParams(args [2]string, argsEscaped bool, r *http.Request) (params HtcProjectsProjectIdContainerRegistryImagesImageNameGetParams, _ error) {
-	// Decode path: imageName.
-	if err := func() error {
-		param := args[1]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[1])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "imageName",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.ImageName = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "imageName",
-			In:   "path",
-			Err:  err,
-		}
-	}
+func decodeGetTasksParams(args [1]string, argsEscaped bool, r *http.Request) (params GetTasksParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: projectId.
 	if err := func() error {
 		param := args[0]
@@ -508,39 +1622,117 @@ func decodeHtcProjectsProjectIdContainerRegistryImagesImageNameGetParams(args [2
 		return params, &ogenerrors.DecodeParamError{
 			Name: "projectId",
 			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode query: pageIndex.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "pageIndex",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotPageIndexVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotPageIndexVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.PageIndex.SetTo(paramsDotPageIndexVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "pageIndex",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Set default value for query: pageSize.
+	{
+		val := int32(100)
+		params.PageSize.SetTo(val)
+	}
+	// Decode query: pageSize.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "pageSize",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotPageSizeVal int32
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToInt32(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotPageSizeVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.PageSize.SetTo(paramsDotPageSizeVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "pageSize",
+			In:   "query",
 			Err:  err,
 		}
 	}
 	return params, nil
 }
 
-// HtcProjectsProjectIdContainerRegistryRepoRepoNamePostParams is parameters of POST /htc/projects/{projectId}/container-registry/repo/{repoName} operation.
-type HtcProjectsProjectIdContainerRegistryRepoRepoNamePostParams struct {
-	ProjectId string
-	// Must match the regex '(?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*'.
-	RepoName string
+// HtcGcpClustersWorkspaceIdGetParams is parameters of GET /htc/gcp/clusters/{workspaceId} operation.
+type HtcGcpClustersWorkspaceIdGetParams struct {
+	WorkspaceId string
 }
 
-func unpackHtcProjectsProjectIdContainerRegistryRepoRepoNamePostParams(packed middleware.Parameters) (params HtcProjectsProjectIdContainerRegistryRepoRepoNamePostParams) {
+func unpackHtcGcpClustersWorkspaceIdGetParams(packed middleware.Parameters) (params HtcGcpClustersWorkspaceIdGetParams) {
 	{
 		key := middleware.ParameterKey{
-			Name: "projectId",
+			Name: "workspaceId",
 			In:   "path",
 		}
-		params.ProjectId = packed[key].(string)
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "repoName",
-			In:   "path",
-		}
-		params.RepoName = packed[key].(string)
+		params.WorkspaceId = packed[key].(string)
 	}
 	return params
 }
 
-func decodeHtcProjectsProjectIdContainerRegistryRepoRepoNamePostParams(args [2]string, argsEscaped bool, r *http.Request) (params HtcProjectsProjectIdContainerRegistryRepoRepoNamePostParams, _ error) {
-	// Decode path: projectId.
+func decodeHtcGcpClustersWorkspaceIdGetParams(args [1]string, argsEscaped bool, r *http.Request) (params HtcGcpClustersWorkspaceIdGetParams, _ error) {
+	// Decode path: workspaceId.
 	if err := func() error {
 		param := args[0]
 		if argsEscaped {
@@ -552,7 +1744,7 @@ func decodeHtcProjectsProjectIdContainerRegistryRepoRepoNamePostParams(args [2]s
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "projectId",
+				Param:   "workspaceId",
 				Value:   param,
 				Style:   uri.PathStyleSimple,
 				Explode: false,
@@ -569,7 +1761,7 @@ func decodeHtcProjectsProjectIdContainerRegistryRepoRepoNamePostParams(args [2]s
 					return err
 				}
 
-				params.ProjectId = c
+				params.WorkspaceId = c
 				return nil
 			}(); err != nil {
 				return err
@@ -580,198 +1772,7 @@ func decodeHtcProjectsProjectIdContainerRegistryRepoRepoNamePostParams(args [2]s
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "projectId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	// Decode path: repoName.
-	if err := func() error {
-		param := args[1]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[1])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "repoName",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.RepoName = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-			if err := func() error {
-				if err := (validate.String{
-					MinLength:    0,
-					MinLengthSet: false,
-					MaxLength:    0,
-					MaxLengthSet: false,
-					Email:        false,
-					Hostname:     false,
-					Regex:        regexMap["(?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*"],
-				}).Validate(string(params.RepoName)); err != nil {
-					return errors.Wrap(err, "string")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "repoName",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
-// HtcProjectsProjectIdContainerRegistryTokenGetParams is parameters of GET /htc/projects/{projectId}/container-registry/token operation.
-type HtcProjectsProjectIdContainerRegistryTokenGetParams struct {
-	ProjectId string
-}
-
-func unpackHtcProjectsProjectIdContainerRegistryTokenGetParams(packed middleware.Parameters) (params HtcProjectsProjectIdContainerRegistryTokenGetParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "projectId",
-			In:   "path",
-		}
-		params.ProjectId = packed[key].(string)
-	}
-	return params
-}
-
-func decodeHtcProjectsProjectIdContainerRegistryTokenGetParams(args [1]string, argsEscaped bool, r *http.Request) (params HtcProjectsProjectIdContainerRegistryTokenGetParams, _ error) {
-	// Decode path: projectId.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "projectId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.ProjectId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "projectId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
-// HtcProjectsProjectIdDimensionsGetParams is parameters of GET /htc/projects/{projectId}/dimensions operation.
-type HtcProjectsProjectIdDimensionsGetParams struct {
-	ProjectId string
-}
-
-func unpackHtcProjectsProjectIdDimensionsGetParams(packed middleware.Parameters) (params HtcProjectsProjectIdDimensionsGetParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "projectId",
-			In:   "path",
-		}
-		params.ProjectId = packed[key].(string)
-	}
-	return params
-}
-
-func decodeHtcProjectsProjectIdDimensionsGetParams(args [1]string, argsEscaped bool, r *http.Request) (params HtcProjectsProjectIdDimensionsGetParams, _ error) {
-	// Decode path: projectId.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "projectId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.ProjectId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "projectId",
+			Name: "workspaceId",
 			In:   "path",
 			Err:  err,
 		}
@@ -844,71 +1845,6 @@ func decodeHtcProjectsProjectIdDimensionsPutParams(args [1]string, argsEscaped b
 	return params, nil
 }
 
-// HtcProjectsProjectIdGetParams is parameters of GET /htc/projects/{projectId} operation.
-type HtcProjectsProjectIdGetParams struct {
-	ProjectId string
-}
-
-func unpackHtcProjectsProjectIdGetParams(packed middleware.Parameters) (params HtcProjectsProjectIdGetParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "projectId",
-			In:   "path",
-		}
-		params.ProjectId = packed[key].(string)
-	}
-	return params
-}
-
-func decodeHtcProjectsProjectIdGetParams(args [1]string, argsEscaped bool, r *http.Request) (params HtcProjectsProjectIdGetParams, _ error) {
-	// Decode path: projectId.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "projectId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.ProjectId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "projectId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
 // HtcProjectsProjectIdLimitsDeleteParams is parameters of DELETE /htc/projects/{projectId}/limits operation.
 type HtcProjectsProjectIdLimitsDeleteParams struct {
 	ProjectId string
@@ -926,71 +1862,6 @@ func unpackHtcProjectsProjectIdLimitsDeleteParams(packed middleware.Parameters) 
 }
 
 func decodeHtcProjectsProjectIdLimitsDeleteParams(args [1]string, argsEscaped bool, r *http.Request) (params HtcProjectsProjectIdLimitsDeleteParams, _ error) {
-	// Decode path: projectId.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "projectId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.ProjectId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "projectId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
-// HtcProjectsProjectIdLimitsGetParams is parameters of GET /htc/projects/{projectId}/limits operation.
-type HtcProjectsProjectIdLimitsGetParams struct {
-	ProjectId string
-}
-
-func unpackHtcProjectsProjectIdLimitsGetParams(packed middleware.Parameters) (params HtcProjectsProjectIdLimitsGetParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "projectId",
-			In:   "path",
-		}
-		params.ProjectId = packed[key].(string)
-	}
-	return params
-}
-
-func decodeHtcProjectsProjectIdLimitsGetParams(args [1]string, argsEscaped bool, r *http.Request) (params HtcProjectsProjectIdLimitsGetParams, _ error) {
 	// Decode path: projectId.
 	if err := func() error {
 		param := args[0]
@@ -2100,244 +2971,6 @@ func decodeHtcProjectsProjectIdTaskRetentionPolicyPutParams(args [1]string, args
 	return params, nil
 }
 
-// HtcProjectsProjectIdTasksGetParams is parameters of GET /htc/projects/{projectId}/tasks operation.
-type HtcProjectsProjectIdTasksGetParams struct {
-	ProjectId string
-	PageIndex OptString
-	PageSize  OptInt32
-}
-
-func unpackHtcProjectsProjectIdTasksGetParams(packed middleware.Parameters) (params HtcProjectsProjectIdTasksGetParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "projectId",
-			In:   "path",
-		}
-		params.ProjectId = packed[key].(string)
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "pageIndex",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.PageIndex = v.(OptString)
-		}
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "pageSize",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.PageSize = v.(OptInt32)
-		}
-	}
-	return params
-}
-
-func decodeHtcProjectsProjectIdTasksGetParams(args [1]string, argsEscaped bool, r *http.Request) (params HtcProjectsProjectIdTasksGetParams, _ error) {
-	q := uri.NewQueryDecoder(r.URL.Query())
-	// Decode path: projectId.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "projectId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.ProjectId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "projectId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	// Decode query: pageIndex.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "pageIndex",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotPageIndexVal string
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotPageIndexVal = c
-					return nil
-				}(); err != nil {
-					return err
-				}
-				params.PageIndex.SetTo(paramsDotPageIndexVal)
-				return nil
-			}); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "pageIndex",
-			In:   "query",
-			Err:  err,
-		}
-	}
-	// Set default value for query: pageSize.
-	{
-		val := int32(100)
-		params.PageSize.SetTo(val)
-	}
-	// Decode query: pageSize.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "pageSize",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotPageSizeVal int32
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToInt32(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotPageSizeVal = c
-					return nil
-				}(); err != nil {
-					return err
-				}
-				params.PageSize.SetTo(paramsDotPageSizeVal)
-				return nil
-			}); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "pageSize",
-			In:   "query",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
-// HtcProjectsProjectIdTasksPostParams is parameters of POST /htc/projects/{projectId}/tasks operation.
-type HtcProjectsProjectIdTasksPostParams struct {
-	ProjectId string
-}
-
-func unpackHtcProjectsProjectIdTasksPostParams(packed middleware.Parameters) (params HtcProjectsProjectIdTasksPostParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "projectId",
-			In:   "path",
-		}
-		params.ProjectId = packed[key].(string)
-	}
-	return params
-}
-
-func decodeHtcProjectsProjectIdTasksPostParams(args [1]string, argsEscaped bool, r *http.Request) (params HtcProjectsProjectIdTasksPostParams, _ error) {
-	// Decode path: projectId.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "projectId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.ProjectId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "projectId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
 // HtcProjectsProjectIdTasksTaskIdDeleteParams is parameters of DELETE /htc/projects/{projectId}/tasks/{taskId} operation.
 type HtcProjectsProjectIdTasksTaskIdDeleteParams struct {
 	ProjectId string
@@ -3079,176 +3712,6 @@ func decodeHtcProjectsProjectIdTasksTaskIdGroupsGetParams(args [2]string, argsEs
 	return params, nil
 }
 
-// HtcProjectsProjectIdTasksTaskIdJobsBatchPostParams is parameters of POST /htc/projects/{projectId}/tasks/{taskId}/jobs/batch operation.
-type HtcProjectsProjectIdTasksTaskIdJobsBatchPostParams struct {
-	ProjectId string
-	TaskId    string
-	Group     OptString
-}
-
-func unpackHtcProjectsProjectIdTasksTaskIdJobsBatchPostParams(packed middleware.Parameters) (params HtcProjectsProjectIdTasksTaskIdJobsBatchPostParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "projectId",
-			In:   "path",
-		}
-		params.ProjectId = packed[key].(string)
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "taskId",
-			In:   "path",
-		}
-		params.TaskId = packed[key].(string)
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "group",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.Group = v.(OptString)
-		}
-	}
-	return params
-}
-
-func decodeHtcProjectsProjectIdTasksTaskIdJobsBatchPostParams(args [2]string, argsEscaped bool, r *http.Request) (params HtcProjectsProjectIdTasksTaskIdJobsBatchPostParams, _ error) {
-	q := uri.NewQueryDecoder(r.URL.Query())
-	// Decode path: projectId.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "projectId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.ProjectId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "projectId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	// Decode path: taskId.
-	if err := func() error {
-		param := args[1]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[1])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "taskId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.TaskId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "taskId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	// Decode query: group.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "group",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotGroupVal string
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotGroupVal = c
-					return nil
-				}(); err != nil {
-					return err
-				}
-				params.Group.SetTo(paramsDotGroupVal)
-				return nil
-			}); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "group",
-			In:   "query",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
 // HtcProjectsProjectIdTasksTaskIdJobsCancelPostParams is parameters of POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel operation.
 type HtcProjectsProjectIdTasksTaskIdJobsCancelPostParams struct {
 	ProjectId string
@@ -3412,468 +3875,6 @@ func decodeHtcProjectsProjectIdTasksTaskIdJobsCancelPostParams(args [2]string, a
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "group",
-			In:   "query",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
-// HtcProjectsProjectIdTasksTaskIdJobsGetParams is parameters of GET /htc/projects/{projectId}/tasks/{taskId}/jobs operation.
-type HtcProjectsProjectIdTasksTaskIdJobsGetParams struct {
-	ProjectId string
-	TaskId    string
-	Group     OptString
-	JobId     []string
-	PageIndex OptString
-	PageSize  OptInt32
-	Status    OptRescaleJobStatus
-	ViewType  OptViewType
-}
-
-func unpackHtcProjectsProjectIdTasksTaskIdJobsGetParams(packed middleware.Parameters) (params HtcProjectsProjectIdTasksTaskIdJobsGetParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "projectId",
-			In:   "path",
-		}
-		params.ProjectId = packed[key].(string)
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "taskId",
-			In:   "path",
-		}
-		params.TaskId = packed[key].(string)
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "group",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.Group = v.(OptString)
-		}
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "jobId",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.JobId = v.([]string)
-		}
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "pageIndex",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.PageIndex = v.(OptString)
-		}
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "pageSize",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.PageSize = v.(OptInt32)
-		}
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "status",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.Status = v.(OptRescaleJobStatus)
-		}
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "viewType",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.ViewType = v.(OptViewType)
-		}
-	}
-	return params
-}
-
-func decodeHtcProjectsProjectIdTasksTaskIdJobsGetParams(args [2]string, argsEscaped bool, r *http.Request) (params HtcProjectsProjectIdTasksTaskIdJobsGetParams, _ error) {
-	q := uri.NewQueryDecoder(r.URL.Query())
-	// Decode path: projectId.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "projectId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.ProjectId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "projectId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	// Decode path: taskId.
-	if err := func() error {
-		param := args[1]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[1])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "taskId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.TaskId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "taskId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	// Decode query: group.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "group",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotGroupVal string
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotGroupVal = c
-					return nil
-				}(); err != nil {
-					return err
-				}
-				params.Group.SetTo(paramsDotGroupVal)
-				return nil
-			}); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "group",
-			In:   "query",
-			Err:  err,
-		}
-	}
-	// Decode query: jobId.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "jobId",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				return d.DecodeArray(func(d uri.Decoder) error {
-					var paramsDotJobIdVal string
-					if err := func() error {
-						val, err := d.DecodeValue()
-						if err != nil {
-							return err
-						}
-
-						c, err := conv.ToString(val)
-						if err != nil {
-							return err
-						}
-
-						paramsDotJobIdVal = c
-						return nil
-					}(); err != nil {
-						return err
-					}
-					params.JobId = append(params.JobId, paramsDotJobIdVal)
-					return nil
-				})
-			}); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "jobId",
-			In:   "query",
-			Err:  err,
-		}
-	}
-	// Decode query: pageIndex.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "pageIndex",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotPageIndexVal string
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotPageIndexVal = c
-					return nil
-				}(); err != nil {
-					return err
-				}
-				params.PageIndex.SetTo(paramsDotPageIndexVal)
-				return nil
-			}); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "pageIndex",
-			In:   "query",
-			Err:  err,
-		}
-	}
-	// Set default value for query: pageSize.
-	{
-		val := int32(100)
-		params.PageSize.SetTo(val)
-	}
-	// Decode query: pageSize.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "pageSize",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotPageSizeVal int32
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToInt32(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotPageSizeVal = c
-					return nil
-				}(); err != nil {
-					return err
-				}
-				params.PageSize.SetTo(paramsDotPageSizeVal)
-				return nil
-			}); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "pageSize",
-			In:   "query",
-			Err:  err,
-		}
-	}
-	// Decode query: status.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "status",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotStatusVal RescaleJobStatus
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotStatusVal = RescaleJobStatus(c)
-					return nil
-				}(); err != nil {
-					return err
-				}
-				params.Status.SetTo(paramsDotStatusVal)
-				return nil
-			}); err != nil {
-				return err
-			}
-			if err := func() error {
-				if value, ok := params.Status.Get(); ok {
-					if err := func() error {
-						if err := value.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						return err
-					}
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "status",
-			In:   "query",
-			Err:  err,
-		}
-	}
-	// Decode query: viewType.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "viewType",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotViewTypeVal ViewType
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotViewTypeVal = ViewType(c)
-					return nil
-				}(); err != nil {
-					return err
-				}
-				params.ViewType.SetTo(paramsDotViewTypeVal)
-				return nil
-			}); err != nil {
-				return err
-			}
-			if err := func() error {
-				if value, ok := params.ViewType.Get(); ok {
-					if err := func() error {
-						if err := value.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						return err
-					}
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "viewType",
 			In:   "query",
 			Err:  err,
 		}
@@ -4154,177 +4155,6 @@ func decodeHtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetParams(args [3]strin
 		return params, &ogenerrors.DecodeParamError{
 			Name: "pageSize",
 			In:   "query",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
-// HtcProjectsProjectIdTasksTaskIdJobsJobIdGetParams is parameters of GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId} operation.
-type HtcProjectsProjectIdTasksTaskIdJobsJobIdGetParams struct {
-	JobId     string
-	ProjectId string
-	TaskId    string
-}
-
-func unpackHtcProjectsProjectIdTasksTaskIdJobsJobIdGetParams(packed middleware.Parameters) (params HtcProjectsProjectIdTasksTaskIdJobsJobIdGetParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "jobId",
-			In:   "path",
-		}
-		params.JobId = packed[key].(string)
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "projectId",
-			In:   "path",
-		}
-		params.ProjectId = packed[key].(string)
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "taskId",
-			In:   "path",
-		}
-		params.TaskId = packed[key].(string)
-	}
-	return params
-}
-
-func decodeHtcProjectsProjectIdTasksTaskIdJobsJobIdGetParams(args [3]string, argsEscaped bool, r *http.Request) (params HtcProjectsProjectIdTasksTaskIdJobsJobIdGetParams, _ error) {
-	// Decode path: jobId.
-	if err := func() error {
-		param := args[2]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[2])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "jobId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.JobId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "jobId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	// Decode path: projectId.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "projectId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.ProjectId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "projectId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	// Decode path: taskId.
-	if err := func() error {
-		param := args[1]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[1])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "taskId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.TaskId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "taskId",
-			In:   "path",
 			Err:  err,
 		}
 	}
@@ -5971,6 +5801,176 @@ func decodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyPutParams(args [1]string, 
 		return params, &ogenerrors.DecodeParamError{
 			Name: "workspaceId",
 			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// SubmitJobsParams is parameters of submitJobs operation.
+type SubmitJobsParams struct {
+	ProjectId string
+	TaskId    string
+	Group     OptString
+}
+
+func unpackSubmitJobsParams(packed middleware.Parameters) (params SubmitJobsParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "projectId",
+			In:   "path",
+		}
+		params.ProjectId = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "taskId",
+			In:   "path",
+		}
+		params.TaskId = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "group",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Group = v.(OptString)
+		}
+	}
+	return params
+}
+
+func decodeSubmitJobsParams(args [2]string, argsEscaped bool, r *http.Request) (params SubmitJobsParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode path: projectId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "projectId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.ProjectId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "projectId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode path: taskId.
+	if err := func() error {
+		param := args[1]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[1])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "taskId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.TaskId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "taskId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode query: group.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "group",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotGroupVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotGroupVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Group.SetTo(paramsDotGroupVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "group",
+			In:   "query",
 			Err:  err,
 		}
 	}

@@ -12,9 +12,9 @@ import (
 	"github.com/rescale/htc-storage-cli/v2/common"
 )
 
-func getImage(ctx context.Context, c *oapi.Client, projectId, imageName string) (*oapi.HTCImageStatus, error) {
-	res, err := c.HtcProjectsProjectIdContainerRegistryImagesImageNameGet(ctx,
-		oapi.HtcProjectsProjectIdContainerRegistryImagesImageNameGetParams{
+func getImage(ctx context.Context, c oapi.ImageInvoker, projectId, imageName string) (*oapi.HTCImageStatus, error) {
+	res, err := c.GetImage(ctx,
+		oapi.GetImageParams{
 			ProjectId: projectId,
 			ImageName: imageName,
 		})
@@ -25,10 +25,10 @@ func getImage(ctx context.Context, c *oapi.Client, projectId, imageName string) 
 	switch res := res.(type) {
 	case *oapi.HTCImageStatus:
 		return res, nil
-	case *oapi.HtcProjectsProjectIdContainerRegistryImagesImageNameGetUnauthorized,
-		*oapi.HtcProjectsProjectIdContainerRegistryImagesImageNameGetForbidden:
+	case *oapi.GetImageUnauthorized,
+		*oapi.GetImageForbidden:
 		return nil, fmt.Errorf("forbidden: %s", res)
-	case *oapi.HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound:
+	case *oapi.GetImageNotFound:
 		return nil, fmt.Errorf("image not found")
 	}
 	return nil, fmt.Errorf("Unknown response type: %s", res)
@@ -46,7 +46,6 @@ func Get(cmd *cobra.Command, args []string) error {
 	}
 
 	ctx := context.Background()
-
 	if len(args) == 0 {
 		images, err := getImages(ctx, runner.Client, p.ProjectId)
 		if err != nil {

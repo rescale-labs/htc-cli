@@ -50,7 +50,7 @@ func loadConfig(cmd *cobra.Command) (*config.Config, error) {
 }
 
 func getBearerToken(ctx context.Context, c *oapi.Client) (*oapi.HTCToken, error) {
-	res, err := c.AuthTokenGet(ctx)
+	res, err := c.GetToken(ctx)
 	if err != nil {
 		log.Fatalf("Login failed: %s", err)
 	}
@@ -114,7 +114,7 @@ func (r *Runner) UpdateToken(now time.Time) error {
 }
 
 func updateWhoAmI(ctx context.Context, c *oapi.Client, cfg *config.Config) error {
-	res, err := c.AuthWhoamiGet(ctx)
+	res, err := c.WhoAmI(ctx)
 	if err != nil {
 		return err
 	}

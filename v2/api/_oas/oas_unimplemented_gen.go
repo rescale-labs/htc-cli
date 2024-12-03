@@ -13,15 +13,6 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
-// AuthTokenGet implements GET /auth/token operation.
-//
-// This endpoint will get a JWT token given an API key.
-//
-// GET /auth/token
-func (UnimplementedHandler) AuthTokenGet(ctx context.Context) (r AuthTokenGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // AuthTokenWhoamiGet implements GET /auth/token/whoami operation.
 //
 // This endpoint will get a JWT token payload given a bearer token.
@@ -31,75 +22,7 @@ func (UnimplementedHandler) AuthTokenWhoamiGet(ctx context.Context) (r AuthToken
 	return r, ht.ErrNotImplemented
 }
 
-// AuthWhoamiGet implements GET /auth/whoami operation.
-//
-// This endpoint will get Rescale user information given a Rescale API key.
-//
-// GET /auth/whoami
-func (UnimplementedHandler) AuthWhoamiGet(ctx context.Context) (r AuthWhoamiGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcGcpClustersWorkspaceIdGet implements GET /htc/gcp/clusters/{workspaceId} operation.
-//
-// This endpoint returns details about all GCP clusters that can run jobs for the specified HTC
-// workspace.
-//
-// GET /htc/gcp/clusters/{workspaceId}
-func (UnimplementedHandler) HtcGcpClustersWorkspaceIdGet(ctx context.Context, params HtcGcpClustersWorkspaceIdGetParams) (r HtcGcpClustersWorkspaceIdGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcMetricsGet implements GET /htc/metrics operation.
-//
-// Get all HTC Metrics for a workspace.
-//
-// GET /htc/metrics
-func (UnimplementedHandler) HtcMetricsGet(ctx context.Context, params HtcMetricsGetParams) (r HtcMetricsGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcProjectsGet implements GET /htc/projects operation.
-//
-// This endpoint will get all projects.
-//
-// GET /htc/projects
-func (UnimplementedHandler) HtcProjectsGet(ctx context.Context, params HtcProjectsGetParams) (r HtcProjectsGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcProjectsPost implements POST /htc/projects operation.
-//
-// This endpoint will create a project. A project is a collection of tasks and container images used
-// to run jobs. Several projects can belong to a single workspace.
-//
-// POST /htc/projects
-func (UnimplementedHandler) HtcProjectsPost(ctx context.Context, req OptHTCProject) (r HtcProjectsPostRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcProjectsProjectIdContainerRegistryImagesGet implements GET /htc/projects/{projectId}/container-registry/images operation.
-//
-// This endpoint will list all images for a project.
-//
-// GET /htc/projects/{projectId}/container-registry/images
-func (UnimplementedHandler) HtcProjectsProjectIdContainerRegistryImagesGet(ctx context.Context, params HtcProjectsProjectIdContainerRegistryImagesGetParams) (r HtcProjectsProjectIdContainerRegistryImagesGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcProjectsProjectIdContainerRegistryImagesImageNameGet implements GET /htc/projects/{projectId}/container-registry/images/{imageName} operation.
-//
-// Retrieves the current status of an image across cloud providers. The status indicates whether the
-// image is ready for use or still being processed. Returns READY when the image is available in all
-// cloud providers, PENDING while the image is being replicated, and a 404 if the image does not
-// exist.
-//
-// GET /htc/projects/{projectId}/container-registry/images/{imageName}
-func (UnimplementedHandler) HtcProjectsProjectIdContainerRegistryImagesImageNameGet(ctx context.Context, params HtcProjectsProjectIdContainerRegistryImagesImageNameGetParams) (r HtcProjectsProjectIdContainerRegistryImagesImageNameGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcProjectsProjectIdContainerRegistryRepoRepoNamePost implements POST /htc/projects/{projectId}/container-registry/repo/{repoName} operation.
+// CreateRepo implements createRepo operation.
 //
 // This endpoint will create a private container repository belonging to this project
 // Private container registries are collections of repositories, and private repositories are
@@ -110,23 +33,20 @@ func (UnimplementedHandler) HtcProjectsProjectIdContainerRegistryImagesImageName
 // `repositoryName`, and the token (see `/htc/projects/:projectId/container-registry/token`).
 //
 // POST /htc/projects/{projectId}/container-registry/repo/{repoName}
-func (UnimplementedHandler) HtcProjectsProjectIdContainerRegistryRepoRepoNamePost(ctx context.Context, params HtcProjectsProjectIdContainerRegistryRepoRepoNamePostParams) (r HtcProjectsProjectIdContainerRegistryRepoRepoNamePostRes, _ error) {
+func (UnimplementedHandler) CreateRepo(ctx context.Context, params CreateRepoParams) (r CreateRepoRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// HtcProjectsProjectIdContainerRegistryTokenGet implements GET /htc/projects/{projectId}/container-registry/token operation.
+// CreateTask implements createTask operation.
 //
-// This endpoint will get a container registry authorization token.
-// To use this token run `docker login --username AWS --password {TOKEN} {CONTAINER_REGISTRY_DOMAIN}`.
-// e.g. `docker login --username AWS --password "eyJwYXlsb2FkIjoiZHhtSzJuQ0x..." 183929446192.dkr.ecr.
-// us-west-2.amazonaws.com`.
+// This endpoint will create a task for a project.
 //
-// GET /htc/projects/{projectId}/container-registry/token
-func (UnimplementedHandler) HtcProjectsProjectIdContainerRegistryTokenGet(ctx context.Context, params HtcProjectsProjectIdContainerRegistryTokenGetParams) (r HtcProjectsProjectIdContainerRegistryTokenGetRes, _ error) {
+// POST /htc/projects/{projectId}/tasks
+func (UnimplementedHandler) CreateTask(ctx context.Context, req OptHTCTask, params CreateTaskParams) (r CreateTaskRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// HtcProjectsProjectIdDimensionsGet implements GET /htc/projects/{projectId}/dimensions operation.
+// GetDimensions implements getDimensions operation.
 //
 // This endpoint is designed to retrieve the current set of dimension combinations configured for a
 // specific project so that users can understand the existing computing environment constraints of a
@@ -141,7 +61,134 @@ func (UnimplementedHandler) HtcProjectsProjectIdContainerRegistryTokenGet(ctx co
 // currently configured `machineType`.
 //
 // GET /htc/projects/{projectId}/dimensions
-func (UnimplementedHandler) HtcProjectsProjectIdDimensionsGet(ctx context.Context, params HtcProjectsProjectIdDimensionsGetParams) (r HtcProjectsProjectIdDimensionsGetRes, _ error) {
+func (UnimplementedHandler) GetDimensions(ctx context.Context, params GetDimensionsParams) (r GetDimensionsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetImage implements getImage operation.
+//
+// Retrieves the current status of an image across cloud providers. The status indicates whether the
+// image is ready for use or still being processed. Returns READY when the image is available in all
+// cloud providers, PENDING while the image is being replicated, and a 404 if the image does not
+// exist.
+//
+// GET /htc/projects/{projectId}/container-registry/images/{imageName}
+func (UnimplementedHandler) GetImage(ctx context.Context, params GetImageParams) (r GetImageRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetImages implements getImages operation.
+//
+// This endpoint will list all images for a project.
+//
+// GET /htc/projects/{projectId}/container-registry/images
+func (UnimplementedHandler) GetImages(ctx context.Context, params GetImagesParams) (r GetImagesRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetJob implements getJob operation.
+//
+// This endpoint will get a job by id.
+//
+// GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}
+func (UnimplementedHandler) GetJob(ctx context.Context, params GetJobParams) (r GetJobRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetJobs implements getJobs operation.
+//
+// This endpoint will get all jobs for a task.
+//
+// GET /htc/projects/{projectId}/tasks/{taskId}/jobs
+func (UnimplementedHandler) GetJobs(ctx context.Context, params GetJobsParams) (r GetJobsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetLimits implements getLimits operation.
+//
+// This endpoint will list all resource limitations associated with this project.
+// A job running in this project will be subject to all resulting limits as well as any associated
+// with the workspace (see `/htc/workspaces/{workspaceId}/limits`).
+//
+// GET /htc/projects/{projectId}/limits
+func (UnimplementedHandler) GetLimits(ctx context.Context, params GetLimitsParams) (r GetLimitsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetMetrics implements getMetrics operation.
+//
+// Get all HTC Metrics for a workspace.
+//
+// GET /htc/metrics
+func (UnimplementedHandler) GetMetrics(ctx context.Context, params GetMetricsParams) (r GetMetricsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetProject implements getProject operation.
+//
+// This endpoint will get a project by id.
+//
+// GET /htc/projects/{projectId}
+func (UnimplementedHandler) GetProject(ctx context.Context, params GetProjectParams) (r GetProjectRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetProjects implements getProjects operation.
+//
+// This endpoint will get all projects.
+//
+// GET /htc/projects
+func (UnimplementedHandler) GetProjects(ctx context.Context, params GetProjectsParams) (r GetProjectsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetRegistryToken implements getRegistryToken operation.
+//
+// This endpoint will get a container registry authorization token.
+// To use this token run `docker login --username AWS --password {TOKEN} {CONTAINER_REGISTRY_DOMAIN}`.
+// e.g. `docker login --username AWS --password "eyJwYXlsb2FkIjoiZHhtSzJuQ0x..." 183929446192.dkr.ecr.
+// us-west-2.amazonaws.com`.
+//
+// GET /htc/projects/{projectId}/container-registry/token
+func (UnimplementedHandler) GetRegistryToken(ctx context.Context, params GetRegistryTokenParams) (r GetRegistryTokenRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetTasks implements getTasks operation.
+//
+// This endpoint will get all tasks in a project.
+//
+// GET /htc/projects/{projectId}/tasks
+func (UnimplementedHandler) GetTasks(ctx context.Context, params GetTasksParams) (r GetTasksRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetToken implements getToken operation.
+//
+// This endpoint will get a JWT token given an API key.
+//
+// GET /auth/token
+func (UnimplementedHandler) GetToken(ctx context.Context) (r GetTokenRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// HtcGcpClustersWorkspaceIdGet implements GET /htc/gcp/clusters/{workspaceId} operation.
+//
+// This endpoint returns details about all GCP clusters that can run jobs for the specified HTC
+// workspace.
+//
+// GET /htc/gcp/clusters/{workspaceId}
+func (UnimplementedHandler) HtcGcpClustersWorkspaceIdGet(ctx context.Context, params HtcGcpClustersWorkspaceIdGetParams) (r HtcGcpClustersWorkspaceIdGetRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// HtcProjectsPost implements POST /htc/projects operation.
+//
+// This endpoint will create a project. A project is a collection of tasks and container images used
+// to run jobs. Several projects can belong to a single workspace.
+//
+// POST /htc/projects
+func (UnimplementedHandler) HtcProjectsPost(ctx context.Context, req OptHTCProject) (r HtcProjectsPostRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -165,15 +212,6 @@ func (UnimplementedHandler) HtcProjectsProjectIdDimensionsPut(ctx context.Contex
 	return r, ht.ErrNotImplemented
 }
 
-// HtcProjectsProjectIdGet implements GET /htc/projects/{projectId} operation.
-//
-// This endpoint will get a project by id.
-//
-// GET /htc/projects/{projectId}
-func (UnimplementedHandler) HtcProjectsProjectIdGet(ctx context.Context, params HtcProjectsProjectIdGetParams) (r HtcProjectsProjectIdGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // HtcProjectsProjectIdLimitsDelete implements DELETE /htc/projects/{projectId}/limits operation.
 //
 // This endpoint will remove all resource limits associated with this project.
@@ -181,17 +219,6 @@ func (UnimplementedHandler) HtcProjectsProjectIdGet(ctx context.Context, params 
 //
 // DELETE /htc/projects/{projectId}/limits
 func (UnimplementedHandler) HtcProjectsProjectIdLimitsDelete(ctx context.Context, params HtcProjectsProjectIdLimitsDeleteParams) (r HtcProjectsProjectIdLimitsDeleteRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcProjectsProjectIdLimitsGet implements GET /htc/projects/{projectId}/limits operation.
-//
-// This endpoint will list all resource limitations associated with this project.
-// A job running in this project will be subject to all resulting limits as well as any associated
-// with the workspace (see `/htc/workspaces/{workspaceId}/limits`).
-//
-// GET /htc/projects/{projectId}/limits
-func (UnimplementedHandler) HtcProjectsProjectIdLimitsGet(ctx context.Context, params HtcProjectsProjectIdLimitsGetParams) (r HtcProjectsProjectIdLimitsGetRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -344,24 +371,6 @@ func (UnimplementedHandler) HtcProjectsProjectIdTaskRetentionPolicyPut(ctx conte
 	return r, ht.ErrNotImplemented
 }
 
-// HtcProjectsProjectIdTasksGet implements GET /htc/projects/{projectId}/tasks operation.
-//
-// This endpoint will get all tasks in a project.
-//
-// GET /htc/projects/{projectId}/tasks
-func (UnimplementedHandler) HtcProjectsProjectIdTasksGet(ctx context.Context, params HtcProjectsProjectIdTasksGetParams) (r HtcProjectsProjectIdTasksGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcProjectsProjectIdTasksPost implements POST /htc/projects/{projectId}/tasks operation.
-//
-// This endpoint will create a task for a project.
-//
-// POST /htc/projects/{projectId}/tasks
-func (UnimplementedHandler) HtcProjectsProjectIdTasksPost(ctx context.Context, req OptHTCTask, params HtcProjectsProjectIdTasksPostParams) (r HtcProjectsProjectIdTasksPostRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // HtcProjectsProjectIdTasksTaskIdDelete implements DELETE /htc/projects/{projectId}/tasks/{taskId} operation.
 //
 // This endpoint will delete a task by ID.
@@ -398,15 +407,6 @@ func (UnimplementedHandler) HtcProjectsProjectIdTasksTaskIdGroupsGet(ctx context
 	return r, ht.ErrNotImplemented
 }
 
-// HtcProjectsProjectIdTasksTaskIdJobsBatchPost implements POST /htc/projects/{projectId}/tasks/{taskId}/jobs/batch operation.
-//
-// This endpoint will submit a batch of jobs for a task.
-//
-// POST /htc/projects/{projectId}/tasks/{taskId}/jobs/batch
-func (UnimplementedHandler) HtcProjectsProjectIdTasksTaskIdJobsBatchPost(ctx context.Context, req []HTCJobSubmitRequest, params HtcProjectsProjectIdTasksTaskIdJobsBatchPostParams) (r HtcProjectsProjectIdTasksTaskIdJobsBatchPostRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // HtcProjectsProjectIdTasksTaskIdJobsCancelPost implements POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel operation.
 //
 // This endpoint will attempt to cancel submitted jobs.
@@ -417,30 +417,12 @@ func (UnimplementedHandler) HtcProjectsProjectIdTasksTaskIdJobsCancelPost(ctx co
 	return r, ht.ErrNotImplemented
 }
 
-// HtcProjectsProjectIdTasksTaskIdJobsGet implements GET /htc/projects/{projectId}/tasks/{taskId}/jobs operation.
-//
-// This endpoint will get all jobs for a task.
-//
-// GET /htc/projects/{projectId}/tasks/{taskId}/jobs
-func (UnimplementedHandler) HtcProjectsProjectIdTasksTaskIdJobsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsGetParams) (r HtcProjectsProjectIdTasksTaskIdJobsGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet implements GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events operation.
 //
 // This endpoint will get events for a job.
 //
 // GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events
 func (UnimplementedHandler) HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetParams) (r HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcProjectsProjectIdTasksTaskIdJobsJobIdGet implements GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId} operation.
-//
-// This endpoint will get a job by id.
-//
-// GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}
-func (UnimplementedHandler) HtcProjectsProjectIdTasksTaskIdJobsJobIdGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsJobIdGetParams) (r HtcProjectsProjectIdTasksTaskIdJobsJobIdGetRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -637,11 +619,29 @@ func (UnimplementedHandler) OAuth2TokenPost(ctx context.Context) (r OAuth2TokenP
 	return r, ht.ErrNotImplemented
 }
 
+// SubmitJobs implements submitJobs operation.
+//
+// This endpoint will submit a batch of jobs for a task.
+//
+// POST /htc/projects/{projectId}/tasks/{taskId}/jobs/batch
+func (UnimplementedHandler) SubmitJobs(ctx context.Context, req []HTCJobSubmitRequest, params SubmitJobsParams) (r SubmitJobsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // WellKnownJwksJSONGet implements GET /.well-known/jwks.json operation.
 //
 // This endpoint will get the public keys used to verify JWT.
 //
 // GET /.well-known/jwks.json
 func (UnimplementedHandler) WellKnownJwksJSONGet(ctx context.Context) (r WellKnownJwksJSONGetRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// WhoAmI implements whoAmI operation.
+//
+// This endpoint will get Rescale user information given a Rescale API key.
+//
+// GET /auth/whoami
+func (UnimplementedHandler) WhoAmI(ctx context.Context) (r WhoAmIRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

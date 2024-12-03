@@ -15,13 +15,11 @@ import (
 
 type submitRequest struct {
 	batch  []oapi.HTCJobSubmitRequest
-	params oapi.HtcProjectsProjectIdTasksTaskIdJobsBatchPostParams
+	params oapi.SubmitJobsParams
 }
 
-func submit(ctx context.Context, c *oapi.Client,
-	r *submitRequest) (*oapi.HTCJobSubmitRequests, error) {
-
-	res, err := c.HtcProjectsProjectIdTasksTaskIdJobsBatchPost(ctx, r.batch, r.params)
+func submit(ctx context.Context, c oapi.JobInvoker, r *submitRequest) (*oapi.HTCJobSubmitRequests, error) {
+	res, err := c.SubmitJobs(ctx, r.batch, r.params)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +66,7 @@ func Submit(cmd *cobra.Command, args []string) error {
 	}
 
 	req := submitRequest{
-		params: oapi.HtcProjectsProjectIdTasksTaskIdJobsBatchPostParams{
+		params: oapi.SubmitJobsParams{
 			ProjectId: p.ProjectId,
 			TaskId:    p.TaskId,
 			Group:     oapi.NewOptString(group),

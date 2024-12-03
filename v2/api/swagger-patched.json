@@ -293,6 +293,12 @@
                   "example": "qWoUF",
                   "type": "string"
                },
+               "envs": {
+                  "items": {
+                     "$ref": "#/components/schemas/EnvPair"
+                  },
+                  "type": "array"
+               },
                "execTimeoutSeconds": {
                   "format": "int32",
                   "type": "integer"
@@ -318,6 +324,9 @@
                },
                "instanceLabels": {
                   "$ref": "#/components/schemas/InstanceLabels"
+               },
+               "jobExecutionEnvironment": {
+                  "$ref": "#/components/schemas/JobExecutionEnvironment"
                },
                "jobUUID": {
                   "example": "155f18d4",
@@ -1964,6 +1973,7 @@
       "/auth/token": {
          "get": {
             "description": "This endpoint will get a JWT token given an API key",
+            "operationId": "getToken",
             "responses": {
                "200": {
                   "content": {
@@ -1994,7 +2004,8 @@
             "summary": "Get JWT Token",
             "tags": [
                "Token Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Auth"
          }
       },
       "/auth/token/whoami": {
@@ -2039,6 +2050,7 @@
       "/auth/whoami": {
          "get": {
             "description": "This endpoint will get Rescale user information given a Rescale API key.",
+            "operationId": "whoAmI",
             "responses": {
                "200": {
                   "content": {
@@ -2069,7 +2081,8 @@
             "summary": "Get Rescale User",
             "tags": [
                "Token Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Auth"
          }
       },
       "/htc/gcp/clusters/{workspaceId}": {
@@ -2127,6 +2140,7 @@
       "/htc/metrics": {
          "get": {
             "description": "Get all HTC Metrics for a workspace",
+            "operationId": "getMetrics",
             "parameters": [
                {
                   "in": "header",
@@ -2166,12 +2180,14 @@
             "summary": "Get Metrics",
             "tags": [
                "Metrics Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Metrics"
          }
       },
       "/htc/projects": {
          "get": {
             "description": "This endpoint will get all projects",
+            "operationId": "getProjects",
             "parameters": [
                {
                   "in": "query",
@@ -2223,7 +2239,8 @@
             "summary": "Get All Projects",
             "tags": [
                "Project Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Project"
          },
          "post": {
             "description": "This endpoint will create a project. A project is a collection of tasks and container images used to run jobs. Several projects can belong to a single workspace.",
@@ -2268,6 +2285,7 @@
       "/htc/projects/{projectId}": {
          "get": {
             "description": "This endpoint will get a project by id",
+            "operationId": "getProject",
             "parameters": [
                {
                   "in": "path",
@@ -2304,7 +2322,8 @@
             "summary": "Get Project",
             "tags": [
                "Project Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Project"
          },
          "patch": {
             "description": "This endpoint allows for updating a project's regions.",
@@ -2359,6 +2378,7 @@
       "/htc/projects/{projectId}/container-registry/images": {
          "get": {
             "description": "This endpoint will list all images for a project",
+            "operationId": "getImages",
             "parameters": [
                {
                   "in": "path",
@@ -2395,12 +2415,14 @@
             "summary": "Get All Images",
             "tags": [
                "Container Registry Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Image"
          }
       },
       "/htc/projects/{projectId}/container-registry/images/{imageName}": {
          "get": {
             "description": "Retrieves the current status of an image across cloud providers. The status indicates whether the image is ready for use or still being processed. Returns READY when the image is available in all cloud providers, PENDING while the image is being replicated, and a 404 if the image does not exist.",
+            "operationId": "getImage",
             "parameters": [
                {
                   "in": "path",
@@ -2467,12 +2489,14 @@
             "summary": "Get image status",
             "tags": [
                "Container Registry Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Image"
          }
       },
       "/htc/projects/{projectId}/container-registry/repo/{repoName}": {
          "post": {
             "description": "This endpoint will create a private container repository belonging to this project\n\nPrivate container registries are collections of repositories, and private repositories are collections of container images. These images are referenced when running jobs within this project. In order to upload an image to a repository, you will need the `registryURI`, the `repositoryName`, and the token (see `/htc/projects/:projectId/container-registry/token`).",
+            "operationId": "createRepo",
             "parameters": [
                {
                   "in": "path",
@@ -2519,12 +2543,14 @@
             "summary": "Create a Private Repo",
             "tags": [
                "Container Registry Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Image"
          }
       },
       "/htc/projects/{projectId}/container-registry/token": {
          "get": {
             "description": "This endpoint will get a container registry authorization token.\n\n To use this token run `docker login --username AWS --password {TOKEN} {CONTAINER_REGISTRY_DOMAIN}`.\n\ne.g. `docker login --username AWS --password \"eyJwYXlsb2FkIjoiZHhtSzJuQ0x...\" 183929446192.dkr.ecr.us-west-2.amazonaws.com`",
+            "operationId": "getRegistryToken",
             "parameters": [
                {
                   "in": "path",
@@ -2562,12 +2588,14 @@
             "summary": "Get Container Registry Token",
             "tags": [
                "Container Registry Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Image"
          }
       },
       "/htc/projects/{projectId}/dimensions": {
          "get": {
             "description": "This endpoint is designed to retrieve the current set of dimension combinations configured for a specific project so that users can understand the existing computing environment constraints of a project. It returns a list of dimension combinations such as pricing priority, geographical region, compute scaling policy, and hyperthreading options.\n\nAny user who _belongs to the workspace this project belongs to_ can use this endpoint to verify or audit the current configuration of a project. This can be helpful in ensuring that the project's settings align with expectations.\n\nThe payload also includes a read-only set of `derived` dimensions which help describe the currently configured `machineType`",
+            "operationId": "getDimensions",
             "parameters": [
                {
                   "in": "path",
@@ -2604,7 +2632,8 @@
             "summary": "Get Project Dimensions",
             "tags": [
                "Project Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Project"
          },
          "put": {
             "description": "This endpoint allows _workspace_, _organization_, and _Rescale administrators_ to _create_, _update_, or _delete_ the dimension combinations for a project. It accepts a list of dimension combinations, each specifying a unique set of computing environment attributes to tailor the computing environment(s) of a project to match specific job requirements.\n\nFor example, a project’s dimensions can be configured to require jobs to run on a particular type of processor architecture, within a certain region, and with or without hyperthreading.\n\nIt's important to note that the dimensions set through this endpoint must align with the available dimensions at the workspace level.\n\n**In the event that a project's dimension requirements need to be reset to allow for a broader range of job types, sending an empty list to this endpoint will remove all existing dimension restrictions, returning the project to a state where it can accommodate any dimension available in the workspace.**",
@@ -2698,6 +2727,7 @@
          },
          "get": {
             "description": "This endpoint will list all resource limitations associated with this project.\n\nA job running in this project will be subject to all resulting limits as well as any associated with the workspace (see `/htc/workspaces/{workspaceId}/limits`)",
+            "operationId": "getLimits",
             "parameters": [
                {
                   "in": "path",
@@ -2734,7 +2764,8 @@
             "summary": "Get Project Limits",
             "tags": [
                "Project Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Project"
          },
          "post": {
             "description": "This endpoint will add a new limit to this project or overwrite an existing limit if one already exists with the provided `modifierRole`.\n\nJobs submitted to this project will only run when the active resource count falls below the minimum of all limits associated with this project.\n\nAny user who belongs the project's workspace can modify the `PROJECT_ADMIN` limit. Higher permissions are required to modify the `WORKSPACE_ADMIN` limit",
@@ -3249,6 +3280,7 @@
       "/htc/projects/{projectId}/tasks": {
          "get": {
             "description": "This endpoint will get all tasks in a project",
+            "operationId": "getTasks",
             "parameters": [
                {
                   "in": "path",
@@ -3301,10 +3333,12 @@
             "summary": "Get All Tasks for a Project",
             "tags": [
                "Task Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Task"
          },
          "post": {
             "description": "This endpoint will create a task for a project",
+            "operationId": "createTask",
             "parameters": [
                {
                   "in": "path",
@@ -3350,7 +3384,8 @@
             "summary": "Create a Task",
             "tags": [
                "Task Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Task"
          }
       },
       "/htc/projects/{projectId}/tasks/{taskId}": {
@@ -3762,6 +3797,7 @@
       "/htc/projects/{projectId}/tasks/{taskId}/jobs": {
          "get": {
             "description": "This endpoint will get all jobs for a task",
+            "operationId": "getJobs",
             "parameters": [
                {
                   "in": "path",
@@ -3856,12 +3892,14 @@
             "summary": "Get All Jobs For a Task",
             "tags": [
                "Job Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Job"
          }
       },
       "/htc/projects/{projectId}/tasks/{taskId}/jobs/batch": {
          "post": {
             "description": "This endpoint will submit a batch of jobs for a task",
+            "operationId": "submitJobs",
             "parameters": [
                {
                   "in": "path",
@@ -3937,7 +3975,8 @@
             "summary": "Submit Jobs",
             "tags": [
                "Job Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Job"
          }
       },
       "/htc/projects/{projectId}/tasks/{taskId}/jobs/cancel": {
@@ -3994,6 +4033,7 @@
       "/htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}": {
          "get": {
             "description": "This endpoint will get a job by id",
+            "operationId": "getJob",
             "parameters": [
                {
                   "in": "path",
@@ -4055,7 +4095,8 @@
             "summary": "Get Job",
             "tags": [
                "Job Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Job"
          }
       },
       "/htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events": {

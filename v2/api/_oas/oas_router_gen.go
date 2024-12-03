@@ -105,7 +105,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					if len(elem) == 0 {
 						switch r.Method {
 						case "GET":
-							s.handleAuthTokenGetRequest([0]string{}, elemIsEscaped, w, r)
+							s.handleGetTokenRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET")
 						}
@@ -149,7 +149,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "GET":
-							s.handleAuthWhoamiGetRequest([0]string{}, elemIsEscaped, w, r)
+							s.handleWhoAmIRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET")
 						}
@@ -213,7 +213,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "GET":
-							s.handleHtcMetricsGetRequest([0]string{}, elemIsEscaped, w, r)
+							s.handleGetMetricsRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET")
 						}
@@ -233,7 +233,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					if len(elem) == 0 {
 						switch r.Method {
 						case "GET":
-							s.handleHtcProjectsGetRequest([0]string{}, elemIsEscaped, w, r)
+							s.handleGetProjectsRequest([0]string{}, elemIsEscaped, w, r)
 						case "POST":
 							s.handleHtcProjectsPostRequest([0]string{}, elemIsEscaped, w, r)
 						default:
@@ -263,7 +263,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						if len(elem) == 0 {
 							switch r.Method {
 							case "GET":
-								s.handleHtcProjectsProjectIdGetRequest([1]string{
+								s.handleGetProjectRequest([1]string{
 									args[0],
 								}, elemIsEscaped, w, r)
 							case "PATCH":
@@ -312,7 +312,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									if len(elem) == 0 {
 										switch r.Method {
 										case "GET":
-											s.handleHtcProjectsProjectIdContainerRegistryImagesGetRequest([1]string{
+											s.handleGetImagesRequest([1]string{
 												args[0],
 											}, elemIsEscaped, w, r)
 										default:
@@ -339,7 +339,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											// Leaf node.
 											switch r.Method {
 											case "GET":
-												s.handleHtcProjectsProjectIdContainerRegistryImagesImageNameGetRequest([2]string{
+												s.handleGetImageRequest([2]string{
 													args[0],
 													args[1],
 												}, elemIsEscaped, w, r)
@@ -371,7 +371,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										// Leaf node.
 										switch r.Method {
 										case "POST":
-											s.handleHtcProjectsProjectIdContainerRegistryRepoRepoNamePostRequest([2]string{
+											s.handleCreateRepoRequest([2]string{
 												args[0],
 												args[1],
 											}, elemIsEscaped, w, r)
@@ -395,7 +395,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										// Leaf node.
 										switch r.Method {
 										case "GET":
-											s.handleHtcProjectsProjectIdContainerRegistryTokenGetRequest([1]string{
+											s.handleGetRegistryTokenRequest([1]string{
 												args[0],
 											}, elemIsEscaped, w, r)
 										default:
@@ -421,7 +421,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									// Leaf node.
 									switch r.Method {
 									case "GET":
-										s.handleHtcProjectsProjectIdDimensionsGetRequest([1]string{
+										s.handleGetDimensionsRequest([1]string{
 											args[0],
 										}, elemIsEscaped, w, r)
 									case "PUT":
@@ -451,7 +451,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											args[0],
 										}, elemIsEscaped, w, r)
 									case "GET":
-										s.handleHtcProjectsProjectIdLimitsGetRequest([1]string{
+										s.handleGetLimitsRequest([1]string{
 											args[0],
 										}, elemIsEscaped, w, r)
 									case "POST":
@@ -675,11 +675,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									if len(elem) == 0 {
 										switch r.Method {
 										case "GET":
-											s.handleHtcProjectsProjectIdTasksGetRequest([1]string{
+											s.handleGetTasksRequest([1]string{
 												args[0],
 											}, elemIsEscaped, w, r)
 										case "POST":
-											s.handleHtcProjectsProjectIdTasksPostRequest([1]string{
+											s.handleCreateTaskRequest([1]string{
 												args[0],
 											}, elemIsEscaped, w, r)
 										default:
@@ -816,7 +816,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												if len(elem) == 0 {
 													switch r.Method {
 													case "GET":
-														s.handleHtcProjectsProjectIdTasksTaskIdJobsGetRequest([2]string{
+														s.handleGetJobsRequest([2]string{
 															args[0],
 															args[1],
 														}, elemIsEscaped, w, r)
@@ -851,7 +851,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 															// Leaf node.
 															switch r.Method {
 															case "POST":
-																s.handleHtcProjectsProjectIdTasksTaskIdJobsBatchPostRequest([2]string{
+																s.handleSubmitJobsRequest([2]string{
 																	args[0],
 																	args[1],
 																}, elemIsEscaped, w, r)
@@ -900,7 +900,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 													if len(elem) == 0 {
 														switch r.Method {
 														case "GET":
-															s.handleHtcProjectsProjectIdTasksTaskIdJobsJobIdGetRequest([3]string{
+															s.handleGetJobRequest([3]string{
 																args[0],
 																args[1],
 																args[2],
@@ -1525,9 +1525,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					if len(elem) == 0 {
 						switch method {
 						case "GET":
-							r.name = "AuthTokenGet"
+							r.name = "GetToken"
 							r.summary = "Get JWT Token"
-							r.operationID = ""
+							r.operationID = "getToken"
 							r.pathPattern = "/auth/token"
 							r.args = args
 							r.count = 0
@@ -1577,9 +1577,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						// Leaf node.
 						switch method {
 						case "GET":
-							r.name = "AuthWhoamiGet"
+							r.name = "WhoAmI"
 							r.summary = "Get Rescale User"
-							r.operationID = ""
+							r.operationID = "whoAmI"
 							r.pathPattern = "/auth/whoami"
 							r.args = args
 							r.count = 0
@@ -1647,9 +1647,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						// Leaf node.
 						switch method {
 						case "GET":
-							r.name = "HtcMetricsGet"
+							r.name = "GetMetrics"
 							r.summary = "Get Metrics"
-							r.operationID = ""
+							r.operationID = "getMetrics"
 							r.pathPattern = "/htc/metrics"
 							r.args = args
 							r.count = 0
@@ -1671,9 +1671,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					if len(elem) == 0 {
 						switch method {
 						case "GET":
-							r.name = "HtcProjectsGet"
+							r.name = "GetProjects"
 							r.summary = "Get All Projects"
-							r.operationID = ""
+							r.operationID = "getProjects"
 							r.pathPattern = "/htc/projects"
 							r.args = args
 							r.count = 0
@@ -1711,9 +1711,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						if len(elem) == 0 {
 							switch method {
 							case "GET":
-								r.name = "HtcProjectsProjectIdGet"
+								r.name = "GetProject"
 								r.summary = "Get Project"
-								r.operationID = ""
+								r.operationID = "getProject"
 								r.pathPattern = "/htc/projects/{projectId}"
 								r.args = args
 								r.count = 1
@@ -1766,9 +1766,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									if len(elem) == 0 {
 										switch method {
 										case "GET":
-											r.name = "HtcProjectsProjectIdContainerRegistryImagesGet"
+											r.name = "GetImages"
 											r.summary = "Get All Images"
-											r.operationID = ""
+											r.operationID = "getImages"
 											r.pathPattern = "/htc/projects/{projectId}/container-registry/images"
 											r.args = args
 											r.count = 1
@@ -1795,9 +1795,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											// Leaf node.
 											switch method {
 											case "GET":
-												r.name = "HtcProjectsProjectIdContainerRegistryImagesImageNameGet"
+												r.name = "GetImage"
 												r.summary = "Get image status"
-												r.operationID = ""
+												r.operationID = "getImage"
 												r.pathPattern = "/htc/projects/{projectId}/container-registry/images/{imageName}"
 												r.args = args
 												r.count = 2
@@ -1828,9 +1828,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										// Leaf node.
 										switch method {
 										case "POST":
-											r.name = "HtcProjectsProjectIdContainerRegistryRepoRepoNamePost"
+											r.name = "CreateRepo"
 											r.summary = "Create a Private Repo"
-											r.operationID = ""
+											r.operationID = "createRepo"
 											r.pathPattern = "/htc/projects/{projectId}/container-registry/repo/{repoName}"
 											r.args = args
 											r.count = 2
@@ -1853,9 +1853,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										// Leaf node.
 										switch method {
 										case "GET":
-											r.name = "HtcProjectsProjectIdContainerRegistryTokenGet"
+											r.name = "GetRegistryToken"
 											r.summary = "Get Container Registry Token"
-											r.operationID = ""
+											r.operationID = "getRegistryToken"
 											r.pathPattern = "/htc/projects/{projectId}/container-registry/token"
 											r.args = args
 											r.count = 1
@@ -1881,9 +1881,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									// Leaf node.
 									switch method {
 									case "GET":
-										r.name = "HtcProjectsProjectIdDimensionsGet"
+										r.name = "GetDimensions"
 										r.summary = "Get Project Dimensions"
-										r.operationID = ""
+										r.operationID = "getDimensions"
 										r.pathPattern = "/htc/projects/{projectId}/dimensions"
 										r.args = args
 										r.count = 1
@@ -1921,9 +1921,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.count = 1
 										return r, true
 									case "GET":
-										r.name = "HtcProjectsProjectIdLimitsGet"
+										r.name = "GetLimits"
 										r.summary = "Get Project Limits"
-										r.operationID = ""
+										r.operationID = "getLimits"
 										r.pathPattern = "/htc/projects/{projectId}/limits"
 										r.args = args
 										r.count = 1
@@ -2175,17 +2175,17 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									if len(elem) == 0 {
 										switch method {
 										case "GET":
-											r.name = "HtcProjectsProjectIdTasksGet"
+											r.name = "GetTasks"
 											r.summary = "Get All Tasks for a Project"
-											r.operationID = ""
+											r.operationID = "getTasks"
 											r.pathPattern = "/htc/projects/{projectId}/tasks"
 											r.args = args
 											r.count = 1
 											return r, true
 										case "POST":
-											r.name = "HtcProjectsProjectIdTasksPost"
+											r.name = "CreateTask"
 											r.summary = "Create a Task"
-											r.operationID = ""
+											r.operationID = "createTask"
 											r.pathPattern = "/htc/projects/{projectId}/tasks"
 											r.args = args
 											r.count = 1
@@ -2331,9 +2331,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 												if len(elem) == 0 {
 													switch method {
 													case "GET":
-														r.name = "HtcProjectsProjectIdTasksTaskIdJobsGet"
+														r.name = "GetJobs"
 														r.summary = "Get All Jobs For a Task"
-														r.operationID = ""
+														r.operationID = "getJobs"
 														r.pathPattern = "/htc/projects/{projectId}/tasks/{taskId}/jobs"
 														r.args = args
 														r.count = 2
@@ -2367,9 +2367,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 															// Leaf node.
 															switch method {
 															case "POST":
-																r.name = "HtcProjectsProjectIdTasksTaskIdJobsBatchPost"
+																r.name = "SubmitJobs"
 																r.summary = "Submit Jobs"
-																r.operationID = ""
+																r.operationID = "submitJobs"
 																r.pathPattern = "/htc/projects/{projectId}/tasks/{taskId}/jobs/batch"
 																r.args = args
 																r.count = 2
@@ -2418,9 +2418,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 													if len(elem) == 0 {
 														switch method {
 														case "GET":
-															r.name = "HtcProjectsProjectIdTasksTaskIdJobsJobIdGet"
+															r.name = "GetJob"
 															r.summary = "Get Job"
-															r.operationID = ""
+															r.operationID = "getJob"
 															r.pathPattern = "/htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}"
 															r.args = args
 															r.count = 3

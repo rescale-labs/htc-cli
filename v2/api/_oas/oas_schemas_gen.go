@@ -254,6 +254,26 @@ func (s *ContainerDetails) SetReason(val OptString) {
 	s.Reason = val
 }
 
+// CreateRepoForbidden is response for CreateRepo operation.
+type CreateRepoForbidden struct{}
+
+func (*CreateRepoForbidden) createRepoRes() {}
+
+// CreateRepoUnauthorized is response for CreateRepo operation.
+type CreateRepoUnauthorized struct{}
+
+func (*CreateRepoUnauthorized) createRepoRes() {}
+
+// CreateTaskForbidden is response for CreateTask operation.
+type CreateTaskForbidden struct{}
+
+func (*CreateTaskForbidden) createTaskRes() {}
+
+// CreateTaskUnauthorized is response for CreateTask operation.
+type CreateTaskUnauthorized struct{}
+
+func (*CreateTaskUnauthorized) createTaskRes() {}
+
 // Ref: #/components/schemas/EnvPair
 type EnvPair struct {
 	Name  string `json:"name"`
@@ -320,6 +340,201 @@ func (s *FeatureFlagsResult) SetCount(val OptInt32) {
 func (s *FeatureFlagsResult) SetResults(val []RescaleFlag) {
 	s.Results = val
 }
+
+// GetDimensionsForbidden is response for GetDimensions operation.
+type GetDimensionsForbidden struct{}
+
+func (*GetDimensionsForbidden) getDimensionsRes() {}
+
+// GetDimensionsUnauthorized is response for GetDimensions operation.
+type GetDimensionsUnauthorized struct{}
+
+func (*GetDimensionsUnauthorized) getDimensionsRes() {}
+
+// GetImageForbidden is response for GetImage operation.
+type GetImageForbidden struct{}
+
+func (*GetImageForbidden) getImageRes() {}
+
+type GetImageNotFound struct {
+	ErrorDescription OptString `json:"errorDescription"`
+	ErrorType        OptString `json:"errorType"`
+}
+
+// GetErrorDescription returns the value of ErrorDescription.
+func (s *GetImageNotFound) GetErrorDescription() OptString {
+	return s.ErrorDescription
+}
+
+// GetErrorType returns the value of ErrorType.
+func (s *GetImageNotFound) GetErrorType() OptString {
+	return s.ErrorType
+}
+
+// SetErrorDescription sets the value of ErrorDescription.
+func (s *GetImageNotFound) SetErrorDescription(val OptString) {
+	s.ErrorDescription = val
+}
+
+// SetErrorType sets the value of ErrorType.
+func (s *GetImageNotFound) SetErrorType(val OptString) {
+	s.ErrorType = val
+}
+
+func (*GetImageNotFound) getImageRes() {}
+
+// GetImageUnauthorized is response for GetImage operation.
+type GetImageUnauthorized struct{}
+
+func (*GetImageUnauthorized) getImageRes() {}
+
+// GetImagesForbidden is response for GetImages operation.
+type GetImagesForbidden struct{}
+
+func (*GetImagesForbidden) getImagesRes() {}
+
+// GetImagesUnauthorized is response for GetImages operation.
+type GetImagesUnauthorized struct{}
+
+func (*GetImagesUnauthorized) getImagesRes() {}
+
+// GetJobForbidden is response for GetJob operation.
+type GetJobForbidden struct{}
+
+func (*GetJobForbidden) getJobRes() {}
+
+// GetJobUnauthorized is response for GetJob operation.
+type GetJobUnauthorized struct{}
+
+func (*GetJobUnauthorized) getJobRes() {}
+
+// GetJobsForbidden is response for GetJobs operation.
+type GetJobsForbidden struct{}
+
+func (*GetJobsForbidden) getJobsRes() {}
+
+// GetJobsUnauthorized is response for GetJobs operation.
+type GetJobsUnauthorized struct{}
+
+func (*GetJobsUnauthorized) getJobsRes() {}
+
+// GetLimitsForbidden is response for GetLimits operation.
+type GetLimitsForbidden struct{}
+
+func (*GetLimitsForbidden) getLimitsRes() {}
+
+// GetLimitsUnauthorized is response for GetLimits operation.
+type GetLimitsUnauthorized struct{}
+
+func (*GetLimitsUnauthorized) getLimitsRes() {}
+
+// GetMetricsForbidden is response for GetMetrics operation.
+type GetMetricsForbidden struct{}
+
+func (*GetMetricsForbidden) getMetricsRes() {}
+
+type GetMetricsOK struct {
+	Data io.Reader
+}
+
+// Read reads data from the Data reader.
+//
+// Kept to satisfy the io.Reader interface.
+func (s GetMetricsOK) Read(p []byte) (n int, err error) {
+	if s.Data == nil {
+		return 0, io.EOF
+	}
+	return s.Data.Read(p)
+}
+
+func (*GetMetricsOK) getMetricsRes() {}
+
+// GetMetricsUnauthorized is response for GetMetrics operation.
+type GetMetricsUnauthorized struct{}
+
+func (*GetMetricsUnauthorized) getMetricsRes() {}
+
+// GetProjectForbidden is response for GetProject operation.
+type GetProjectForbidden struct{}
+
+func (*GetProjectForbidden) getProjectRes() {}
+
+// GetProjectUnauthorized is response for GetProject operation.
+type GetProjectUnauthorized struct{}
+
+func (*GetProjectUnauthorized) getProjectRes() {}
+
+// GetProjectsForbidden is response for GetProjects operation.
+type GetProjectsForbidden struct{}
+
+func (*GetProjectsForbidden) getProjectsRes() {}
+
+// GetProjectsUnauthorized is response for GetProjects operation.
+type GetProjectsUnauthorized struct{}
+
+func (*GetProjectsUnauthorized) getProjectsRes() {}
+
+// GetRegistryTokenForbidden is response for GetRegistryToken operation.
+type GetRegistryTokenForbidden struct{}
+
+func (*GetRegistryTokenForbidden) getRegistryTokenRes() {}
+
+type GetRegistryTokenOK struct {
+	Data io.Reader
+}
+
+// Read reads data from the Data reader.
+//
+// Kept to satisfy the io.Reader interface.
+func (s GetRegistryTokenOK) Read(p []byte) (n int, err error) {
+	if s.Data == nil {
+		return 0, io.EOF
+	}
+	return s.Data.Read(p)
+}
+
+// GetRegistryTokenOKHeaders wraps GetRegistryTokenOK with response headers.
+type GetRegistryTokenOKHeaders struct {
+	ContentType string
+	Response    GetRegistryTokenOK
+}
+
+// GetContentType returns the value of ContentType.
+func (s *GetRegistryTokenOKHeaders) GetContentType() string {
+	return s.ContentType
+}
+
+// GetResponse returns the value of Response.
+func (s *GetRegistryTokenOKHeaders) GetResponse() GetRegistryTokenOK {
+	return s.Response
+}
+
+// SetContentType sets the value of ContentType.
+func (s *GetRegistryTokenOKHeaders) SetContentType(val string) {
+	s.ContentType = val
+}
+
+// SetResponse sets the value of Response.
+func (s *GetRegistryTokenOKHeaders) SetResponse(val GetRegistryTokenOK) {
+	s.Response = val
+}
+
+func (*GetRegistryTokenOKHeaders) getRegistryTokenRes() {}
+
+// GetRegistryTokenUnauthorized is response for GetRegistryToken operation.
+type GetRegistryTokenUnauthorized struct{}
+
+func (*GetRegistryTokenUnauthorized) getRegistryTokenRes() {}
+
+// GetTasksForbidden is response for GetTasks operation.
+type GetTasksForbidden struct{}
+
+func (*GetTasksForbidden) getTasksRes() {}
+
+// GetTasksUnauthorized is response for GetTasks operation.
+type GetTasksUnauthorized struct{}
+
+func (*GetTasksUnauthorized) getTasksRes() {}
 
 // Ref: #/components/schemas/HTCCluster
 type HTCCluster struct {
@@ -961,7 +1176,7 @@ func (s *HTCImageStatus) SetStatus(val OptStatus) {
 	s.Status = val
 }
 
-func (*HTCImageStatus) htcProjectsProjectIdContainerRegistryImagesImageNameGetRes() {}
+func (*HTCImageStatus) getImageRes() {}
 
 // Ref: #/components/schemas/HTCImages
 type HTCImages struct {
@@ -989,7 +1204,7 @@ func (s *HTCImages) SetImages(val []string) {
 	s.Images = val
 }
 
-func (*HTCImages) htcProjectsProjectIdContainerRegistryImagesGetRes() {}
+func (*HTCImages) getImagesRes() {}
 
 // Ref: #/components/schemas/HTCInfraResource
 type HTCInfraResource struct {
@@ -1032,33 +1247,35 @@ func (*HTCInfraResource) htcRegionsGetRes() {}
 
 // Ref: #/components/schemas/HTCJob
 type HTCJob struct {
-	Architecture       OptArchitecture       `json:"architecture"`
-	Commands           []string              `json:"commands"`
-	CompletedAt        OptNilNullableInstant `json:"completedAt"`
-	Container          OptContainerDetails   `json:"container"`
-	CreatedAt          OptInstant            `json:"createdAt"`
-	CreatedBy          OptString             `json:"createdBy"`
-	ExecTimeoutSeconds OptInt32              `json:"execTimeoutSeconds"`
-	FailureCode        *NilHTCJobFailureCode `json:"failureCode"`
-	Group              OptString             `json:"group"`
-	ImageName          OptString             `json:"imageName"`
-	InstanceId         OptString             `json:"instanceId"`
-	InstanceLabels     OptInstanceLabels     `json:"instanceLabels"`
-	JobUUID            OptString             `json:"jobUUID"`
-	MaxDiskGiB         OptInt32              `json:"maxDiskGiB"`
-	MaxMemory          OptInt32              `json:"maxMemory"`
-	MaxSwap            OptInt32              `json:"maxSwap"`
-	MaxVCpus           OptInt32              `json:"maxVCpus"`
-	ProjectId          OptString             `json:"projectId"`
-	ProviderJobId      OptString             `json:"providerJobId"`
-	Region             OptRescaleRegion      `json:"region"`
-	StartedAt          OptNilNullableInstant `json:"startedAt"`
-	Status             OptRescaleJobStatus   `json:"status"`
-	StatusReason       OptNilString          `json:"statusReason"`
-	Tags               []Tag                 `json:"tags"`
-	TaskId             OptString             `json:"taskId"`
-	UpdatedAt          OptInstant            `json:"updatedAt"`
-	WorkspaceId        OptString             `json:"workspaceId"`
+	Architecture            OptArchitecture            `json:"architecture"`
+	Commands                []string                   `json:"commands"`
+	CompletedAt             OptNilNullableInstant      `json:"completedAt"`
+	Container               OptContainerDetails        `json:"container"`
+	CreatedAt               OptInstant                 `json:"createdAt"`
+	CreatedBy               OptString                  `json:"createdBy"`
+	Envs                    []EnvPair                  `json:"envs"`
+	ExecTimeoutSeconds      OptInt32                   `json:"execTimeoutSeconds"`
+	FailureCode             *NilHTCJobFailureCode      `json:"failureCode"`
+	Group                   OptString                  `json:"group"`
+	ImageName               OptString                  `json:"imageName"`
+	InstanceId              OptString                  `json:"instanceId"`
+	InstanceLabels          OptInstanceLabels          `json:"instanceLabels"`
+	JobExecutionEnvironment OptJobExecutionEnvironment `json:"jobExecutionEnvironment"`
+	JobUUID                 OptString                  `json:"jobUUID"`
+	MaxDiskGiB              OptInt32                   `json:"maxDiskGiB"`
+	MaxMemory               OptInt32                   `json:"maxMemory"`
+	MaxSwap                 OptInt32                   `json:"maxSwap"`
+	MaxVCpus                OptInt32                   `json:"maxVCpus"`
+	ProjectId               OptString                  `json:"projectId"`
+	ProviderJobId           OptString                  `json:"providerJobId"`
+	Region                  OptRescaleRegion           `json:"region"`
+	StartedAt               OptNilNullableInstant      `json:"startedAt"`
+	Status                  OptRescaleJobStatus        `json:"status"`
+	StatusReason            OptNilString               `json:"statusReason"`
+	Tags                    []Tag                      `json:"tags"`
+	TaskId                  OptString                  `json:"taskId"`
+	UpdatedAt               OptInstant                 `json:"updatedAt"`
+	WorkspaceId             OptString                  `json:"workspaceId"`
 }
 
 // GetArchitecture returns the value of Architecture.
@@ -1091,6 +1308,11 @@ func (s *HTCJob) GetCreatedBy() OptString {
 	return s.CreatedBy
 }
 
+// GetEnvs returns the value of Envs.
+func (s *HTCJob) GetEnvs() []EnvPair {
+	return s.Envs
+}
+
 // GetExecTimeoutSeconds returns the value of ExecTimeoutSeconds.
 func (s *HTCJob) GetExecTimeoutSeconds() OptInt32 {
 	return s.ExecTimeoutSeconds
@@ -1119,6 +1341,11 @@ func (s *HTCJob) GetInstanceId() OptString {
 // GetInstanceLabels returns the value of InstanceLabels.
 func (s *HTCJob) GetInstanceLabels() OptInstanceLabels {
 	return s.InstanceLabels
+}
+
+// GetJobExecutionEnvironment returns the value of JobExecutionEnvironment.
+func (s *HTCJob) GetJobExecutionEnvironment() OptJobExecutionEnvironment {
+	return s.JobExecutionEnvironment
 }
 
 // GetJobUUID returns the value of JobUUID.
@@ -1226,6 +1453,11 @@ func (s *HTCJob) SetCreatedBy(val OptString) {
 	s.CreatedBy = val
 }
 
+// SetEnvs sets the value of Envs.
+func (s *HTCJob) SetEnvs(val []EnvPair) {
+	s.Envs = val
+}
+
 // SetExecTimeoutSeconds sets the value of ExecTimeoutSeconds.
 func (s *HTCJob) SetExecTimeoutSeconds(val OptInt32) {
 	s.ExecTimeoutSeconds = val
@@ -1254,6 +1486,11 @@ func (s *HTCJob) SetInstanceId(val OptString) {
 // SetInstanceLabels sets the value of InstanceLabels.
 func (s *HTCJob) SetInstanceLabels(val OptInstanceLabels) {
 	s.InstanceLabels = val
+}
+
+// SetJobExecutionEnvironment sets the value of JobExecutionEnvironment.
+func (s *HTCJob) SetJobExecutionEnvironment(val OptJobExecutionEnvironment) {
+	s.JobExecutionEnvironment = val
 }
 
 // SetJobUUID sets the value of JobUUID.
@@ -1331,7 +1568,7 @@ func (s *HTCJob) SetWorkspaceId(val OptString) {
 	s.WorkspaceId = val
 }
 
-func (*HTCJob) htcProjectsProjectIdTasksTaskIdJobsJobIdGetRes() {}
+func (*HTCJob) getJobRes() {}
 
 // Ref: #/components/schemas/HTCJobDefinition
 type HTCJobDefinition struct {
@@ -1763,7 +2000,7 @@ func (s *HTCJobSubmitRequest) SetWorkspaceId(val OptString) {
 
 type HTCJobSubmitRequests []HTCJobSubmitRequest
 
-func (*HTCJobSubmitRequests) htcProjectsProjectIdTasksTaskIdJobsBatchPostRes() {}
+func (*HTCJobSubmitRequests) submitJobsRes() {}
 
 // Ref: #/components/schemas/HTCJobs
 type HTCJobs struct {
@@ -1791,7 +2028,7 @@ func (s *HTCJobs) SetNext(val OptURI) {
 	s.Next = val
 }
 
-func (*HTCJobs) htcProjectsProjectIdTasksTaskIdJobsGetRes() {}
+func (*HTCJobs) getJobsRes() {}
 
 // Ref: #/components/schemas/HTCLimitCreate
 type HTCLimitCreate struct {
@@ -2029,13 +2266,13 @@ func (s *HTCProject) SetWorkspaceId(val OptString) {
 	s.WorkspaceId = val
 }
 
+func (*HTCProject) getProjectRes()                {}
 func (*HTCProject) htcProjectsPostRes()           {}
-func (*HTCProject) htcProjectsProjectIdGetRes()   {}
 func (*HTCProject) htcProjectsProjectIdPatchRes() {}
 
 type HTCProjectDimensions []HTCComputeEnvironment
 
-func (*HTCProjectDimensions) htcProjectsProjectIdDimensionsGetRes() {}
+func (*HTCProjectDimensions) getDimensionsRes() {}
 
 // Ref: #/components/schemas/HTCProjectLimit
 type HTCProjectLimit struct {
@@ -2188,7 +2425,7 @@ func (s *HTCProjectLimitModifierRole) UnmarshalText(data []byte) error {
 
 type HTCProjectLimits []HTCProjectLimit
 
-func (*HTCProjectLimits) htcProjectsProjectIdLimitsGetRes() {}
+func (*HTCProjectLimits) getLimitsRes() {}
 
 // Ref: #/components/schemas/HTCProjectUpdate
 type HTCProjectUpdate struct {
@@ -2231,7 +2468,7 @@ func (s *HTCProjectsResponse) SetNext(val OptURI) {
 	s.Next = val
 }
 
-func (*HTCProjectsResponse) htcProjectsGetRes() {}
+func (*HTCProjectsResponse) getProjectsRes() {}
 
 // Ref: #/components/schemas/HTCRegionAdminSettings
 type HTCRegionAdminSettings struct {
@@ -2679,7 +2916,7 @@ func (s *HTCRepository) SetWorkspaceId(val OptString) {
 	s.WorkspaceId = val
 }
 
-func (*HTCRepository) htcProjectsProjectIdContainerRegistryRepoRepoNamePostRes() {}
+func (*HTCRepository) createRepoRes() {}
 
 // Ref: #/components/schemas/HTCRequestError
 type HTCRequestError struct {
@@ -2718,8 +2955,8 @@ func (s *HTCRequestError) SetMessage(val OptString) {
 	s.Message = val
 }
 
-func (*HTCRequestError) htcProjectsProjectIdTasksTaskIdJobsBatchPostRes() {}
-func (*HTCRequestError) htcProjectsProjectIdTasksTaskIdJobsJobIdGetRes()  {}
+func (*HTCRequestError) getJobRes()     {}
+func (*HTCRequestError) submitJobsRes() {}
 
 // Ref: #/components/schemas/HTCRetryStrategy
 type HTCRetryStrategy struct {
@@ -2872,7 +3109,7 @@ func (s *HTCTask) SetWorkspaceId(val OptString) {
 	s.WorkspaceId = val
 }
 
-func (*HTCTask) htcProjectsProjectIdTasksPostRes()        {}
+func (*HTCTask) createTaskRes()                           {}
 func (*HTCTask) htcProjectsProjectIdTasksTaskIdGetRes()   {}
 func (*HTCTask) htcProjectsProjectIdTasksTaskIdPatchRes() {}
 
@@ -3013,7 +3250,7 @@ func (s *HTCTasksResponse) SetNext(val OptURI) {
 	s.Next = val
 }
 
-func (*HTCTasksResponse) htcProjectsProjectIdTasksGetRes() {}
+func (*HTCTasksResponse) getTasksRes() {}
 
 // Ref: #/components/schemas/HTCToken
 type HTCToken struct {
@@ -3043,7 +3280,7 @@ func (s *HTCToken) SetTokenValue(val OptString) {
 	s.TokenValue = val
 }
 
-func (*HTCToken) authTokenGetRes() {}
+func (*HTCToken) getTokenRes() {}
 
 type HTCTokenPayload string
 
@@ -3131,42 +3368,6 @@ type HtcGcpClustersWorkspaceIdGetUnauthorized struct{}
 
 func (*HtcGcpClustersWorkspaceIdGetUnauthorized) htcGcpClustersWorkspaceIdGetRes() {}
 
-// HtcMetricsGetForbidden is response for HtcMetricsGet operation.
-type HtcMetricsGetForbidden struct{}
-
-func (*HtcMetricsGetForbidden) htcMetricsGetRes() {}
-
-type HtcMetricsGetOK struct {
-	Data io.Reader
-}
-
-// Read reads data from the Data reader.
-//
-// Kept to satisfy the io.Reader interface.
-func (s HtcMetricsGetOK) Read(p []byte) (n int, err error) {
-	if s.Data == nil {
-		return 0, io.EOF
-	}
-	return s.Data.Read(p)
-}
-
-func (*HtcMetricsGetOK) htcMetricsGetRes() {}
-
-// HtcMetricsGetUnauthorized is response for HtcMetricsGet operation.
-type HtcMetricsGetUnauthorized struct{}
-
-func (*HtcMetricsGetUnauthorized) htcMetricsGetRes() {}
-
-// HtcProjectsGetForbidden is response for HtcProjectsGet operation.
-type HtcProjectsGetForbidden struct{}
-
-func (*HtcProjectsGetForbidden) htcProjectsGetRes() {}
-
-// HtcProjectsGetUnauthorized is response for HtcProjectsGet operation.
-type HtcProjectsGetUnauthorized struct{}
-
-func (*HtcProjectsGetUnauthorized) htcProjectsGetRes() {}
-
 // HtcProjectsPostForbidden is response for HtcProjectsPost operation.
 type HtcProjectsPostForbidden struct{}
 
@@ -3176,135 +3377,6 @@ func (*HtcProjectsPostForbidden) htcProjectsPostRes() {}
 type HtcProjectsPostUnauthorized struct{}
 
 func (*HtcProjectsPostUnauthorized) htcProjectsPostRes() {}
-
-// HtcProjectsProjectIdContainerRegistryImagesGetForbidden is response for HtcProjectsProjectIdContainerRegistryImagesGet operation.
-type HtcProjectsProjectIdContainerRegistryImagesGetForbidden struct{}
-
-func (*HtcProjectsProjectIdContainerRegistryImagesGetForbidden) htcProjectsProjectIdContainerRegistryImagesGetRes() {
-}
-
-// HtcProjectsProjectIdContainerRegistryImagesGetUnauthorized is response for HtcProjectsProjectIdContainerRegistryImagesGet operation.
-type HtcProjectsProjectIdContainerRegistryImagesGetUnauthorized struct{}
-
-func (*HtcProjectsProjectIdContainerRegistryImagesGetUnauthorized) htcProjectsProjectIdContainerRegistryImagesGetRes() {
-}
-
-// HtcProjectsProjectIdContainerRegistryImagesImageNameGetForbidden is response for HtcProjectsProjectIdContainerRegistryImagesImageNameGet operation.
-type HtcProjectsProjectIdContainerRegistryImagesImageNameGetForbidden struct{}
-
-func (*HtcProjectsProjectIdContainerRegistryImagesImageNameGetForbidden) htcProjectsProjectIdContainerRegistryImagesImageNameGetRes() {
-}
-
-type HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound struct {
-	ErrorDescription OptString `json:"errorDescription"`
-	ErrorType        OptString `json:"errorType"`
-}
-
-// GetErrorDescription returns the value of ErrorDescription.
-func (s *HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound) GetErrorDescription() OptString {
-	return s.ErrorDescription
-}
-
-// GetErrorType returns the value of ErrorType.
-func (s *HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound) GetErrorType() OptString {
-	return s.ErrorType
-}
-
-// SetErrorDescription sets the value of ErrorDescription.
-func (s *HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound) SetErrorDescription(val OptString) {
-	s.ErrorDescription = val
-}
-
-// SetErrorType sets the value of ErrorType.
-func (s *HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound) SetErrorType(val OptString) {
-	s.ErrorType = val
-}
-
-func (*HtcProjectsProjectIdContainerRegistryImagesImageNameGetNotFound) htcProjectsProjectIdContainerRegistryImagesImageNameGetRes() {
-}
-
-// HtcProjectsProjectIdContainerRegistryImagesImageNameGetUnauthorized is response for HtcProjectsProjectIdContainerRegistryImagesImageNameGet operation.
-type HtcProjectsProjectIdContainerRegistryImagesImageNameGetUnauthorized struct{}
-
-func (*HtcProjectsProjectIdContainerRegistryImagesImageNameGetUnauthorized) htcProjectsProjectIdContainerRegistryImagesImageNameGetRes() {
-}
-
-// HtcProjectsProjectIdContainerRegistryRepoRepoNamePostForbidden is response for HtcProjectsProjectIdContainerRegistryRepoRepoNamePost operation.
-type HtcProjectsProjectIdContainerRegistryRepoRepoNamePostForbidden struct{}
-
-func (*HtcProjectsProjectIdContainerRegistryRepoRepoNamePostForbidden) htcProjectsProjectIdContainerRegistryRepoRepoNamePostRes() {
-}
-
-// HtcProjectsProjectIdContainerRegistryRepoRepoNamePostUnauthorized is response for HtcProjectsProjectIdContainerRegistryRepoRepoNamePost operation.
-type HtcProjectsProjectIdContainerRegistryRepoRepoNamePostUnauthorized struct{}
-
-func (*HtcProjectsProjectIdContainerRegistryRepoRepoNamePostUnauthorized) htcProjectsProjectIdContainerRegistryRepoRepoNamePostRes() {
-}
-
-// HtcProjectsProjectIdContainerRegistryTokenGetForbidden is response for HtcProjectsProjectIdContainerRegistryTokenGet operation.
-type HtcProjectsProjectIdContainerRegistryTokenGetForbidden struct{}
-
-func (*HtcProjectsProjectIdContainerRegistryTokenGetForbidden) htcProjectsProjectIdContainerRegistryTokenGetRes() {
-}
-
-type HtcProjectsProjectIdContainerRegistryTokenGetOK struct {
-	Data io.Reader
-}
-
-// Read reads data from the Data reader.
-//
-// Kept to satisfy the io.Reader interface.
-func (s HtcProjectsProjectIdContainerRegistryTokenGetOK) Read(p []byte) (n int, err error) {
-	if s.Data == nil {
-		return 0, io.EOF
-	}
-	return s.Data.Read(p)
-}
-
-// HtcProjectsProjectIdContainerRegistryTokenGetOKHeaders wraps HtcProjectsProjectIdContainerRegistryTokenGetOK with response headers.
-type HtcProjectsProjectIdContainerRegistryTokenGetOKHeaders struct {
-	ContentType string
-	Response    HtcProjectsProjectIdContainerRegistryTokenGetOK
-}
-
-// GetContentType returns the value of ContentType.
-func (s *HtcProjectsProjectIdContainerRegistryTokenGetOKHeaders) GetContentType() string {
-	return s.ContentType
-}
-
-// GetResponse returns the value of Response.
-func (s *HtcProjectsProjectIdContainerRegistryTokenGetOKHeaders) GetResponse() HtcProjectsProjectIdContainerRegistryTokenGetOK {
-	return s.Response
-}
-
-// SetContentType sets the value of ContentType.
-func (s *HtcProjectsProjectIdContainerRegistryTokenGetOKHeaders) SetContentType(val string) {
-	s.ContentType = val
-}
-
-// SetResponse sets the value of Response.
-func (s *HtcProjectsProjectIdContainerRegistryTokenGetOKHeaders) SetResponse(val HtcProjectsProjectIdContainerRegistryTokenGetOK) {
-	s.Response = val
-}
-
-func (*HtcProjectsProjectIdContainerRegistryTokenGetOKHeaders) htcProjectsProjectIdContainerRegistryTokenGetRes() {
-}
-
-// HtcProjectsProjectIdContainerRegistryTokenGetUnauthorized is response for HtcProjectsProjectIdContainerRegistryTokenGet operation.
-type HtcProjectsProjectIdContainerRegistryTokenGetUnauthorized struct{}
-
-func (*HtcProjectsProjectIdContainerRegistryTokenGetUnauthorized) htcProjectsProjectIdContainerRegistryTokenGetRes() {
-}
-
-// HtcProjectsProjectIdDimensionsGetForbidden is response for HtcProjectsProjectIdDimensionsGet operation.
-type HtcProjectsProjectIdDimensionsGetForbidden struct{}
-
-func (*HtcProjectsProjectIdDimensionsGetForbidden) htcProjectsProjectIdDimensionsGetRes() {}
-
-// HtcProjectsProjectIdDimensionsGetUnauthorized is response for HtcProjectsProjectIdDimensionsGet operation.
-type HtcProjectsProjectIdDimensionsGetUnauthorized struct{}
-
-func (*HtcProjectsProjectIdDimensionsGetUnauthorized) htcProjectsProjectIdDimensionsGetRes() {}
 
 type HtcProjectsProjectIdDimensionsPutCreatedApplicationJSON []HTCComputeEnvironment
 
@@ -3321,16 +3393,6 @@ type HtcProjectsProjectIdDimensionsPutUnauthorized struct{}
 
 func (*HtcProjectsProjectIdDimensionsPutUnauthorized) htcProjectsProjectIdDimensionsPutRes() {}
 
-// HtcProjectsProjectIdGetForbidden is response for HtcProjectsProjectIdGet operation.
-type HtcProjectsProjectIdGetForbidden struct{}
-
-func (*HtcProjectsProjectIdGetForbidden) htcProjectsProjectIdGetRes() {}
-
-// HtcProjectsProjectIdGetUnauthorized is response for HtcProjectsProjectIdGet operation.
-type HtcProjectsProjectIdGetUnauthorized struct{}
-
-func (*HtcProjectsProjectIdGetUnauthorized) htcProjectsProjectIdGetRes() {}
-
 // HtcProjectsProjectIdLimitsDeleteForbidden is response for HtcProjectsProjectIdLimitsDelete operation.
 type HtcProjectsProjectIdLimitsDeleteForbidden struct{}
 
@@ -3345,16 +3407,6 @@ func (*HtcProjectsProjectIdLimitsDeleteNoContent) htcProjectsProjectIdLimitsDele
 type HtcProjectsProjectIdLimitsDeleteUnauthorized struct{}
 
 func (*HtcProjectsProjectIdLimitsDeleteUnauthorized) htcProjectsProjectIdLimitsDeleteRes() {}
-
-// HtcProjectsProjectIdLimitsGetForbidden is response for HtcProjectsProjectIdLimitsGet operation.
-type HtcProjectsProjectIdLimitsGetForbidden struct{}
-
-func (*HtcProjectsProjectIdLimitsGetForbidden) htcProjectsProjectIdLimitsGetRes() {}
-
-// HtcProjectsProjectIdLimitsGetUnauthorized is response for HtcProjectsProjectIdLimitsGet operation.
-type HtcProjectsProjectIdLimitsGetUnauthorized struct{}
-
-func (*HtcProjectsProjectIdLimitsGetUnauthorized) htcProjectsProjectIdLimitsGetRes() {}
 
 // HtcProjectsProjectIdLimitsIDDeleteForbidden is response for HtcProjectsProjectIdLimitsIDDelete operation.
 type HtcProjectsProjectIdLimitsIDDeleteForbidden struct{}
@@ -3496,26 +3548,6 @@ type HtcProjectsProjectIdTaskRetentionPolicyPutUnauthorized struct{}
 
 func (*HtcProjectsProjectIdTaskRetentionPolicyPutUnauthorized) htcProjectsProjectIdTaskRetentionPolicyPutRes() {
 }
-
-// HtcProjectsProjectIdTasksGetForbidden is response for HtcProjectsProjectIdTasksGet operation.
-type HtcProjectsProjectIdTasksGetForbidden struct{}
-
-func (*HtcProjectsProjectIdTasksGetForbidden) htcProjectsProjectIdTasksGetRes() {}
-
-// HtcProjectsProjectIdTasksGetUnauthorized is response for HtcProjectsProjectIdTasksGet operation.
-type HtcProjectsProjectIdTasksGetUnauthorized struct{}
-
-func (*HtcProjectsProjectIdTasksGetUnauthorized) htcProjectsProjectIdTasksGetRes() {}
-
-// HtcProjectsProjectIdTasksPostForbidden is response for HtcProjectsProjectIdTasksPost operation.
-type HtcProjectsProjectIdTasksPostForbidden struct{}
-
-func (*HtcProjectsProjectIdTasksPostForbidden) htcProjectsProjectIdTasksPostRes() {}
-
-// HtcProjectsProjectIdTasksPostUnauthorized is response for HtcProjectsProjectIdTasksPost operation.
-type HtcProjectsProjectIdTasksPostUnauthorized struct{}
-
-func (*HtcProjectsProjectIdTasksPostUnauthorized) htcProjectsProjectIdTasksPostRes() {}
 
 // HtcProjectsProjectIdTasksTaskIdDeleteForbidden is response for HtcProjectsProjectIdTasksTaskIdDelete operation.
 type HtcProjectsProjectIdTasksTaskIdDeleteForbidden struct{}
@@ -3757,18 +3789,6 @@ type HtcProjectsProjectIdTasksTaskIdGroupsGetUnauthorized struct{}
 func (*HtcProjectsProjectIdTasksTaskIdGroupsGetUnauthorized) htcProjectsProjectIdTasksTaskIdGroupsGetRes() {
 }
 
-// HtcProjectsProjectIdTasksTaskIdJobsBatchPostForbidden is response for HtcProjectsProjectIdTasksTaskIdJobsBatchPost operation.
-type HtcProjectsProjectIdTasksTaskIdJobsBatchPostForbidden struct{}
-
-func (*HtcProjectsProjectIdTasksTaskIdJobsBatchPostForbidden) htcProjectsProjectIdTasksTaskIdJobsBatchPostRes() {
-}
-
-// HtcProjectsProjectIdTasksTaskIdJobsBatchPostUnauthorized is response for HtcProjectsProjectIdTasksTaskIdJobsBatchPost operation.
-type HtcProjectsProjectIdTasksTaskIdJobsBatchPostUnauthorized struct{}
-
-func (*HtcProjectsProjectIdTasksTaskIdJobsBatchPostUnauthorized) htcProjectsProjectIdTasksTaskIdJobsBatchPostRes() {
-}
-
 // HtcProjectsProjectIdTasksTaskIdJobsCancelPostForbidden is response for HtcProjectsProjectIdTasksTaskIdJobsCancelPost operation.
 type HtcProjectsProjectIdTasksTaskIdJobsCancelPostForbidden struct{}
 
@@ -3787,17 +3807,6 @@ type HtcProjectsProjectIdTasksTaskIdJobsCancelPostUnauthorized struct{}
 func (*HtcProjectsProjectIdTasksTaskIdJobsCancelPostUnauthorized) htcProjectsProjectIdTasksTaskIdJobsCancelPostRes() {
 }
 
-// HtcProjectsProjectIdTasksTaskIdJobsGetForbidden is response for HtcProjectsProjectIdTasksTaskIdJobsGet operation.
-type HtcProjectsProjectIdTasksTaskIdJobsGetForbidden struct{}
-
-func (*HtcProjectsProjectIdTasksTaskIdJobsGetForbidden) htcProjectsProjectIdTasksTaskIdJobsGetRes() {}
-
-// HtcProjectsProjectIdTasksTaskIdJobsGetUnauthorized is response for HtcProjectsProjectIdTasksTaskIdJobsGet operation.
-type HtcProjectsProjectIdTasksTaskIdJobsGetUnauthorized struct{}
-
-func (*HtcProjectsProjectIdTasksTaskIdJobsGetUnauthorized) htcProjectsProjectIdTasksTaskIdJobsGetRes() {
-}
-
 // HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetForbidden is response for HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet operation.
 type HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetForbidden struct{}
 
@@ -3813,18 +3822,6 @@ func (*HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetOKApplicationJSON) htcPr
 type HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetUnauthorized struct{}
 
 func (*HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetUnauthorized) htcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes() {
-}
-
-// HtcProjectsProjectIdTasksTaskIdJobsJobIdGetForbidden is response for HtcProjectsProjectIdTasksTaskIdJobsJobIdGet operation.
-type HtcProjectsProjectIdTasksTaskIdJobsJobIdGetForbidden struct{}
-
-func (*HtcProjectsProjectIdTasksTaskIdJobsJobIdGetForbidden) htcProjectsProjectIdTasksTaskIdJobsJobIdGetRes() {
-}
-
-// HtcProjectsProjectIdTasksTaskIdJobsJobIdGetUnauthorized is response for HtcProjectsProjectIdTasksTaskIdJobsJobIdGet operation.
-type HtcProjectsProjectIdTasksTaskIdJobsJobIdGetUnauthorized struct{}
-
-func (*HtcProjectsProjectIdTasksTaskIdJobsJobIdGetUnauthorized) htcProjectsProjectIdTasksTaskIdJobsJobIdGetRes() {
 }
 
 // HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetForbidden is response for HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGet operation.
@@ -4079,6 +4076,43 @@ func (s *InstanceLabels) SetRegion(val OptString) {
 }
 
 type Instant time.Time
+
+// Ref: #/components/schemas/JobExecutionEnvironment
+type JobExecutionEnvironment struct {
+	Architecture OptFloat64 `json:"architecture"`
+	InstanceId   OptString  `json:"instanceId"`
+	InstanceType OptString  `json:"instanceType"`
+}
+
+// GetArchitecture returns the value of Architecture.
+func (s *JobExecutionEnvironment) GetArchitecture() OptFloat64 {
+	return s.Architecture
+}
+
+// GetInstanceId returns the value of InstanceId.
+func (s *JobExecutionEnvironment) GetInstanceId() OptString {
+	return s.InstanceId
+}
+
+// GetInstanceType returns the value of InstanceType.
+func (s *JobExecutionEnvironment) GetInstanceType() OptString {
+	return s.InstanceType
+}
+
+// SetArchitecture sets the value of Architecture.
+func (s *JobExecutionEnvironment) SetArchitecture(val OptFloat64) {
+	s.Architecture = val
+}
+
+// SetInstanceId sets the value of InstanceId.
+func (s *JobExecutionEnvironment) SetInstanceId(val OptString) {
+	s.InstanceId = val
+}
+
+// SetInstanceType sets the value of InstanceType.
+func (s *JobExecutionEnvironment) SetInstanceType(val OptString) {
+	s.InstanceType = val
+}
 
 // Ref: #/components/schemas/JobPriority
 type JobPriority string
@@ -4431,14 +4465,14 @@ func (s *OAuth2ErrorResponse) SetErrorDescription(val OptString) {
 	s.ErrorDescription = val
 }
 
-func (*OAuth2ErrorResponse) authTokenGetRes()                 {}
 func (*OAuth2ErrorResponse) authTokenWhoamiGetRes()           {}
-func (*OAuth2ErrorResponse) authWhoamiGetRes()                {}
+func (*OAuth2ErrorResponse) getTokenRes()                     {}
 func (*OAuth2ErrorResponse) htcGcpClustersWorkspaceIdGetRes() {}
 func (*OAuth2ErrorResponse) htcRegionsGetRes()                {}
 func (*OAuth2ErrorResponse) htcRegionsRegionGetRes()          {}
 func (*OAuth2ErrorResponse) oAuth2TokenPostRes()              {}
 func (*OAuth2ErrorResponse) wellKnownJwksJSONGetRes()         {}
+func (*OAuth2ErrorResponse) whoAmIRes()                       {}
 
 // Ref: #/components/schemas/OAuth2Token
 type OAuth2Token struct {
@@ -5899,6 +5933,52 @@ func (o OptInt64) Get() (v int64, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptInt64) Or(d int64) int64 {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptJobExecutionEnvironment returns new OptJobExecutionEnvironment with value set to v.
+func NewOptJobExecutionEnvironment(v JobExecutionEnvironment) OptJobExecutionEnvironment {
+	return OptJobExecutionEnvironment{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptJobExecutionEnvironment is optional JobExecutionEnvironment.
+type OptJobExecutionEnvironment struct {
+	Value JobExecutionEnvironment
+	Set   bool
+}
+
+// IsSet returns true if OptJobExecutionEnvironment was set.
+func (o OptJobExecutionEnvironment) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptJobExecutionEnvironment) Reset() {
+	var v JobExecutionEnvironment
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptJobExecutionEnvironment) SetTo(v JobExecutionEnvironment) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptJobExecutionEnvironment) Get() (v JobExecutionEnvironment, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptJobExecutionEnvironment) Or(d JobExecutionEnvironment) JobExecutionEnvironment {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -8069,6 +8149,16 @@ func (s *StorageAccessTokens) SetRegionStores(val []StorageAccessToken) {
 func (*StorageAccessTokens) htcProjectsProjectIdStorageTokensGetRes()            {}
 func (*StorageAccessTokens) htcProjectsProjectIdTasksTaskIdStorageTokensGetRes() {}
 
+// SubmitJobsForbidden is response for SubmitJobs operation.
+type SubmitJobsForbidden struct{}
+
+func (*SubmitJobsForbidden) submitJobsRes() {}
+
+// SubmitJobsUnauthorized is response for SubmitJobs operation.
+type SubmitJobsUnauthorized struct{}
+
+func (*SubmitJobsUnauthorized) submitJobsRes() {}
+
 // Ref: #/components/schemas/SupportedRescaleRegion
 type SupportedRescaleRegion string
 
@@ -8422,7 +8512,7 @@ func (s *WhoAmI) SetUserFeatures(val OptFeatureFlagsResult) {
 	s.UserFeatures = val
 }
 
-func (*WhoAmI) authWhoamiGetRes() {}
+func (*WhoAmI) whoAmIRes() {}
 
 // Ref: #/components/schemas/Workspace
 type Workspace struct {

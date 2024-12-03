@@ -24,8 +24,8 @@ func LimitsGet(cmd *cobra.Command, args []string) error {
 	}
 
 	ctx := context.Background()
-	res, err := runner.Client.HtcProjectsProjectIdLimitsGet(ctx,
-		oapi.HtcProjectsProjectIdLimitsGetParams{ProjectId: p.ProjectId})
+	res, err := runner.Client.GetLimits(ctx,
+		oapi.GetLimitsParams{ProjectId: p.ProjectId})
 	if err != nil {
 		return err
 	}
@@ -33,8 +33,7 @@ func LimitsGet(cmd *cobra.Command, args []string) error {
 	switch res := res.(type) {
 	case *oapi.HTCProjectLimits:
 		return runner.PrintResult(res, os.Stdout)
-	case *oapi.HtcProjectsProjectIdLimitsGetForbidden,
-		*oapi.HtcProjectsProjectIdLimitsGetUnauthorized:
+	case *oapi.GetLimitsForbidden, *oapi.GetLimitsUnauthorized:
 		return fmt.Errorf("forbidden: %s", res)
 	}
 

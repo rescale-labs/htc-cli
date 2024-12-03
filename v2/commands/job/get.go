@@ -17,37 +17,35 @@ import (
 
 const pageSize = 500
 
-func getJobs(ctx context.Context, c *oapi.Client, params *oapi.HtcProjectsProjectIdTasksTaskIdJobsGetParams) (*oapi.HTCJobs, error) {
-	res, err := c.HtcProjectsProjectIdTasksTaskIdJobsGet(ctx, *params)
+func getJobs(ctx context.Context, c oapi.JobInvoker, params *oapi.GetJobsParams) (*oapi.HTCJobs, error) {
+	res, err := c.GetJobs(ctx, *params)
 	if err != nil {
 		return nil, err
 	}
 	switch res := res.(type) {
 	case *oapi.HTCJobs:
 		return res, nil
-	case *oapi.HtcProjectsProjectIdTasksTaskIdJobsGetUnauthorized,
-		*oapi.HtcProjectsProjectIdTasksTaskIdJobsGetForbidden:
+	case *oapi.GetJobsUnauthorized, *oapi.GetJobsForbidden:
 		return nil, fmt.Errorf("forbidden: %s", res)
 	}
 	return nil, fmt.Errorf("Unknown response type: %s", res)
 }
 
-func getJob(ctx context.Context, c *oapi.Client, projectId, taskId, jobId string) (*oapi.HTCJob, error) {
-	params := oapi.HtcProjectsProjectIdTasksTaskIdJobsJobIdGetParams{
+func getJob(ctx context.Context, c oapi.JobInvoker, projectId, taskId, jobId string) (*oapi.HTCJob, error) {
+	params := oapi.GetJobParams{
 		ProjectId: projectId,
 		TaskId:    taskId,
 		JobId:     jobId,
 	}
 	log.Printf("getJob: %s %s %s", projectId, taskId, jobId)
-	res, err := c.HtcProjectsProjectIdTasksTaskIdJobsJobIdGet(ctx, params)
+	res, err := c.GetJob(ctx, params)
 	if err != nil {
 		return nil, err
 	}
 	switch res := res.(type) {
 	case *oapi.HTCJob:
 		return res, nil
-	case *oapi.HtcProjectsProjectIdTasksTaskIdJobsJobIdGetUnauthorized,
-		*oapi.HtcProjectsProjectIdTasksTaskIdJobsJobIdGetForbidden:
+	case *oapi.GetJobUnauthorized, *oapi.GetJobForbidden:
 		return nil, fmt.Errorf("forbidden: %s", res)
 	}
 	return nil, fmt.Errorf("Unknown response type: %s", res)
@@ -77,7 +75,7 @@ func Get(cmd *cobra.Command, args []string) error {
 		}
 
 		var items []oapi.HTCJob
-		params := oapi.HtcProjectsProjectIdTasksTaskIdJobsGetParams{
+		params := oapi.GetJobsParams{
 			ProjectId: p.ProjectId,
 			TaskId:    p.TaskId,
 			Group:     oapi.OptString{group, group != ""},

@@ -17,24 +17,18 @@ import (
 
 // Invoker invokes operations described by OpenAPI v3 specification.
 type Invoker interface {
-	// AuthTokenGet invokes GET /auth/token operation.
-	//
-	// This endpoint will get a JWT token given an API key.
-	//
-	// GET /auth/token
-	AuthTokenGet(ctx context.Context) (AuthTokenGetRes, error)
+	AuthInvoker
+	ImageInvoker
+	JobInvoker
+	MetricsInvoker
+	ProjectInvoker
+	TaskInvoker
 	// AuthTokenWhoamiGet invokes GET /auth/token/whoami operation.
 	//
 	// This endpoint will get a JWT token payload given a bearer token.
 	//
 	// GET /auth/token/whoami
 	AuthTokenWhoamiGet(ctx context.Context) (AuthTokenWhoamiGetRes, error)
-	// AuthWhoamiGet invokes GET /auth/whoami operation.
-	//
-	// This endpoint will get Rescale user information given a Rescale API key.
-	//
-	// GET /auth/whoami
-	AuthWhoamiGet(ctx context.Context) (AuthWhoamiGetRes, error)
 	// HtcGcpClustersWorkspaceIdGet invokes GET /htc/gcp/clusters/{workspaceId} operation.
 	//
 	// This endpoint returns details about all GCP clusters that can run jobs for the specified HTC
@@ -42,18 +36,6 @@ type Invoker interface {
 	//
 	// GET /htc/gcp/clusters/{workspaceId}
 	HtcGcpClustersWorkspaceIdGet(ctx context.Context, params HtcGcpClustersWorkspaceIdGetParams) (HtcGcpClustersWorkspaceIdGetRes, error)
-	// HtcMetricsGet invokes GET /htc/metrics operation.
-	//
-	// Get all HTC Metrics for a workspace.
-	//
-	// GET /htc/metrics
-	HtcMetricsGet(ctx context.Context, params HtcMetricsGetParams) (HtcMetricsGetRes, error)
-	// HtcProjectsGet invokes GET /htc/projects operation.
-	//
-	// This endpoint will get all projects.
-	//
-	// GET /htc/projects
-	HtcProjectsGet(ctx context.Context, params HtcProjectsGetParams) (HtcProjectsGetRes, error)
 	// HtcProjectsPost invokes POST /htc/projects operation.
 	//
 	// This endpoint will create a project. A project is a collection of tasks and container images used
@@ -61,54 +43,6 @@ type Invoker interface {
 	//
 	// POST /htc/projects
 	HtcProjectsPost(ctx context.Context, request OptHTCProject) (HtcProjectsPostRes, error)
-	// HtcProjectsProjectIdContainerRegistryImagesGet invokes GET /htc/projects/{projectId}/container-registry/images operation.
-	//
-	// This endpoint will list all images for a project.
-	//
-	// GET /htc/projects/{projectId}/container-registry/images
-	HtcProjectsProjectIdContainerRegistryImagesGet(ctx context.Context, params HtcProjectsProjectIdContainerRegistryImagesGetParams) (HtcProjectsProjectIdContainerRegistryImagesGetRes, error)
-	// HtcProjectsProjectIdContainerRegistryImagesImageNameGet invokes GET /htc/projects/{projectId}/container-registry/images/{imageName} operation.
-	//
-	// Retrieves the current status of an image across cloud providers. The status indicates whether the
-	// image is ready for use or still being processed. Returns READY when the image is available in all
-	// cloud providers, PENDING while the image is being replicated, and a 404 if the image does not
-	// exist.
-	//
-	// GET /htc/projects/{projectId}/container-registry/images/{imageName}
-	HtcProjectsProjectIdContainerRegistryImagesImageNameGet(ctx context.Context, params HtcProjectsProjectIdContainerRegistryImagesImageNameGetParams) (HtcProjectsProjectIdContainerRegistryImagesImageNameGetRes, error)
-	// HtcProjectsProjectIdContainerRegistryRepoRepoNamePost invokes POST /htc/projects/{projectId}/container-registry/repo/{repoName} operation.
-	//
-	// This endpoint will create a private container repository belonging to this project
-	// Private container registries are collections of repositories, and private repositories are
-	// collections of container images. These images are referenced when running jobs within this project.
-	//  In order to upload an image to a repository, you will need the `registryURI`, the
-	// `repositoryName`, and the token (see `/htc/projects/:projectId/container-registry/token`).
-	//
-	// POST /htc/projects/{projectId}/container-registry/repo/{repoName}
-	HtcProjectsProjectIdContainerRegistryRepoRepoNamePost(ctx context.Context, params HtcProjectsProjectIdContainerRegistryRepoRepoNamePostParams) (HtcProjectsProjectIdContainerRegistryRepoRepoNamePostRes, error)
-	// HtcProjectsProjectIdContainerRegistryTokenGet invokes GET /htc/projects/{projectId}/container-registry/token operation.
-	//
-	// This endpoint will get a container registry authorization token.
-	// To use this token run `docker login --username AWS --password {TOKEN} {CONTAINER_REGISTRY_DOMAIN}`.
-	// e.g. `docker login --username AWS --password "eyJwYXlsb2FkIjoiZHhtSzJuQ0x..." 183929446192.dkr.ecr.
-	// us-west-2.amazonaws.com`.
-	//
-	// GET /htc/projects/{projectId}/container-registry/token
-	HtcProjectsProjectIdContainerRegistryTokenGet(ctx context.Context, params HtcProjectsProjectIdContainerRegistryTokenGetParams) (HtcProjectsProjectIdContainerRegistryTokenGetRes, error)
-	// HtcProjectsProjectIdDimensionsGet invokes GET /htc/projects/{projectId}/dimensions operation.
-	//
-	// This endpoint is designed to retrieve the current set of dimension combinations configured for a
-	// specific project so that users can understand the existing computing environment constraints of a
-	// project. It returns a list of dimension combinations such as pricing priority, geographical region,
-	//  compute scaling policy, and hyperthreading options.
-	// Any user who _belongs to the workspace this project belongs to_ can use this endpoint to verify or
-	// audit the current configuration of a project. This can be helpful in ensuring that the project's
-	// settings align with expectations.
-	// The payload also includes a read-only set of `derived` dimensions which help describe the
-	// currently configured `machineType`.
-	//
-	// GET /htc/projects/{projectId}/dimensions
-	HtcProjectsProjectIdDimensionsGet(ctx context.Context, params HtcProjectsProjectIdDimensionsGetParams) (HtcProjectsProjectIdDimensionsGetRes, error)
 	// HtcProjectsProjectIdDimensionsPut invokes PUT /htc/projects/{projectId}/dimensions operation.
 	//
 	// This endpoint allows _workspace_, _organization_, and _Rescale administrators_ to _create_,
@@ -126,12 +60,6 @@ type Invoker interface {
 	//
 	// PUT /htc/projects/{projectId}/dimensions
 	HtcProjectsProjectIdDimensionsPut(ctx context.Context, request []HTCComputeEnvironment, params HtcProjectsProjectIdDimensionsPutParams) (HtcProjectsProjectIdDimensionsPutRes, error)
-	// HtcProjectsProjectIdGet invokes GET /htc/projects/{projectId} operation.
-	//
-	// This endpoint will get a project by id.
-	//
-	// GET /htc/projects/{projectId}
-	HtcProjectsProjectIdGet(ctx context.Context, params HtcProjectsProjectIdGetParams) (HtcProjectsProjectIdGetRes, error)
 	// HtcProjectsProjectIdLimitsDelete invokes DELETE /htc/projects/{projectId}/limits operation.
 	//
 	// This endpoint will remove all resource limits associated with this project.
@@ -139,14 +67,6 @@ type Invoker interface {
 	//
 	// DELETE /htc/projects/{projectId}/limits
 	HtcProjectsProjectIdLimitsDelete(ctx context.Context, params HtcProjectsProjectIdLimitsDeleteParams) (HtcProjectsProjectIdLimitsDeleteRes, error)
-	// HtcProjectsProjectIdLimitsGet invokes GET /htc/projects/{projectId}/limits operation.
-	//
-	// This endpoint will list all resource limitations associated with this project.
-	// A job running in this project will be subject to all resulting limits as well as any associated
-	// with the workspace (see `/htc/workspaces/{workspaceId}/limits`).
-	//
-	// GET /htc/projects/{projectId}/limits
-	HtcProjectsProjectIdLimitsGet(ctx context.Context, params HtcProjectsProjectIdLimitsGetParams) (HtcProjectsProjectIdLimitsGetRes, error)
 	// HtcProjectsProjectIdLimitsIDDelete invokes DELETE /htc/projects/{projectId}/limits/{id} operation.
 	//
 	// This endpoint will remove a single resource limit associated with this project if it exists.
@@ -259,18 +179,6 @@ type Invoker interface {
 	//
 	// PUT /htc/projects/{projectId}/task-retention-policy
 	HtcProjectsProjectIdTaskRetentionPolicyPut(ctx context.Context, request OptTaskRetentionPolicy, params HtcProjectsProjectIdTaskRetentionPolicyPutParams) (HtcProjectsProjectIdTaskRetentionPolicyPutRes, error)
-	// HtcProjectsProjectIdTasksGet invokes GET /htc/projects/{projectId}/tasks operation.
-	//
-	// This endpoint will get all tasks in a project.
-	//
-	// GET /htc/projects/{projectId}/tasks
-	HtcProjectsProjectIdTasksGet(ctx context.Context, params HtcProjectsProjectIdTasksGetParams) (HtcProjectsProjectIdTasksGetRes, error)
-	// HtcProjectsProjectIdTasksPost invokes POST /htc/projects/{projectId}/tasks operation.
-	//
-	// This endpoint will create a task for a project.
-	//
-	// POST /htc/projects/{projectId}/tasks
-	HtcProjectsProjectIdTasksPost(ctx context.Context, request OptHTCTask, params HtcProjectsProjectIdTasksPostParams) (HtcProjectsProjectIdTasksPostRes, error)
 	// HtcProjectsProjectIdTasksTaskIdDelete invokes DELETE /htc/projects/{projectId}/tasks/{taskId} operation.
 	//
 	// This endpoint will delete a task by ID.
@@ -295,12 +203,6 @@ type Invoker interface {
 	//
 	// GET /htc/projects/{projectId}/tasks/{taskId}/groups
 	HtcProjectsProjectIdTasksTaskIdGroupsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdGroupsGetParams) (HtcProjectsProjectIdTasksTaskIdGroupsGetRes, error)
-	// HtcProjectsProjectIdTasksTaskIdJobsBatchPost invokes POST /htc/projects/{projectId}/tasks/{taskId}/jobs/batch operation.
-	//
-	// This endpoint will submit a batch of jobs for a task.
-	//
-	// POST /htc/projects/{projectId}/tasks/{taskId}/jobs/batch
-	HtcProjectsProjectIdTasksTaskIdJobsBatchPost(ctx context.Context, request []HTCJobSubmitRequest, params HtcProjectsProjectIdTasksTaskIdJobsBatchPostParams) (HtcProjectsProjectIdTasksTaskIdJobsBatchPostRes, error)
 	// HtcProjectsProjectIdTasksTaskIdJobsCancelPost invokes POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel operation.
 	//
 	// This endpoint will attempt to cancel submitted jobs.
@@ -308,24 +210,12 @@ type Invoker interface {
 	//
 	// POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel
 	HtcProjectsProjectIdTasksTaskIdJobsCancelPost(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsCancelPostParams) (HtcProjectsProjectIdTasksTaskIdJobsCancelPostRes, error)
-	// HtcProjectsProjectIdTasksTaskIdJobsGet invokes GET /htc/projects/{projectId}/tasks/{taskId}/jobs operation.
-	//
-	// This endpoint will get all jobs for a task.
-	//
-	// GET /htc/projects/{projectId}/tasks/{taskId}/jobs
-	HtcProjectsProjectIdTasksTaskIdJobsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsGetParams) (HtcProjectsProjectIdTasksTaskIdJobsGetRes, error)
 	// HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet invokes GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events operation.
 	//
 	// This endpoint will get events for a job.
 	//
 	// GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events
 	HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetParams) (HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes, error)
-	// HtcProjectsProjectIdTasksTaskIdJobsJobIdGet invokes GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId} operation.
-	//
-	// This endpoint will get a job by id.
-	//
-	// GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}
-	HtcProjectsProjectIdTasksTaskIdJobsJobIdGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsJobIdGetParams) (HtcProjectsProjectIdTasksTaskIdJobsJobIdGetRes, error)
 	// HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGet invokes GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/logs operation.
 	//
 	// This endpoint will get job logs.
@@ -477,6 +367,158 @@ type Invoker interface {
 	WellKnownJwksJSONGet(ctx context.Context) (WellKnownJwksJSONGetRes, error)
 }
 
+// AuthInvoker invokes operations described by OpenAPI v3 specification.
+//
+// x-gen-operation-group: Auth
+type AuthInvoker interface {
+	// GetToken invokes getToken operation.
+	//
+	// This endpoint will get a JWT token given an API key.
+	//
+	// GET /auth/token
+	GetToken(ctx context.Context) (GetTokenRes, error)
+	// WhoAmI invokes whoAmI operation.
+	//
+	// This endpoint will get Rescale user information given a Rescale API key.
+	//
+	// GET /auth/whoami
+	WhoAmI(ctx context.Context) (WhoAmIRes, error)
+}
+
+// ImageInvoker invokes operations described by OpenAPI v3 specification.
+//
+// x-gen-operation-group: Image
+type ImageInvoker interface {
+	// CreateRepo invokes createRepo operation.
+	//
+	// This endpoint will create a private container repository belonging to this project
+	// Private container registries are collections of repositories, and private repositories are
+	// collections of container images. These images are referenced when running jobs within this project.
+	//  In order to upload an image to a repository, you will need the `registryURI`, the
+	// `repositoryName`, and the token (see `/htc/projects/:projectId/container-registry/token`).
+	//
+	// POST /htc/projects/{projectId}/container-registry/repo/{repoName}
+	CreateRepo(ctx context.Context, params CreateRepoParams) (CreateRepoRes, error)
+	// GetImage invokes getImage operation.
+	//
+	// Retrieves the current status of an image across cloud providers. The status indicates whether the
+	// image is ready for use or still being processed. Returns READY when the image is available in all
+	// cloud providers, PENDING while the image is being replicated, and a 404 if the image does not
+	// exist.
+	//
+	// GET /htc/projects/{projectId}/container-registry/images/{imageName}
+	GetImage(ctx context.Context, params GetImageParams) (GetImageRes, error)
+	// GetImages invokes getImages operation.
+	//
+	// This endpoint will list all images for a project.
+	//
+	// GET /htc/projects/{projectId}/container-registry/images
+	GetImages(ctx context.Context, params GetImagesParams) (GetImagesRes, error)
+	// GetRegistryToken invokes getRegistryToken operation.
+	//
+	// This endpoint will get a container registry authorization token.
+	// To use this token run `docker login --username AWS --password {TOKEN} {CONTAINER_REGISTRY_DOMAIN}`.
+	// e.g. `docker login --username AWS --password "eyJwYXlsb2FkIjoiZHhtSzJuQ0x..." 183929446192.dkr.ecr.
+	// us-west-2.amazonaws.com`.
+	//
+	// GET /htc/projects/{projectId}/container-registry/token
+	GetRegistryToken(ctx context.Context, params GetRegistryTokenParams) (GetRegistryTokenRes, error)
+}
+
+// JobInvoker invokes operations described by OpenAPI v3 specification.
+//
+// x-gen-operation-group: Job
+type JobInvoker interface {
+	// GetJob invokes getJob operation.
+	//
+	// This endpoint will get a job by id.
+	//
+	// GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}
+	GetJob(ctx context.Context, params GetJobParams) (GetJobRes, error)
+	// GetJobs invokes getJobs operation.
+	//
+	// This endpoint will get all jobs for a task.
+	//
+	// GET /htc/projects/{projectId}/tasks/{taskId}/jobs
+	GetJobs(ctx context.Context, params GetJobsParams) (GetJobsRes, error)
+	// SubmitJobs invokes submitJobs operation.
+	//
+	// This endpoint will submit a batch of jobs for a task.
+	//
+	// POST /htc/projects/{projectId}/tasks/{taskId}/jobs/batch
+	SubmitJobs(ctx context.Context, request []HTCJobSubmitRequest, params SubmitJobsParams) (SubmitJobsRes, error)
+}
+
+// MetricsInvoker invokes operations described by OpenAPI v3 specification.
+//
+// x-gen-operation-group: Metrics
+type MetricsInvoker interface {
+	// GetMetrics invokes getMetrics operation.
+	//
+	// Get all HTC Metrics for a workspace.
+	//
+	// GET /htc/metrics
+	GetMetrics(ctx context.Context, params GetMetricsParams) (GetMetricsRes, error)
+}
+
+// ProjectInvoker invokes operations described by OpenAPI v3 specification.
+//
+// x-gen-operation-group: Project
+type ProjectInvoker interface {
+	// GetDimensions invokes getDimensions operation.
+	//
+	// This endpoint is designed to retrieve the current set of dimension combinations configured for a
+	// specific project so that users can understand the existing computing environment constraints of a
+	// project. It returns a list of dimension combinations such as pricing priority, geographical region,
+	//  compute scaling policy, and hyperthreading options.
+	// Any user who _belongs to the workspace this project belongs to_ can use this endpoint to verify or
+	// audit the current configuration of a project. This can be helpful in ensuring that the project's
+	// settings align with expectations.
+	// The payload also includes a read-only set of `derived` dimensions which help describe the
+	// currently configured `machineType`.
+	//
+	// GET /htc/projects/{projectId}/dimensions
+	GetDimensions(ctx context.Context, params GetDimensionsParams) (GetDimensionsRes, error)
+	// GetLimits invokes getLimits operation.
+	//
+	// This endpoint will list all resource limitations associated with this project.
+	// A job running in this project will be subject to all resulting limits as well as any associated
+	// with the workspace (see `/htc/workspaces/{workspaceId}/limits`).
+	//
+	// GET /htc/projects/{projectId}/limits
+	GetLimits(ctx context.Context, params GetLimitsParams) (GetLimitsRes, error)
+	// GetProject invokes getProject operation.
+	//
+	// This endpoint will get a project by id.
+	//
+	// GET /htc/projects/{projectId}
+	GetProject(ctx context.Context, params GetProjectParams) (GetProjectRes, error)
+	// GetProjects invokes getProjects operation.
+	//
+	// This endpoint will get all projects.
+	//
+	// GET /htc/projects
+	GetProjects(ctx context.Context, params GetProjectsParams) (GetProjectsRes, error)
+}
+
+// TaskInvoker invokes operations described by OpenAPI v3 specification.
+//
+// x-gen-operation-group: Task
+type TaskInvoker interface {
+	// CreateTask invokes createTask operation.
+	//
+	// This endpoint will create a task for a project.
+	//
+	// POST /htc/projects/{projectId}/tasks
+	CreateTask(ctx context.Context, request OptHTCTask, params CreateTaskParams) (CreateTaskRes, error)
+	// GetTasks invokes getTasks operation.
+	//
+	// This endpoint will get all tasks in a project.
+	//
+	// GET /htc/projects/{projectId}/tasks
+	GetTasks(ctx context.Context, params GetTasksParams) (GetTasksRes, error)
+}
+
 // Client implements OAS client.
 type Client struct {
 	serverURL *url.URL
@@ -525,75 +567,6 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 		return c.serverURL
 	}
 	return u
-}
-
-// AuthTokenGet invokes GET /auth/token operation.
-//
-// This endpoint will get a JWT token given an API key.
-//
-// GET /auth/token
-func (c *Client) AuthTokenGet(ctx context.Context) (AuthTokenGetRes, error) {
-	res, err := c.sendAuthTokenGet(ctx)
-	return res, err
-}
-
-func (c *Client) sendAuthTokenGet(ctx context.Context) (res AuthTokenGetRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [1]string
-	pathParts[0] = "/auth/token"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "AuthTokenGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeAuthTokenGetResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
 }
 
 // AuthTokenWhoamiGet invokes GET /auth/token/whoami operation.
@@ -665,24 +638,67 @@ func (c *Client) sendAuthTokenWhoamiGet(ctx context.Context) (res AuthTokenWhoam
 	return result, nil
 }
 
-// AuthWhoamiGet invokes GET /auth/whoami operation.
+// CreateRepo invokes createRepo operation.
 //
-// This endpoint will get Rescale user information given a Rescale API key.
+// This endpoint will create a private container repository belonging to this project
+// Private container registries are collections of repositories, and private repositories are
+// collections of container images. These images are referenced when running jobs within this project.
 //
-// GET /auth/whoami
-func (c *Client) AuthWhoamiGet(ctx context.Context) (AuthWhoamiGetRes, error) {
-	res, err := c.sendAuthWhoamiGet(ctx)
+//	In order to upload an image to a repository, you will need the `registryURI`, the
+//
+// `repositoryName`, and the token (see `/htc/projects/:projectId/container-registry/token`).
+//
+// POST /htc/projects/{projectId}/container-registry/repo/{repoName}
+func (c *Client) CreateRepo(ctx context.Context, params CreateRepoParams) (CreateRepoRes, error) {
+	res, err := c.sendCreateRepo(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendAuthWhoamiGet(ctx context.Context) (res AuthWhoamiGetRes, err error) {
+func (c *Client) sendCreateRepo(ctx context.Context, params CreateRepoParams) (res CreateRepoRes, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [1]string
-	pathParts[0] = "/auth/whoami"
+	var pathParts [4]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/container-registry/repo/"
+	{
+		// Encode "repoName" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "repoName",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.RepoName))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
 	uri.AddPathParts(u, pathParts[:]...)
 
-	r, err := ht.NewRequest(ctx, "GET", u)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -692,7 +708,7 @@ func (c *Client) sendAuthWhoamiGet(ctx context.Context) (res AuthWhoamiGetRes, e
 		var satisfied bitset
 		{
 
-			switch err := c.securitySecurityScheme(ctx, "AuthWhoamiGet", r); {
+			switch err := c.securitySecurityScheme(ctx, "CreateRepo", r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -726,7 +742,1418 @@ func (c *Client) sendAuthWhoamiGet(ctx context.Context) (res AuthWhoamiGetRes, e
 	}
 	defer resp.Body.Close()
 
-	result, err := decodeAuthWhoamiGetResponse(resp)
+	result, err := decodeCreateRepoResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CreateTask invokes createTask operation.
+//
+// This endpoint will create a task for a project.
+//
+// POST /htc/projects/{projectId}/tasks
+func (c *Client) CreateTask(ctx context.Context, request OptHTCTask, params CreateTaskParams) (CreateTaskRes, error) {
+	res, err := c.sendCreateTask(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendCreateTask(ctx context.Context, request OptHTCTask, params CreateTaskParams) (res CreateTaskRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/tasks"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCreateTaskRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "CreateTask", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeCreateTaskResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetDimensions invokes getDimensions operation.
+//
+// This endpoint is designed to retrieve the current set of dimension combinations configured for a
+// specific project so that users can understand the existing computing environment constraints of a
+// project. It returns a list of dimension combinations such as pricing priority, geographical region,
+//
+//	compute scaling policy, and hyperthreading options.
+//
+// Any user who _belongs to the workspace this project belongs to_ can use this endpoint to verify or
+// audit the current configuration of a project. This can be helpful in ensuring that the project's
+// settings align with expectations.
+// The payload also includes a read-only set of `derived` dimensions which help describe the
+// currently configured `machineType`.
+//
+// GET /htc/projects/{projectId}/dimensions
+func (c *Client) GetDimensions(ctx context.Context, params GetDimensionsParams) (GetDimensionsRes, error) {
+	res, err := c.sendGetDimensions(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetDimensions(ctx context.Context, params GetDimensionsParams) (res GetDimensionsRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/dimensions"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetDimensions", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetDimensionsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetImage invokes getImage operation.
+//
+// Retrieves the current status of an image across cloud providers. The status indicates whether the
+// image is ready for use or still being processed. Returns READY when the image is available in all
+// cloud providers, PENDING while the image is being replicated, and a 404 if the image does not
+// exist.
+//
+// GET /htc/projects/{projectId}/container-registry/images/{imageName}
+func (c *Client) GetImage(ctx context.Context, params GetImageParams) (GetImageRes, error) {
+	res, err := c.sendGetImage(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetImage(ctx context.Context, params GetImageParams) (res GetImageRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [4]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/container-registry/images/"
+	{
+		// Encode "imageName" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "imageName",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ImageName))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetImage", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetImageResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetImages invokes getImages operation.
+//
+// This endpoint will list all images for a project.
+//
+// GET /htc/projects/{projectId}/container-registry/images
+func (c *Client) GetImages(ctx context.Context, params GetImagesParams) (GetImagesRes, error) {
+	res, err := c.sendGetImages(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetImages(ctx context.Context, params GetImagesParams) (res GetImagesRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/container-registry/images"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetImages", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetImagesResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetJob invokes getJob operation.
+//
+// This endpoint will get a job by id.
+//
+// GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}
+func (c *Client) GetJob(ctx context.Context, params GetJobParams) (GetJobRes, error) {
+	res, err := c.sendGetJob(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetJob(ctx context.Context, params GetJobParams) (res GetJobRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [6]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/tasks/"
+	{
+		// Encode "taskId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "taskId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.TaskId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	pathParts[4] = "/jobs/"
+	{
+		// Encode "jobId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "jobId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.JobId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[5] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetJob", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetJobResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetJobs invokes getJobs operation.
+//
+// This endpoint will get all jobs for a task.
+//
+// GET /htc/projects/{projectId}/tasks/{taskId}/jobs
+func (c *Client) GetJobs(ctx context.Context, params GetJobsParams) (GetJobsRes, error) {
+	res, err := c.sendGetJobs(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetJobs(ctx context.Context, params GetJobsParams) (res GetJobsRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [5]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/tasks/"
+	{
+		// Encode "taskId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "taskId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.TaskId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	pathParts[4] = "/jobs"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "group" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "group",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Group.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "jobId" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "jobId",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.JobId != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.JobId {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "pageIndex" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "pageIndex",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.PageIndex.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "pageSize" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "pageSize",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.PageSize.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "status" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "status",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Status.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "viewType" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "viewType",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.ViewType.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetJobs", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetJobsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetLimits invokes getLimits operation.
+//
+// This endpoint will list all resource limitations associated with this project.
+// A job running in this project will be subject to all resulting limits as well as any associated
+// with the workspace (see `/htc/workspaces/{workspaceId}/limits`).
+//
+// GET /htc/projects/{projectId}/limits
+func (c *Client) GetLimits(ctx context.Context, params GetLimitsParams) (GetLimitsRes, error) {
+	res, err := c.sendGetLimits(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetLimits(ctx context.Context, params GetLimitsParams) (res GetLimitsRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/limits"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetLimits", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetLimitsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetMetrics invokes getMetrics operation.
+//
+// Get all HTC Metrics for a workspace.
+//
+// GET /htc/metrics
+func (c *Client) GetMetrics(ctx context.Context, params GetMetricsParams) (GetMetricsRes, error) {
+	res, err := c.sendGetMetrics(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetMetrics(ctx context.Context, params GetMetricsParams) (res GetMetricsRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/htc/metrics"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept-Encoding",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.AcceptEncoding != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.AcceptEncoding {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetMetrics", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetMetricsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetProject invokes getProject operation.
+//
+// This endpoint will get a project by id.
+//
+// GET /htc/projects/{projectId}
+func (c *Client) GetProject(ctx context.Context, params GetProjectParams) (GetProjectRes, error) {
+	res, err := c.sendGetProject(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetProject(ctx context.Context, params GetProjectParams) (res GetProjectRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetProject", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetProjectResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetProjects invokes getProjects operation.
+//
+// This endpoint will get all projects.
+//
+// GET /htc/projects
+func (c *Client) GetProjects(ctx context.Context, params GetProjectsParams) (GetProjectsRes, error) {
+	res, err := c.sendGetProjects(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetProjects(ctx context.Context, params GetProjectsParams) (res GetProjectsRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/htc/projects"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "onlyMyProjects" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "onlyMyProjects",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.OnlyMyProjects.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "pageIndex" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "pageIndex",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.PageIndex.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "pageSize" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "pageSize",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.PageSize.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetProjects", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetProjectsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetRegistryToken invokes getRegistryToken operation.
+//
+// This endpoint will get a container registry authorization token.
+// To use this token run `docker login --username AWS --password {TOKEN} {CONTAINER_REGISTRY_DOMAIN}`.
+// e.g. `docker login --username AWS --password "eyJwYXlsb2FkIjoiZHhtSzJuQ0x..." 183929446192.dkr.ecr.
+// us-west-2.amazonaws.com`.
+//
+// GET /htc/projects/{projectId}/container-registry/token
+func (c *Client) GetRegistryToken(ctx context.Context, params GetRegistryTokenParams) (GetRegistryTokenRes, error) {
+	res, err := c.sendGetRegistryToken(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetRegistryToken(ctx context.Context, params GetRegistryTokenParams) (res GetRegistryTokenRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/container-registry/token"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetRegistryToken", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetRegistryTokenResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetTasks invokes getTasks operation.
+//
+// This endpoint will get all tasks in a project.
+//
+// GET /htc/projects/{projectId}/tasks
+func (c *Client) GetTasks(ctx context.Context, params GetTasksParams) (GetTasksRes, error) {
+	res, err := c.sendGetTasks(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetTasks(ctx context.Context, params GetTasksParams) (res GetTasksRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/tasks"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "pageIndex" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "pageIndex",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.PageIndex.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "pageSize" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "pageSize",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.PageSize.Get(); ok {
+				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetTasks", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetTasksResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetToken invokes getToken operation.
+//
+// This endpoint will get a JWT token given an API key.
+//
+// GET /auth/token
+func (c *Client) GetToken(ctx context.Context) (GetTokenRes, error) {
+	res, err := c.sendGetToken(ctx)
+	return res, err
+}
+
+func (c *Client) sendGetToken(ctx context.Context) (res GetTokenRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/auth/token"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetToken", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetTokenResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -822,223 +2249,6 @@ func (c *Client) sendHtcGcpClustersWorkspaceIdGet(ctx context.Context, params Ht
 	return result, nil
 }
 
-// HtcMetricsGet invokes GET /htc/metrics operation.
-//
-// Get all HTC Metrics for a workspace.
-//
-// GET /htc/metrics
-func (c *Client) HtcMetricsGet(ctx context.Context, params HtcMetricsGetParams) (HtcMetricsGetRes, error) {
-	res, err := c.sendHtcMetricsGet(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendHtcMetricsGet(ctx context.Context, params HtcMetricsGetParams) (res HtcMetricsGetRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [1]string
-	pathParts[0] = "/htc/metrics"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	h := uri.NewHeaderEncoder(r.Header)
-	{
-		cfg := uri.HeaderParameterEncodingConfig{
-			Name:    "Accept-Encoding",
-			Explode: false,
-		}
-		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
-			if params.AcceptEncoding != nil {
-				return e.EncodeArray(func(e uri.Encoder) error {
-					for i, item := range params.AcceptEncoding {
-						if err := func() error {
-							return e.EncodeValue(conv.StringToString(item))
-						}(); err != nil {
-							return errors.Wrapf(err, "[%d]", i)
-						}
-					}
-					return nil
-				})
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode header")
-		}
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcMetricsGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcMetricsGetResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcProjectsGet invokes GET /htc/projects operation.
-//
-// This endpoint will get all projects.
-//
-// GET /htc/projects
-func (c *Client) HtcProjectsGet(ctx context.Context, params HtcProjectsGetParams) (HtcProjectsGetRes, error) {
-	res, err := c.sendHtcProjectsGet(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendHtcProjectsGet(ctx context.Context, params HtcProjectsGetParams) (res HtcProjectsGetRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [1]string
-	pathParts[0] = "/htc/projects"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	q := uri.NewQueryEncoder()
-	{
-		// Encode "onlyMyProjects" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "onlyMyProjects",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.OnlyMyProjects.Get(); ok {
-				return e.EncodeValue(conv.BoolToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "pageIndex" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "pageIndex",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.PageIndex.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "pageSize" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "pageSize",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.PageSize.Get(); ok {
-				return e.EncodeValue(conv.Int32ToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	u.RawQuery = q.Values().Encode()
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcProjectsGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcProjectsGetResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
 // HtcProjectsPost invokes POST /htc/projects operation.
 //
 // This endpoint will create a project. A project is a collection of tasks and container images used
@@ -1105,504 +2315,6 @@ func (c *Client) sendHtcProjectsPost(ctx context.Context, request OptHTCProject)
 	defer resp.Body.Close()
 
 	result, err := decodeHtcProjectsPostResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcProjectsProjectIdContainerRegistryImagesGet invokes GET /htc/projects/{projectId}/container-registry/images operation.
-//
-// This endpoint will list all images for a project.
-//
-// GET /htc/projects/{projectId}/container-registry/images
-func (c *Client) HtcProjectsProjectIdContainerRegistryImagesGet(ctx context.Context, params HtcProjectsProjectIdContainerRegistryImagesGetParams) (HtcProjectsProjectIdContainerRegistryImagesGetRes, error) {
-	res, err := c.sendHtcProjectsProjectIdContainerRegistryImagesGet(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendHtcProjectsProjectIdContainerRegistryImagesGet(ctx context.Context, params HtcProjectsProjectIdContainerRegistryImagesGetParams) (res HtcProjectsProjectIdContainerRegistryImagesGetRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/container-registry/images"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcProjectsProjectIdContainerRegistryImagesGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcProjectsProjectIdContainerRegistryImagesGetResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcProjectsProjectIdContainerRegistryImagesImageNameGet invokes GET /htc/projects/{projectId}/container-registry/images/{imageName} operation.
-//
-// Retrieves the current status of an image across cloud providers. The status indicates whether the
-// image is ready for use or still being processed. Returns READY when the image is available in all
-// cloud providers, PENDING while the image is being replicated, and a 404 if the image does not
-// exist.
-//
-// GET /htc/projects/{projectId}/container-registry/images/{imageName}
-func (c *Client) HtcProjectsProjectIdContainerRegistryImagesImageNameGet(ctx context.Context, params HtcProjectsProjectIdContainerRegistryImagesImageNameGetParams) (HtcProjectsProjectIdContainerRegistryImagesImageNameGetRes, error) {
-	res, err := c.sendHtcProjectsProjectIdContainerRegistryImagesImageNameGet(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendHtcProjectsProjectIdContainerRegistryImagesImageNameGet(ctx context.Context, params HtcProjectsProjectIdContainerRegistryImagesImageNameGetParams) (res HtcProjectsProjectIdContainerRegistryImagesImageNameGetRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [4]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/container-registry/images/"
-	{
-		// Encode "imageName" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "imageName",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ImageName))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[3] = encoded
-	}
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcProjectsProjectIdContainerRegistryImagesImageNameGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcProjectsProjectIdContainerRegistryImagesImageNameGetResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcProjectsProjectIdContainerRegistryRepoRepoNamePost invokes POST /htc/projects/{projectId}/container-registry/repo/{repoName} operation.
-//
-// This endpoint will create a private container repository belonging to this project
-// Private container registries are collections of repositories, and private repositories are
-// collections of container images. These images are referenced when running jobs within this project.
-//
-//	In order to upload an image to a repository, you will need the `registryURI`, the
-//
-// `repositoryName`, and the token (see `/htc/projects/:projectId/container-registry/token`).
-//
-// POST /htc/projects/{projectId}/container-registry/repo/{repoName}
-func (c *Client) HtcProjectsProjectIdContainerRegistryRepoRepoNamePost(ctx context.Context, params HtcProjectsProjectIdContainerRegistryRepoRepoNamePostParams) (HtcProjectsProjectIdContainerRegistryRepoRepoNamePostRes, error) {
-	res, err := c.sendHtcProjectsProjectIdContainerRegistryRepoRepoNamePost(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendHtcProjectsProjectIdContainerRegistryRepoRepoNamePost(ctx context.Context, params HtcProjectsProjectIdContainerRegistryRepoRepoNamePostParams) (res HtcProjectsProjectIdContainerRegistryRepoRepoNamePostRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [4]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/container-registry/repo/"
-	{
-		// Encode "repoName" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "repoName",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.RepoName))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[3] = encoded
-	}
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "POST", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcProjectsProjectIdContainerRegistryRepoRepoNamePost", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcProjectsProjectIdContainerRegistryRepoRepoNamePostResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcProjectsProjectIdContainerRegistryTokenGet invokes GET /htc/projects/{projectId}/container-registry/token operation.
-//
-// This endpoint will get a container registry authorization token.
-// To use this token run `docker login --username AWS --password {TOKEN} {CONTAINER_REGISTRY_DOMAIN}`.
-// e.g. `docker login --username AWS --password "eyJwYXlsb2FkIjoiZHhtSzJuQ0x..." 183929446192.dkr.ecr.
-// us-west-2.amazonaws.com`.
-//
-// GET /htc/projects/{projectId}/container-registry/token
-func (c *Client) HtcProjectsProjectIdContainerRegistryTokenGet(ctx context.Context, params HtcProjectsProjectIdContainerRegistryTokenGetParams) (HtcProjectsProjectIdContainerRegistryTokenGetRes, error) {
-	res, err := c.sendHtcProjectsProjectIdContainerRegistryTokenGet(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendHtcProjectsProjectIdContainerRegistryTokenGet(ctx context.Context, params HtcProjectsProjectIdContainerRegistryTokenGetParams) (res HtcProjectsProjectIdContainerRegistryTokenGetRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/container-registry/token"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcProjectsProjectIdContainerRegistryTokenGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcProjectsProjectIdContainerRegistryTokenGetResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcProjectsProjectIdDimensionsGet invokes GET /htc/projects/{projectId}/dimensions operation.
-//
-// This endpoint is designed to retrieve the current set of dimension combinations configured for a
-// specific project so that users can understand the existing computing environment constraints of a
-// project. It returns a list of dimension combinations such as pricing priority, geographical region,
-//
-//	compute scaling policy, and hyperthreading options.
-//
-// Any user who _belongs to the workspace this project belongs to_ can use this endpoint to verify or
-// audit the current configuration of a project. This can be helpful in ensuring that the project's
-// settings align with expectations.
-// The payload also includes a read-only set of `derived` dimensions which help describe the
-// currently configured `machineType`.
-//
-// GET /htc/projects/{projectId}/dimensions
-func (c *Client) HtcProjectsProjectIdDimensionsGet(ctx context.Context, params HtcProjectsProjectIdDimensionsGetParams) (HtcProjectsProjectIdDimensionsGetRes, error) {
-	res, err := c.sendHtcProjectsProjectIdDimensionsGet(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendHtcProjectsProjectIdDimensionsGet(ctx context.Context, params HtcProjectsProjectIdDimensionsGetParams) (res HtcProjectsProjectIdDimensionsGetRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/dimensions"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcProjectsProjectIdDimensionsGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcProjectsProjectIdDimensionsGetResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -1712,93 +2424,6 @@ func (c *Client) sendHtcProjectsProjectIdDimensionsPut(ctx context.Context, requ
 	return result, nil
 }
 
-// HtcProjectsProjectIdGet invokes GET /htc/projects/{projectId} operation.
-//
-// This endpoint will get a project by id.
-//
-// GET /htc/projects/{projectId}
-func (c *Client) HtcProjectsProjectIdGet(ctx context.Context, params HtcProjectsProjectIdGetParams) (HtcProjectsProjectIdGetRes, error) {
-	res, err := c.sendHtcProjectsProjectIdGet(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendHtcProjectsProjectIdGet(ctx context.Context, params HtcProjectsProjectIdGetParams) (res HtcProjectsProjectIdGetRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [2]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcProjectsProjectIdGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcProjectsProjectIdGetResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
 // HtcProjectsProjectIdLimitsDelete invokes DELETE /htc/projects/{projectId}/limits operation.
 //
 // This endpoint will remove all resource limits associated with this project.
@@ -1881,96 +2506,6 @@ func (c *Client) sendHtcProjectsProjectIdLimitsDelete(ctx context.Context, param
 	defer resp.Body.Close()
 
 	result, err := decodeHtcProjectsProjectIdLimitsDeleteResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcProjectsProjectIdLimitsGet invokes GET /htc/projects/{projectId}/limits operation.
-//
-// This endpoint will list all resource limitations associated with this project.
-// A job running in this project will be subject to all resulting limits as well as any associated
-// with the workspace (see `/htc/workspaces/{workspaceId}/limits`).
-//
-// GET /htc/projects/{projectId}/limits
-func (c *Client) HtcProjectsProjectIdLimitsGet(ctx context.Context, params HtcProjectsProjectIdLimitsGetParams) (HtcProjectsProjectIdLimitsGetRes, error) {
-	res, err := c.sendHtcProjectsProjectIdLimitsGet(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendHtcProjectsProjectIdLimitsGet(ctx context.Context, params HtcProjectsProjectIdLimitsGetParams) (res HtcProjectsProjectIdLimitsGetRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/limits"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcProjectsProjectIdLimitsGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcProjectsProjectIdLimitsGetResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -3175,222 +3710,6 @@ func (c *Client) sendHtcProjectsProjectIdTaskRetentionPolicyPut(ctx context.Cont
 	return result, nil
 }
 
-// HtcProjectsProjectIdTasksGet invokes GET /htc/projects/{projectId}/tasks operation.
-//
-// This endpoint will get all tasks in a project.
-//
-// GET /htc/projects/{projectId}/tasks
-func (c *Client) HtcProjectsProjectIdTasksGet(ctx context.Context, params HtcProjectsProjectIdTasksGetParams) (HtcProjectsProjectIdTasksGetRes, error) {
-	res, err := c.sendHtcProjectsProjectIdTasksGet(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendHtcProjectsProjectIdTasksGet(ctx context.Context, params HtcProjectsProjectIdTasksGetParams) (res HtcProjectsProjectIdTasksGetRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/tasks"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	q := uri.NewQueryEncoder()
-	{
-		// Encode "pageIndex" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "pageIndex",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.PageIndex.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "pageSize" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "pageSize",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.PageSize.Get(); ok {
-				return e.EncodeValue(conv.Int32ToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	u.RawQuery = q.Values().Encode()
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcProjectsProjectIdTasksGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcProjectsProjectIdTasksGetResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcProjectsProjectIdTasksPost invokes POST /htc/projects/{projectId}/tasks operation.
-//
-// This endpoint will create a task for a project.
-//
-// POST /htc/projects/{projectId}/tasks
-func (c *Client) HtcProjectsProjectIdTasksPost(ctx context.Context, request OptHTCTask, params HtcProjectsProjectIdTasksPostParams) (HtcProjectsProjectIdTasksPostRes, error) {
-	res, err := c.sendHtcProjectsProjectIdTasksPost(ctx, request, params)
-	return res, err
-}
-
-func (c *Client) sendHtcProjectsProjectIdTasksPost(ctx context.Context, request OptHTCTask, params HtcProjectsProjectIdTasksPostParams) (res HtcProjectsProjectIdTasksPostRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/tasks"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "POST", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeHtcProjectsProjectIdTasksPostRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcProjectsProjectIdTasksPost", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcProjectsProjectIdTasksPostResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
 // HtcProjectsProjectIdTasksTaskIdDelete invokes DELETE /htc/projects/{projectId}/tasks/{taskId} operation.
 //
 // This endpoint will delete a task by ID.
@@ -3917,136 +4236,6 @@ func (c *Client) sendHtcProjectsProjectIdTasksTaskIdGroupsGet(ctx context.Contex
 	return result, nil
 }
 
-// HtcProjectsProjectIdTasksTaskIdJobsBatchPost invokes POST /htc/projects/{projectId}/tasks/{taskId}/jobs/batch operation.
-//
-// This endpoint will submit a batch of jobs for a task.
-//
-// POST /htc/projects/{projectId}/tasks/{taskId}/jobs/batch
-func (c *Client) HtcProjectsProjectIdTasksTaskIdJobsBatchPost(ctx context.Context, request []HTCJobSubmitRequest, params HtcProjectsProjectIdTasksTaskIdJobsBatchPostParams) (HtcProjectsProjectIdTasksTaskIdJobsBatchPostRes, error) {
-	res, err := c.sendHtcProjectsProjectIdTasksTaskIdJobsBatchPost(ctx, request, params)
-	return res, err
-}
-
-func (c *Client) sendHtcProjectsProjectIdTasksTaskIdJobsBatchPost(ctx context.Context, request []HTCJobSubmitRequest, params HtcProjectsProjectIdTasksTaskIdJobsBatchPostParams) (res HtcProjectsProjectIdTasksTaskIdJobsBatchPostRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [5]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/tasks/"
-	{
-		// Encode "taskId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "taskId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.TaskId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[3] = encoded
-	}
-	pathParts[4] = "/jobs/batch"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	q := uri.NewQueryEncoder()
-	{
-		// Encode "group" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "group",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Group.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	u.RawQuery = q.Values().Encode()
-
-	r, err := ht.NewRequest(ctx, "POST", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeHtcProjectsProjectIdTasksTaskIdJobsBatchPostRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcProjectsProjectIdTasksTaskIdJobsBatchPost", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcProjectsProjectIdTasksTaskIdJobsBatchPostResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
 // HtcProjectsProjectIdTasksTaskIdJobsCancelPost invokes POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel operation.
 //
 // This endpoint will attempt to cancel submitted jobs.
@@ -4168,227 +4357,6 @@ func (c *Client) sendHtcProjectsProjectIdTasksTaskIdJobsCancelPost(ctx context.C
 	defer resp.Body.Close()
 
 	result, err := decodeHtcProjectsProjectIdTasksTaskIdJobsCancelPostResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcProjectsProjectIdTasksTaskIdJobsGet invokes GET /htc/projects/{projectId}/tasks/{taskId}/jobs operation.
-//
-// This endpoint will get all jobs for a task.
-//
-// GET /htc/projects/{projectId}/tasks/{taskId}/jobs
-func (c *Client) HtcProjectsProjectIdTasksTaskIdJobsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsGetParams) (HtcProjectsProjectIdTasksTaskIdJobsGetRes, error) {
-	res, err := c.sendHtcProjectsProjectIdTasksTaskIdJobsGet(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendHtcProjectsProjectIdTasksTaskIdJobsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsGetParams) (res HtcProjectsProjectIdTasksTaskIdJobsGetRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [5]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/tasks/"
-	{
-		// Encode "taskId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "taskId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.TaskId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[3] = encoded
-	}
-	pathParts[4] = "/jobs"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	q := uri.NewQueryEncoder()
-	{
-		// Encode "group" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "group",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Group.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "jobId" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "jobId",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if params.JobId != nil {
-				return e.EncodeArray(func(e uri.Encoder) error {
-					for i, item := range params.JobId {
-						if err := func() error {
-							return e.EncodeValue(conv.StringToString(item))
-						}(); err != nil {
-							return errors.Wrapf(err, "[%d]", i)
-						}
-					}
-					return nil
-				})
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "pageIndex" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "pageIndex",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.PageIndex.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "pageSize" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "pageSize",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.PageSize.Get(); ok {
-				return e.EncodeValue(conv.Int32ToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "status" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "status",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Status.Get(); ok {
-				return e.EncodeValue(conv.StringToString(string(val)))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "viewType" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "viewType",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.ViewType.Get(); ok {
-				return e.EncodeValue(conv.StringToString(string(val)))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	u.RawQuery = q.Values().Encode()
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcProjectsProjectIdTasksTaskIdJobsGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcProjectsProjectIdTasksTaskIdJobsGetResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -4552,131 +4520,6 @@ func (c *Client) sendHtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet(ctx conte
 	defer resp.Body.Close()
 
 	result, err := decodeHtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcProjectsProjectIdTasksTaskIdJobsJobIdGet invokes GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId} operation.
-//
-// This endpoint will get a job by id.
-//
-// GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}
-func (c *Client) HtcProjectsProjectIdTasksTaskIdJobsJobIdGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsJobIdGetParams) (HtcProjectsProjectIdTasksTaskIdJobsJobIdGetRes, error) {
-	res, err := c.sendHtcProjectsProjectIdTasksTaskIdJobsJobIdGet(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendHtcProjectsProjectIdTasksTaskIdJobsJobIdGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsJobIdGetParams) (res HtcProjectsProjectIdTasksTaskIdJobsJobIdGetRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [6]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/tasks/"
-	{
-		// Encode "taskId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "taskId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.TaskId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[3] = encoded
-	}
-	pathParts[4] = "/jobs/"
-	{
-		// Encode "jobId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "jobId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.JobId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[5] = encoded
-	}
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcProjectsProjectIdTasksTaskIdJobsJobIdGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcProjectsProjectIdTasksTaskIdJobsJobIdGetResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -6315,6 +6158,136 @@ func (c *Client) sendOAuth2TokenPost(ctx context.Context) (res OAuth2TokenPostRe
 	return result, nil
 }
 
+// SubmitJobs invokes submitJobs operation.
+//
+// This endpoint will submit a batch of jobs for a task.
+//
+// POST /htc/projects/{projectId}/tasks/{taskId}/jobs/batch
+func (c *Client) SubmitJobs(ctx context.Context, request []HTCJobSubmitRequest, params SubmitJobsParams) (SubmitJobsRes, error) {
+	res, err := c.sendSubmitJobs(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendSubmitJobs(ctx context.Context, request []HTCJobSubmitRequest, params SubmitJobsParams) (res SubmitJobsRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [5]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/tasks/"
+	{
+		// Encode "taskId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "taskId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.TaskId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	pathParts[4] = "/jobs/batch"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "group" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "group",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Group.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeSubmitJobsRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "SubmitJobs", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeSubmitJobsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // WellKnownJwksJSONGet invokes GET /.well-known/jwks.json operation.
 //
 // This endpoint will get the public keys used to verify JWT.
@@ -6344,6 +6317,75 @@ func (c *Client) sendWellKnownJwksJSONGet(ctx context.Context) (res WellKnownJwk
 	defer resp.Body.Close()
 
 	result, err := decodeWellKnownJwksJSONGetResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// WhoAmI invokes whoAmI operation.
+//
+// This endpoint will get Rescale user information given a Rescale API key.
+//
+// GET /auth/whoami
+func (c *Client) WhoAmI(ctx context.Context) (WhoAmIRes, error) {
+	res, err := c.sendWhoAmI(ctx)
+	return res, err
+}
+
+func (c *Client) sendWhoAmI(ctx context.Context) (res WhoAmIRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/auth/whoami"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "WhoAmI", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeWhoAmIResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

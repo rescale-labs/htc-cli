@@ -16,6 +16,88 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
+func (s *Server) decodeCreateTaskRequest(r *http.Request) (
+	req OptHTCTask,
+	close func() error,
+	rerr error,
+) {
+	var closers []func() error
+	close = func() error {
+		var merr error
+		// Close in reverse order, to match defer behavior.
+		for i := len(closers) - 1; i >= 0; i-- {
+			c := closers[i]
+			merr = multierr.Append(merr, c())
+		}
+		return merr
+	}
+	defer func() {
+		if rerr != nil {
+			rerr = multierr.Append(rerr, close())
+		}
+	}()
+	if _, ok := r.Header["Content-Type"]; !ok && r.ContentLength == 0 {
+		return req, close, nil
+	}
+	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	if err != nil {
+		return req, close, errors.Wrap(err, "parse media type")
+	}
+	switch {
+	case ct == "application/json":
+		if r.ContentLength == 0 {
+			return req, close, nil
+		}
+		buf, err := io.ReadAll(r.Body)
+		if err != nil {
+			return req, close, err
+		}
+
+		if len(buf) == 0 {
+			return req, close, nil
+		}
+
+		d := jx.DecodeBytes(buf)
+
+		var request OptHTCTask
+		if err := func() error {
+			request.Reset()
+			if err := request.Decode(d); err != nil {
+				return err
+			}
+			if err := d.Skip(); err != io.EOF {
+				return errors.New("unexpected trailing data")
+			}
+			return nil
+		}(); err != nil {
+			err = &ogenerrors.DecodeBodyError{
+				ContentType: ct,
+				Body:        buf,
+				Err:         err,
+			}
+			return req, close, err
+		}
+		if err := func() error {
+			if value, ok := request.Get(); ok {
+				if err := func() error {
+					if err := value.Validate(); err != nil {
+						return err
+					}
+					return nil
+				}(); err != nil {
+					return err
+				}
+			}
+			return nil
+		}(); err != nil {
+			return req, close, errors.Wrap(err, "validate")
+		}
+		return request, close, nil
+	default:
+		return req, close, validate.InvalidContentType(ct)
+	}
+}
+
 func (s *Server) decodeHtcProjectsPostRequest(r *http.Request) (
 	req OptHTCProject,
 	close func() error,
@@ -507,184 +589,6 @@ func (s *Server) decodeHtcProjectsProjectIdTaskRetentionPolicyPutRequest(r *http
 	}
 }
 
-func (s *Server) decodeHtcProjectsProjectIdTasksPostRequest(r *http.Request) (
-	req OptHTCTask,
-	close func() error,
-	rerr error,
-) {
-	var closers []func() error
-	close = func() error {
-		var merr error
-		// Close in reverse order, to match defer behavior.
-		for i := len(closers) - 1; i >= 0; i-- {
-			c := closers[i]
-			merr = multierr.Append(merr, c())
-		}
-		return merr
-	}
-	defer func() {
-		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
-		}
-	}()
-	if _, ok := r.Header["Content-Type"]; !ok && r.ContentLength == 0 {
-		return req, close, nil
-	}
-	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
-	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
-	}
-	switch {
-	case ct == "application/json":
-		if r.ContentLength == 0 {
-			return req, close, nil
-		}
-		buf, err := io.ReadAll(r.Body)
-		if err != nil {
-			return req, close, err
-		}
-
-		if len(buf) == 0 {
-			return req, close, nil
-		}
-
-		d := jx.DecodeBytes(buf)
-
-		var request OptHTCTask
-		if err := func() error {
-			request.Reset()
-			if err := request.Decode(d); err != nil {
-				return err
-			}
-			if err := d.Skip(); err != io.EOF {
-				return errors.New("unexpected trailing data")
-			}
-			return nil
-		}(); err != nil {
-			err = &ogenerrors.DecodeBodyError{
-				ContentType: ct,
-				Body:        buf,
-				Err:         err,
-			}
-			return req, close, err
-		}
-		if err := func() error {
-			if value, ok := request.Get(); ok {
-				if err := func() error {
-					if err := value.Validate(); err != nil {
-						return err
-					}
-					return nil
-				}(); err != nil {
-					return err
-				}
-			}
-			return nil
-		}(); err != nil {
-			return req, close, errors.Wrap(err, "validate")
-		}
-		return request, close, nil
-	default:
-		return req, close, validate.InvalidContentType(ct)
-	}
-}
-
-func (s *Server) decodeHtcProjectsProjectIdTasksTaskIdJobsBatchPostRequest(r *http.Request) (
-	req []HTCJobSubmitRequest,
-	close func() error,
-	rerr error,
-) {
-	var closers []func() error
-	close = func() error {
-		var merr error
-		// Close in reverse order, to match defer behavior.
-		for i := len(closers) - 1; i >= 0; i-- {
-			c := closers[i]
-			merr = multierr.Append(merr, c())
-		}
-		return merr
-	}
-	defer func() {
-		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
-		}
-	}()
-	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
-	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
-	}
-	switch {
-	case ct == "application/json":
-		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
-		}
-		buf, err := io.ReadAll(r.Body)
-		if err != nil {
-			return req, close, err
-		}
-
-		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
-		}
-
-		d := jx.DecodeBytes(buf)
-
-		var request []HTCJobSubmitRequest
-		if err := func() error {
-			request = make([]HTCJobSubmitRequest, 0)
-			if err := d.Arr(func(d *jx.Decoder) error {
-				var elem HTCJobSubmitRequest
-				if err := elem.Decode(d); err != nil {
-					return err
-				}
-				request = append(request, elem)
-				return nil
-			}); err != nil {
-				return err
-			}
-			if err := d.Skip(); err != io.EOF {
-				return errors.New("unexpected trailing data")
-			}
-			return nil
-		}(); err != nil {
-			err = &ogenerrors.DecodeBodyError{
-				ContentType: ct,
-				Body:        buf,
-				Err:         err,
-			}
-			return req, close, err
-		}
-		if err := func() error {
-			if request == nil {
-				return errors.New("nil is invalid value")
-			}
-			var failures []validate.FieldError
-			for i, elem := range request {
-				if err := func() error {
-					if err := elem.Validate(); err != nil {
-						return err
-					}
-					return nil
-				}(); err != nil {
-					failures = append(failures, validate.FieldError{
-						Name:  fmt.Sprintf("[%d]", i),
-						Error: err,
-					})
-				}
-			}
-			if len(failures) > 0 {
-				return &validate.Error{Fields: failures}
-			}
-			return nil
-		}(); err != nil {
-			return req, close, errors.Wrap(err, "validate")
-		}
-		return request, close, nil
-	default:
-		return req, close, validate.InvalidContentType(ct)
-	}
-}
-
 func (s *Server) decodeHtcProjectsProjectIdTasksTaskIdPatchRequest(r *http.Request) (
 	req OptHTCTaskUpdate,
 	close func() error,
@@ -838,6 +742,102 @@ func (s *Server) decodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyPutRequest(r *
 				}(); err != nil {
 					return err
 				}
+			}
+			return nil
+		}(); err != nil {
+			return req, close, errors.Wrap(err, "validate")
+		}
+		return request, close, nil
+	default:
+		return req, close, validate.InvalidContentType(ct)
+	}
+}
+
+func (s *Server) decodeSubmitJobsRequest(r *http.Request) (
+	req []HTCJobSubmitRequest,
+	close func() error,
+	rerr error,
+) {
+	var closers []func() error
+	close = func() error {
+		var merr error
+		// Close in reverse order, to match defer behavior.
+		for i := len(closers) - 1; i >= 0; i-- {
+			c := closers[i]
+			merr = multierr.Append(merr, c())
+		}
+		return merr
+	}
+	defer func() {
+		if rerr != nil {
+			rerr = multierr.Append(rerr, close())
+		}
+	}()
+	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	if err != nil {
+		return req, close, errors.Wrap(err, "parse media type")
+	}
+	switch {
+	case ct == "application/json":
+		if r.ContentLength == 0 {
+			return req, close, validate.ErrBodyRequired
+		}
+		buf, err := io.ReadAll(r.Body)
+		if err != nil {
+			return req, close, err
+		}
+
+		if len(buf) == 0 {
+			return req, close, validate.ErrBodyRequired
+		}
+
+		d := jx.DecodeBytes(buf)
+
+		var request []HTCJobSubmitRequest
+		if err := func() error {
+			request = make([]HTCJobSubmitRequest, 0)
+			if err := d.Arr(func(d *jx.Decoder) error {
+				var elem HTCJobSubmitRequest
+				if err := elem.Decode(d); err != nil {
+					return err
+				}
+				request = append(request, elem)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := d.Skip(); err != io.EOF {
+				return errors.New("unexpected trailing data")
+			}
+			return nil
+		}(); err != nil {
+			err = &ogenerrors.DecodeBodyError{
+				ContentType: ct,
+				Body:        buf,
+				Err:         err,
+			}
+			return req, close, err
+		}
+		if err := func() error {
+			if request == nil {
+				return errors.New("nil is invalid value")
+			}
+			var failures []validate.FieldError
+			for i, elem := range request {
+				if err := func() error {
+					if err := elem.Validate(); err != nil {
+						return err
+					}
+					return nil
+				}(); err != nil {
+					failures = append(failures, validate.FieldError{
+						Name:  fmt.Sprintf("[%d]", i),
+						Error: err,
+					})
+				}
+			}
+			if len(failures) > 0 {
+				return &validate.Error{Fields: failures}
 			}
 			return nil
 		}(); err != nil {
