@@ -134,7 +134,7 @@ func (r *Runner) RenewToken() error {
 		return fmt.Errorf("API client auth failed: %w", err)
 	}
 	if err := updateWhoAmI(ctx, r.Client, r.Config); err != nil {
-		return fmt.Errorf("API client auth failed: %w", err)
+		return fmt.Errorf("API client identification failed: %w", err)
 	}
 
 	if err := r.Config.SaveCredentials(); err != nil {

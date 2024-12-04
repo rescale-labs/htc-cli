@@ -120,7 +120,7 @@ func (c *Config) ReadIdentity(contextName string, i *Identity) error {
 // client in common.ClientWrapper.
 func (c *Config) SecurityScheme(ctx context.Context, operationName string) (oapi.SecurityScheme, error) {
 	switch operationName {
-	case "AuthTokenGet", "AuthWhoamiGet":
+	case "GetToken", "WhoAmI":
 		// Only these two methods use the API key. See
 		// common.ClientWrapper.Do() for companion code.
 		return oapi.SecurityScheme{Token: c.Credentials.ApiKey}, nil
