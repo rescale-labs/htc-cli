@@ -1,6 +1,6 @@
 # Changelog
 
-## Pending next release
+## v0.0.6
 
 * Update `htc image login-repo` to feed token to docker/podman over
   stdin instead of as a command arg.
