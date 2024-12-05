@@ -1842,7 +1842,7 @@ type HTCJobSubmitRequest struct {
 	ParentJobId         OptString             `json:"parentJobId"`
 	ProjectId           OptString             `json:"projectId"`
 	Regions             []RescaleRegion       `json:"regions"`
-	RescaleProjectId    OptString             `json:"rescaleProjectId"`
+	RescaleProjectId    OptNilString          `json:"rescaleProjectId"`
 	RescaleTimeReceived OptDateTime           `json:"rescaleTimeReceived"`
 	RetryStrategy       OptHTCRetryStrategy   `json:"retryStrategy"`
 	Tags                []Tag                 `json:"tags"`
@@ -1906,7 +1906,7 @@ func (s *HTCJobSubmitRequest) GetRegions() []RescaleRegion {
 }
 
 // GetRescaleProjectId returns the value of RescaleProjectId.
-func (s *HTCJobSubmitRequest) GetRescaleProjectId() OptString {
+func (s *HTCJobSubmitRequest) GetRescaleProjectId() OptNilString {
 	return s.RescaleProjectId
 }
 
@@ -1991,7 +1991,7 @@ func (s *HTCJobSubmitRequest) SetRegions(val []RescaleRegion) {
 }
 
 // SetRescaleProjectId sets the value of RescaleProjectId.
-func (s *HTCJobSubmitRequest) SetRescaleProjectId(val OptString) {
+func (s *HTCJobSubmitRequest) SetRescaleProjectId(val OptNilString) {
 	s.RescaleProjectId = val
 }
 

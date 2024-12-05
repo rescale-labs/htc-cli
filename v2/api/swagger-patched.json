@@ -558,6 +558,7 @@
                   "writeOnly": true
                },
                "rescaleProjectId": {
+                  "nullable": true,
                   "type": "string"
                },
                "rescaleTimeReceived": {
