@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.0.7
+
+* Add new experimental cloudfilesystems section from swagger to
+  HTCJobSubmitRequest.
+* Future proof authentication against method renames.
+
 ## v0.0.6
 
 * Update `htc image login-repo` to feed token to docker/podman over

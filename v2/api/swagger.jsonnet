@@ -239,6 +239,13 @@ local patches = {
           },
         },
       },
+      HTCJobSubmitRequest+: {
+        properties+: {
+          rescaleProjectId+: {
+            nullable: true,
+          },
+        },
+      },
       HTCJobSubmitRequests: {
         type: 'array',
         items: {
