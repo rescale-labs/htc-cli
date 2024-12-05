@@ -10,6 +10,7 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"strings"
 	"time"
 
@@ -114,13 +115,29 @@ func (c *Config) ReadIdentity(contextName string, i *Identity) error {
 	return nil
 }
 
+// Takes a function or method. Returns its name with the package
+// stripped out.
+func getFunctionName(temp interface{}) string {
+	strs := strings.Split((runtime.FuncForPC(reflect.ValueOf(temp).Pointer()).Name()), ".")
+	return strs[len(strs)-1]
+}
+
 // Implements oapi.SecuritySource. Note that ogen *always* sends this
 // token up with "Authorization: Bearer", so when we need to send
 // "Authorization: Token" that's hacked out upstream by the custom HTTP
 // client in common.ClientWrapper.
 func (c *Config) SecurityScheme(ctx context.Context, operationName string) (oapi.SecurityScheme, error) {
+	// Use method names as they're defined in the code, so that if we
+	// ever rename these again, we'll find out with a compile time
+	// error.
+	//
+	// NB: (*oapi.Client) lets us get the original function, not the
+	// closure bound to an actual oapi.Client struct pointer (which has
+	// a `-fm` suffix).
+	getToken := getFunctionName((*oapi.Client).GetToken)
+	whoAmI := getFunctionName((*oapi.Client).WhoAmI)
 	switch operationName {
-	case "GetToken", "WhoAmI":
+	case getToken, whoAmI:
 		// Only these two methods use the API key. See
 		// common.ClientWrapper.Do() for companion code.
 		return oapi.SecurityScheme{Token: c.Credentials.ApiKey}, nil
