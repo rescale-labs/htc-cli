@@ -22,6 +22,16 @@ func (UnimplementedHandler) AuthTokenWhoamiGet(ctx context.Context) (r AuthToken
 	return r, ht.ErrNotImplemented
 }
 
+// CreateProject implements createProject operation.
+//
+// This endpoint will create a project. A project is a collection of tasks and container images used
+// to run jobs. Several projects can belong to a single workspace.
+//
+// POST /htc/projects
+func (UnimplementedHandler) CreateProject(ctx context.Context, req OptHTCProject) (r CreateProjectRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // CreateRepo implements createRepo operation.
 //
 // This endpoint will create a private container repository belonging to this project
@@ -179,16 +189,6 @@ func (UnimplementedHandler) GetToken(ctx context.Context) (r GetTokenRes, _ erro
 //
 // GET /htc/gcp/clusters/{workspaceId}
 func (UnimplementedHandler) HtcGcpClustersWorkspaceIdGet(ctx context.Context, params HtcGcpClustersWorkspaceIdGetParams) (r HtcGcpClustersWorkspaceIdGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcProjectsPost implements POST /htc/projects operation.
-//
-// This endpoint will create a project. A project is a collection of tasks and container images used
-// to run jobs. Several projects can belong to a single workspace.
-//
-// POST /htc/projects
-func (UnimplementedHandler) HtcProjectsPost(ctx context.Context, req OptHTCProject) (r HtcProjectsPostRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

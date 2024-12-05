@@ -61,6 +61,10 @@ local patches = {
           },
         },
       },
+      post+: {
+        'x-ogen-operation-group': 'Project',
+        operationId: 'createProject',
+      },
     },
     '/htc/projects/{projectId}'+: {
       get+: {

@@ -235,7 +235,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "GET":
 							s.handleGetProjectsRequest([0]string{}, elemIsEscaped, w, r)
 						case "POST":
-							s.handleHtcProjectsPostRequest([0]string{}, elemIsEscaped, w, r)
+							s.handleCreateProjectRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET,POST")
 						}
@@ -1679,9 +1679,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.count = 0
 							return r, true
 						case "POST":
-							r.name = "HtcProjectsPost"
+							r.name = "CreateProject"
 							r.summary = "Create Project"
-							r.operationID = ""
+							r.operationID = "createProject"
 							r.pathPattern = "/htc/projects"
 							r.args = args
 							r.count = 0
