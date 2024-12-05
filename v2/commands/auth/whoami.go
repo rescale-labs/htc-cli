@@ -36,7 +36,7 @@ func WhoAmI(cmd *cobra.Command, args []string) error {
 
 var WhoAmICmd = &cobra.Command{
 	Use:   "whoami",
-	Short: "Returns status of current user from HTC API",
-	// Long:
-	Run: common.WrapRunE(WhoAmI),
+	Short: "Returns status of current user from HTC API.",
+	Long:  "Returns status of current user from HTC API.\n\nUses Rescale API key and does not fetch or save a bearer token.",
+	Run:   common.WrapRunE(WhoAmI),
 }

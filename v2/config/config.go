@@ -115,6 +115,13 @@ func (c *Config) ReadIdentity(contextName string, i *Identity) error {
 	return nil
 }
 
+func (c *Config) DeleteCredentials() error {
+	if err := os.Remove(c.credentialsPath(c.Context)); !errors.Is(err, fs.ErrNotExist) {
+		return err
+	}
+	return nil
+}
+
 // Takes a function or method. Returns its name with the package
 // stripped out.
 func getFunctionName(temp interface{}) string {
