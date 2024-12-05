@@ -302,12 +302,23 @@ func (s *EnvPair) SetValue(val string) {
 
 // Ref: #/components/schemas/ExperimentalFields
 type ExperimentalFields struct {
-	KubernetesSwap OptBool `json:"kubernetesSwap"`
+	CloudFileSystems OptBool `json:"cloudFileSystems"`
+	KubernetesSwap   OptBool `json:"kubernetesSwap"`
+}
+
+// GetCloudFileSystems returns the value of CloudFileSystems.
+func (s *ExperimentalFields) GetCloudFileSystems() OptBool {
+	return s.CloudFileSystems
 }
 
 // GetKubernetesSwap returns the value of KubernetesSwap.
 func (s *ExperimentalFields) GetKubernetesSwap() OptBool {
 	return s.KubernetesSwap
+}
+
+// SetCloudFileSystems sets the value of CloudFileSystems.
+func (s *ExperimentalFields) SetCloudFileSystems(val OptBool) {
+	s.CloudFileSystems = val
 }
 
 // SetKubernetesSwap sets the value of KubernetesSwap.
@@ -1831,6 +1842,7 @@ type HTCJobSubmitRequest struct {
 	ParentJobId         OptString             `json:"parentJobId"`
 	ProjectId           OptString             `json:"projectId"`
 	Regions             []RescaleRegion       `json:"regions"`
+	RescaleProjectId    OptString             `json:"rescaleProjectId"`
 	RescaleTimeReceived OptDateTime           `json:"rescaleTimeReceived"`
 	RetryStrategy       OptHTCRetryStrategy   `json:"retryStrategy"`
 	Tags                []Tag                 `json:"tags"`
@@ -1891,6 +1903,11 @@ func (s *HTCJobSubmitRequest) GetProjectId() OptString {
 // GetRegions returns the value of Regions.
 func (s *HTCJobSubmitRequest) GetRegions() []RescaleRegion {
 	return s.Regions
+}
+
+// GetRescaleProjectId returns the value of RescaleProjectId.
+func (s *HTCJobSubmitRequest) GetRescaleProjectId() OptString {
+	return s.RescaleProjectId
 }
 
 // GetRescaleTimeReceived returns the value of RescaleTimeReceived.
@@ -1971,6 +1988,11 @@ func (s *HTCJobSubmitRequest) SetProjectId(val OptString) {
 // SetRegions sets the value of Regions.
 func (s *HTCJobSubmitRequest) SetRegions(val []RescaleRegion) {
 	s.Regions = val
+}
+
+// SetRescaleProjectId sets the value of RescaleProjectId.
+func (s *HTCJobSubmitRequest) SetRescaleProjectId(val OptString) {
+	s.RescaleProjectId = val
 }
 
 // SetRescaleTimeReceived sets the value of RescaleTimeReceived.

@@ -448,6 +448,12 @@ func (s *ExperimentalFields) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *ExperimentalFields) encodeFields(e *jx.Encoder) {
 	{
+		if s.CloudFileSystems.Set {
+			e.FieldStart("cloudFileSystems")
+			s.CloudFileSystems.Encode(e)
+		}
+	}
+	{
 		if s.KubernetesSwap.Set {
 			e.FieldStart("kubernetesSwap")
 			s.KubernetesSwap.Encode(e)
@@ -455,8 +461,9 @@ func (s *ExperimentalFields) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfExperimentalFields = [1]string{
-	0: "kubernetesSwap",
+var jsonFieldsNameOfExperimentalFields = [2]string{
+	0: "cloudFileSystems",
+	1: "kubernetesSwap",
 }
 
 // Decode decodes ExperimentalFields from json.
@@ -467,6 +474,16 @@ func (s *ExperimentalFields) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
+		case "cloudFileSystems":
+			if err := func() error {
+				s.CloudFileSystems.Reset()
+				if err := s.CloudFileSystems.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"cloudFileSystems\"")
+			}
 		case "kubernetesSwap":
 			if err := func() error {
 				s.KubernetesSwap.Reset()
@@ -2761,6 +2778,12 @@ func (s *HTCJobSubmitRequest) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.RescaleProjectId.Set {
+			e.FieldStart("rescaleProjectId")
+			s.RescaleProjectId.Encode(e)
+		}
+	}
+	{
 		if s.RescaleTimeReceived.Set {
 			e.FieldStart("rescaleTimeReceived")
 			s.RescaleTimeReceived.Encode(e, json.EncodeDateTime)
@@ -2796,7 +2819,7 @@ func (s *HTCJobSubmitRequest) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfHTCJobSubmitRequest = [16]string{
+var jsonFieldsNameOfHTCJobSubmitRequest = [17]string{
 	0:  "batchSize",
 	1:  "cloudProvider",
 	2:  "createdBy",
@@ -2808,11 +2831,12 @@ var jsonFieldsNameOfHTCJobSubmitRequest = [16]string{
 	8:  "parentJobId",
 	9:  "projectId",
 	10: "regions",
-	11: "rescaleTimeReceived",
-	12: "retryStrategy",
-	13: "tags",
-	14: "taskId",
-	15: "workspaceId",
+	11: "rescaleProjectId",
+	12: "rescaleTimeReceived",
+	13: "retryStrategy",
+	14: "tags",
+	15: "taskId",
+	16: "workspaceId",
 }
 
 // Decode decodes HTCJobSubmitRequest from json.
@@ -2820,7 +2844,7 @@ func (s *HTCJobSubmitRequest) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode HTCJobSubmitRequest to nil")
 	}
-	var requiredBitSet [2]uint8
+	var requiredBitSet [3]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -2941,6 +2965,16 @@ func (s *HTCJobSubmitRequest) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"regions\"")
 			}
+		case "rescaleProjectId":
+			if err := func() error {
+				s.RescaleProjectId.Reset()
+				if err := s.RescaleProjectId.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"rescaleProjectId\"")
+			}
 		case "rescaleTimeReceived":
 			if err := func() error {
 				s.RescaleTimeReceived.Reset()
@@ -3007,8 +3041,9 @@ func (s *HTCJobSubmitRequest) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [2]uint8{
+	for i, mask := range [3]uint8{
 		0b00100000,
+		0b00000000,
 		0b00000000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
