@@ -27,12 +27,7 @@ func init() {
 	RootCmd.PersistentFlags().String("context", "", "config context to use (default \"default\")")
 
 	// auth
-	authCmd := &cobra.Command{
-		Use: "auth",
-	}
-	authCmd.AddCommand(auth.LoginCmd)
-	authCmd.AddCommand(auth.WhoAmICmd)
-	RootCmd.AddCommand(authCmd)
+	RootCmd.AddCommand(auth.AuthCmd)
 
 	// config
 	configCmd := &cobra.Command{
