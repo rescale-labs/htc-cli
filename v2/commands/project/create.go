@@ -49,7 +49,7 @@ func createProject(cmd *cobra.Command, args []string) error {
 
 var CreateCmd = &cobra.Command{
 	Use:   "create PROJECT_JSON",
-	Short: "Creates an HTC project using JSON file or - for stdin",
+	Short: "Creates an HTC project using JSON file or - for stdin.",
 	Run:   common.WrapRunE(createProject),
 	Args:  cobra.ExactArgs(1),
 }
@@ -67,6 +67,15 @@ func init() {
 	if err != nil {
 		panic("Unable to serialize `project create` JSON example: " + err.Error())
 	}
+
+	CreateCmd.Long = CreateCmd.Short + `
+
+The global list of region names can be found by running:
+
+	htc region get
+
+Note that your workspace likely does *NOT* have access to all regions.
+`
 
 	// NB: EOF has no leading space so that copy/paste works w/o
 	// editing.
