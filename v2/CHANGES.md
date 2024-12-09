@@ -1,5 +1,12 @@
 # Changelog
 
+## Pending release
+
+* Add `auth logout` for clearing existing stored API key and token.
+* Add `project create` with sample JSON in usage string.
+* Add `region get` to print the global list of HTC regions.
+* Extend `dimensions get` to support tabular text output by default.
+
 ## v0.0.7
 
 * Add new experimental cloudfilesystems section from swagger to

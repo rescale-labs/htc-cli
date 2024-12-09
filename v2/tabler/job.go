@@ -20,7 +20,10 @@ func (j *HTCJob) Fields() []Field {
 	return htcJobFields
 }
 
-// json output depends on using the concrete type's UnmarshalJSON.
+// Because of how ogen constructs the underlying type, json output
+// fails unless we use the concrete type's UnmarshalJSON. So, cast
+// back to it and call it instead of letting the stdlib try on its own
+// with reflection.
 func (j *HTCJob) MarshalJSON() ([]byte, error) {
 	c := (*oapi.HTCJob)(j)
 	return c.MarshalJSON()

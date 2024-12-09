@@ -11,8 +11,8 @@ import (
 	ht "github.com/ogen-go/ogen/http"
 )
 
-func encodeCreateTaskRequest(
-	req OptHTCTask,
+func encodeCreateProjectRequest(
+	req OptHTCProject,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -31,8 +31,8 @@ func encodeCreateTaskRequest(
 	return nil
 }
 
-func encodeHtcProjectsPostRequest(
-	req OptHTCProject,
+func encodeCreateTaskRequest(
+	req OptHTCTask,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"

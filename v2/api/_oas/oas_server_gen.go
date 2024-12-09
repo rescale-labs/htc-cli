@@ -27,13 +27,6 @@ type Handler interface {
 	//
 	// GET /htc/gcp/clusters/{workspaceId}
 	HtcGcpClustersWorkspaceIdGet(ctx context.Context, params HtcGcpClustersWorkspaceIdGetParams) (HtcGcpClustersWorkspaceIdGetRes, error)
-	// HtcProjectsPost implements POST /htc/projects operation.
-	//
-	// This endpoint will create a project. A project is a collection of tasks and container images used
-	// to run jobs. Several projects can belong to a single workspace.
-	//
-	// POST /htc/projects
-	HtcProjectsPost(ctx context.Context, req OptHTCProject) (HtcProjectsPostRes, error)
 	// HtcProjectsProjectIdDimensionsPut implements PUT /htc/projects/{projectId}/dimensions operation.
 	//
 	// This endpoint allows _workspace_, _organization_, and _Rescale administrators_ to _create_,
@@ -456,6 +449,13 @@ type MetricsHandler interface {
 //
 // x-ogen-operation-group: Project
 type ProjectHandler interface {
+	// CreateProject implements createProject operation.
+	//
+	// This endpoint will create a project. A project is a collection of tasks and container images used
+	// to run jobs. Several projects can belong to a single workspace.
+	//
+	// POST /htc/projects
+	CreateProject(ctx context.Context, req OptHTCProject) (CreateProjectRes, error)
 	// GetDimensions implements getDimensions operation.
 	//
 	// This endpoint is designed to retrieve the current set of dimension combinations configured for a

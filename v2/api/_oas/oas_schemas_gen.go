@@ -254,6 +254,16 @@ func (s *ContainerDetails) SetReason(val OptString) {
 	s.Reason = val
 }
 
+// CreateProjectForbidden is response for CreateProject operation.
+type CreateProjectForbidden struct{}
+
+func (*CreateProjectForbidden) createProjectRes() {}
+
+// CreateProjectUnauthorized is response for CreateProject operation.
+type CreateProjectUnauthorized struct{}
+
+func (*CreateProjectUnauthorized) createProjectRes() {}
+
 // CreateRepoForbidden is response for CreateRepo operation.
 type CreateRepoForbidden struct{}
 
@@ -2288,8 +2298,8 @@ func (s *HTCProject) SetWorkspaceId(val OptString) {
 	s.WorkspaceId = val
 }
 
+func (*HTCProject) createProjectRes()             {}
 func (*HTCProject) getProjectRes()                {}
-func (*HTCProject) htcProjectsPostRes()           {}
 func (*HTCProject) htcProjectsProjectIdPatchRes() {}
 
 type HTCProjectDimensions []HTCComputeEnvironment
@@ -3389,16 +3399,6 @@ func (*HtcGcpClustersWorkspaceIdGetForbidden) htcGcpClustersWorkspaceIdGetRes() 
 type HtcGcpClustersWorkspaceIdGetUnauthorized struct{}
 
 func (*HtcGcpClustersWorkspaceIdGetUnauthorized) htcGcpClustersWorkspaceIdGetRes() {}
-
-// HtcProjectsPostForbidden is response for HtcProjectsPost operation.
-type HtcProjectsPostForbidden struct{}
-
-func (*HtcProjectsPostForbidden) htcProjectsPostRes() {}
-
-// HtcProjectsPostUnauthorized is response for HtcProjectsPost operation.
-type HtcProjectsPostUnauthorized struct{}
-
-func (*HtcProjectsPostUnauthorized) htcProjectsPostRes() {}
 
 type HtcProjectsProjectIdDimensionsPutCreatedApplicationJSON []HTCComputeEnvironment
 

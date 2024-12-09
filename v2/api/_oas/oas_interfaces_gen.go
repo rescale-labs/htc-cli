@@ -5,6 +5,10 @@ type AuthTokenWhoamiGetRes interface {
 	authTokenWhoamiGetRes()
 }
 
+type CreateProjectRes interface {
+	createProjectRes()
+}
+
 type CreateRepoRes interface {
 	createRepoRes()
 }
@@ -63,10 +67,6 @@ type GetTokenRes interface {
 
 type HtcGcpClustersWorkspaceIdGetRes interface {
 	htcGcpClustersWorkspaceIdGetRes()
-}
-
-type HtcProjectsPostRes interface {
-	htcProjectsPostRes()
 }
 
 type HtcProjectsProjectIdDimensionsPutRes interface {

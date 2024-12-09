@@ -10,6 +10,7 @@ import (
 
 	oapi "github.com/rescale/htc-storage-cli/v2/api/_oas"
 	"github.com/rescale/htc-storage-cli/v2/common"
+	"github.com/rescale/htc-storage-cli/v2/tabler"
 )
 
 func DimensionsGet(cmd *cobra.Command, args []string) error {
@@ -32,7 +33,7 @@ func DimensionsGet(cmd *cobra.Command, args []string) error {
 
 	switch res := res.(type) {
 	case *oapi.HTCProjectDimensions:
-		return runner.PrintResult(res, os.Stdout)
+		return runner.PrintResult((*tabler.ComputeEnvs)(res), os.Stdout)
 	case *oapi.GetDimensionsForbidden,
 		*oapi.GetDimensionsUnauthorized:
 		return fmt.Errorf("forbidden: %s", res)

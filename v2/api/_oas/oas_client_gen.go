@@ -36,13 +36,6 @@ type Invoker interface {
 	//
 	// GET /htc/gcp/clusters/{workspaceId}
 	HtcGcpClustersWorkspaceIdGet(ctx context.Context, params HtcGcpClustersWorkspaceIdGetParams) (HtcGcpClustersWorkspaceIdGetRes, error)
-	// HtcProjectsPost invokes POST /htc/projects operation.
-	//
-	// This endpoint will create a project. A project is a collection of tasks and container images used
-	// to run jobs. Several projects can belong to a single workspace.
-	//
-	// POST /htc/projects
-	HtcProjectsPost(ctx context.Context, request OptHTCProject) (HtcProjectsPostRes, error)
 	// HtcProjectsProjectIdDimensionsPut invokes PUT /htc/projects/{projectId}/dimensions operation.
 	//
 	// This endpoint allows _workspace_, _organization_, and _Rescale administrators_ to _create_,
@@ -465,6 +458,13 @@ type MetricsInvoker interface {
 //
 // x-gen-operation-group: Project
 type ProjectInvoker interface {
+	// CreateProject invokes createProject operation.
+	//
+	// This endpoint will create a project. A project is a collection of tasks and container images used
+	// to run jobs. Several projects can belong to a single workspace.
+	//
+	// POST /htc/projects
+	CreateProject(ctx context.Context, request OptHTCProject) (CreateProjectRes, error)
 	// GetDimensions invokes getDimensions operation.
 	//
 	// This endpoint is designed to retrieve the current set of dimension combinations configured for a
@@ -631,6 +631,79 @@ func (c *Client) sendAuthTokenWhoamiGet(ctx context.Context) (res AuthTokenWhoam
 	defer resp.Body.Close()
 
 	result, err := decodeAuthTokenWhoamiGetResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CreateProject invokes createProject operation.
+//
+// This endpoint will create a project. A project is a collection of tasks and container images used
+// to run jobs. Several projects can belong to a single workspace.
+//
+// POST /htc/projects
+func (c *Client) CreateProject(ctx context.Context, request OptHTCProject) (CreateProjectRes, error) {
+	res, err := c.sendCreateProject(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendCreateProject(ctx context.Context, request OptHTCProject) (res CreateProjectRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/htc/projects"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCreateProjectRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "CreateProject", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeCreateProjectResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -2242,79 +2315,6 @@ func (c *Client) sendHtcGcpClustersWorkspaceIdGet(ctx context.Context, params Ht
 	defer resp.Body.Close()
 
 	result, err := decodeHtcGcpClustersWorkspaceIdGetResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcProjectsPost invokes POST /htc/projects operation.
-//
-// This endpoint will create a project. A project is a collection of tasks and container images used
-// to run jobs. Several projects can belong to a single workspace.
-//
-// POST /htc/projects
-func (c *Client) HtcProjectsPost(ctx context.Context, request OptHTCProject) (HtcProjectsPostRes, error) {
-	res, err := c.sendHtcProjectsPost(ctx, request)
-	return res, err
-}
-
-func (c *Client) sendHtcProjectsPost(ctx context.Context, request OptHTCProject) (res HtcProjectsPostRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [1]string
-	pathParts[0] = "/htc/projects"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "POST", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeHtcProjectsPostRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcProjectsPost", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcProjectsPostResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

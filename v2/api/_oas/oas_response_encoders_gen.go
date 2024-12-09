@@ -49,6 +49,35 @@ func encodeAuthTokenWhoamiGetResponse(response AuthTokenWhoamiGetRes, w http.Res
 	}
 }
 
+func encodeCreateProjectResponse(response CreateProjectRes, w http.ResponseWriter) error {
+	switch response := response.(type) {
+	case *HTCProject:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *CreateProjectUnauthorized:
+		w.WriteHeader(401)
+
+		return nil
+
+	case *CreateProjectForbidden:
+		w.WriteHeader(403)
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeCreateRepoResponse(response CreateRepoRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCRepository:
@@ -527,35 +556,6 @@ func encodeHtcGcpClustersWorkspaceIdGetResponse(response HtcGcpClustersWorkspace
 		if _, err := e.WriteTo(w); err != nil {
 			return errors.Wrap(err, "write")
 		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeHtcProjectsPostResponse(response HtcProjectsPostRes, w http.ResponseWriter) error {
-	switch response := response.(type) {
-	case *HTCProject:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *HtcProjectsPostUnauthorized:
-		w.WriteHeader(401)
-
-		return nil
-
-	case *HtcProjectsPostForbidden:
-		w.WriteHeader(403)
 
 		return nil
 

@@ -2251,6 +2251,7 @@
          },
          "post": {
             "description": "This endpoint will create a project. A project is a collection of tasks and container images used to run jobs. Several projects can belong to a single workspace.",
+            "operationId": "createProject",
             "requestBody": {
                "content": {
                   "application/json": {
@@ -2286,7 +2287,8 @@
             "summary": "Create Project",
             "tags": [
                "Project Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Project"
          }
       },
       "/htc/projects/{projectId}": {

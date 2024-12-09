@@ -10,6 +10,7 @@ import (
 	"github.com/rescale/htc-storage-cli/v2/commands/job"
 	"github.com/rescale/htc-storage-cli/v2/commands/metrics"
 	"github.com/rescale/htc-storage-cli/v2/commands/project"
+	"github.com/rescale/htc-storage-cli/v2/commands/region"
 	"github.com/rescale/htc-storage-cli/v2/commands/task"
 	"github.com/rescale/htc-storage-cli/v2/commands/version"
 )
@@ -66,6 +67,9 @@ func init() {
 
 	// project
 	RootCmd.AddCommand(project.ProjectCmd)
+
+	// region
+	RootCmd.AddCommand(region.RegionCmd)
 
 	// task
 	taskCmd := &cobra.Command{
