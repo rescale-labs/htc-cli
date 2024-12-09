@@ -11,6 +11,7 @@ var ProjectCmd = &cobra.Command{
 func init() {
 	ProjectCmd.PersistentFlags().String("project-id", "", "HTC project ID")
 
+	ProjectCmd.AddCommand(CreateCmd)
 	ProjectCmd.AddCommand(DimensionsCmd)
 	ProjectCmd.AddCommand(GetCmd)
 	ProjectCmd.AddCommand(LimitsCmd)
