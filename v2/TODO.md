@@ -60,7 +60,6 @@ Automation:
     * Brian would like to be able to add extra columns to tabular output.
     * Brian would like `htc config edit` that drops into an editor.
 
-
 ## stuff from Alistair 2024-10-22
 
 things we run a lot in my team are:
@@ -164,5 +163,9 @@ I can give example output from any of the above / existing scripting, if that he
 * Eventually support project deletion along the lines of
   https://rescale.atlassian.net/browse/ENK-2095 ?
 * Show the last job run in a task/project/workspace.
+
+Security:
+  * Before we can deprecate htcctl, we'll need to do security certification for `htc`. (See Rescale internal sync notes from 2024-11-26.)
+
 
 <!-- vim: set tw=999999 sts=0 ts=2 sw=2: -->
