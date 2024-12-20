@@ -73,8 +73,8 @@ func Get(cmd *cobra.Command, args []string) error {
 }
 
 var GetCmd = &cobra.Command{
-	Use:   "get",
-	Short: "Returns HTC projects in a workspace",
+	Use:   "get [PROJECT_ID]",
+	Short: "Returns all HTC projects, or a single project, in the current workspace",
 	// Long:
 	Run: common.WrapRunE(Get),
 }
