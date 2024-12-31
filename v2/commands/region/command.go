@@ -24,7 +24,8 @@ func getRegions(cmd *cobra.Command, _ []string) error {
 }
 
 var RegionCmd = &cobra.Command{
-	Use: "region",
+	Use:   "region",
+	Short: "List HTC regions",
 }
 
 var GetCmd = &cobra.Command{

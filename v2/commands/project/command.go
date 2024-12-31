@@ -5,7 +5,8 @@ import (
 )
 
 var ProjectCmd = &cobra.Command{
-	Use: "project",
+	Use:   "project",
+	Short: "Commands for HTC projects",
 }
 
 func init() {
