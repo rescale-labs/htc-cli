@@ -1,11 +1,16 @@
 # Changelog
 
-## Pending release
+## v0.0.8
 
 * Add `auth logout` for clearing existing stored API key and token.
 * Add `project create` with sample JSON in usage string.
 * Add `region get` to print the global list of HTC regions.
 * Extend `dimensions get` to support tabular text output by default.
+* Extend `job get` to support sorting by several fields.
+* Document that `job submit` can be fed from stdin and include a
+  sample JSON payload in usage string.
+* Fix top level help text so that all subcommands have applicable
+  headings.
 
 ## v0.0.7
 
