@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	oapi "github.com/rescale/htc-storage-cli/v2/api/_oas"
+	oapi "github.com/rescale-labs/htc-cli/v2/api/_oas"
 	"github.com/spf13/cobra"
 )
 

@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/rescale/htc-storage-cli/v2/config"
+	"github.com/rescale-labs/htc-cli/v2/config"
 )
 
 func WrapRunE(f func(cmd *cobra.Command, args []string) error) func(cmd *cobra.Command, args []string) {

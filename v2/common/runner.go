@@ -14,9 +14,9 @@ import (
 	"github.com/go-faster/yaml"
 	"github.com/spf13/cobra"
 
-	oapi "github.com/rescale/htc-storage-cli/v2/api/_oas"
-	"github.com/rescale/htc-storage-cli/v2/config"
-	"github.com/rescale/htc-storage-cli/v2/tabler"
+	oapi "github.com/rescale-labs/htc-cli/v2/api/_oas"
+	"github.com/rescale-labs/htc-cli/v2/config"
+	"github.com/rescale-labs/htc-cli/v2/tabler"
 )
 
 // Wrap http.Client so that we can set auth headers appropriately

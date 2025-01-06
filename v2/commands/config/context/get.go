@@ -7,8 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/rescale/htc-storage-cli/v2/common"
-	"github.com/rescale/htc-storage-cli/v2/tabler"
+	"github.com/rescale-labs/htc-cli/v2/common"
+	"github.com/rescale-labs/htc-cli/v2/tabler"
 )
 
 func Get(cmd *cobra.Command, args []string) error {

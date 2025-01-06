@@ -3,23 +3,22 @@ package commands
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/rescale/htc-storage-cli/v2/commands/auth"
-	"github.com/rescale/htc-storage-cli/v2/commands/config"
-	cfgcontext "github.com/rescale/htc-storage-cli/v2/commands/config/context"
-	"github.com/rescale/htc-storage-cli/v2/commands/image"
-	"github.com/rescale/htc-storage-cli/v2/commands/job"
-	"github.com/rescale/htc-storage-cli/v2/commands/metrics"
-	"github.com/rescale/htc-storage-cli/v2/commands/project"
-	"github.com/rescale/htc-storage-cli/v2/commands/region"
-	"github.com/rescale/htc-storage-cli/v2/commands/task"
-	"github.com/rescale/htc-storage-cli/v2/commands/version"
+	"github.com/rescale-labs/htc-cli/v2/commands/auth"
+	"github.com/rescale-labs/htc-cli/v2/commands/config"
+	"github.com/rescale-labs/htc-cli/v2/commands/image"
+	"github.com/rescale-labs/htc-cli/v2/commands/job"
+	"github.com/rescale-labs/htc-cli/v2/commands/metrics"
+	"github.com/rescale-labs/htc-cli/v2/commands/project"
+	"github.com/rescale-labs/htc-cli/v2/commands/region"
+	"github.com/rescale-labs/htc-cli/v2/commands/task"
+	"github.com/rescale-labs/htc-cli/v2/commands/version"
 )
 
 var RootCmd = &cobra.Command{
 	Use:   "htc",
 	Short: "The CLI for Rescale's High Throughput Computing (HTC) API",
 	Long: `htc provides easy access to key parts of Rescale's HTC API.
-  	See https://htc.rescale.com/docs/ for more details.`,
+See https://htc.rescale.com/docs/ for more details.`,
 }
 
 func init() {
@@ -31,39 +30,16 @@ func init() {
 	RootCmd.AddCommand(auth.AuthCmd)
 
 	// config
-	configCmd := &cobra.Command{
-		Use: "config",
-	}
-	configCmd.AddCommand(config.SetCmd)
-	configCmd.AddCommand(config.UnsetCmd)
-	RootCmd.AddCommand(configCmd)
-
-	// config context
-	contextCmd := &cobra.Command{
-		Use: "context",
-	}
-	contextCmd.AddCommand(cfgcontext.DeleteCmd)
-	contextCmd.AddCommand(cfgcontext.GetCmd)
-	contextCmd.AddCommand(cfgcontext.UseCmd)
-	configCmd.AddCommand(contextCmd)
+	RootCmd.AddCommand(config.ConfigCmd)
 
 	// image
 	RootCmd.AddCommand(image.ImageCmd)
 
 	// job
-	jobCmd := &cobra.Command{
-		Use: "job",
-	}
-	jobCmd.AddCommand(job.SubmitCmd)
-	jobCmd.AddCommand(job.GetCmd)
-	RootCmd.AddCommand(jobCmd)
+	RootCmd.AddCommand(job.JobCmd)
 
 	// metrics
-	metricsCmd := &cobra.Command{
-		Use: "metrics",
-	}
-	metricsCmd.AddCommand(metrics.GetCmd)
-	RootCmd.AddCommand(metricsCmd)
+	RootCmd.AddCommand(metrics.MetricsCmd)
 
 	// project
 	RootCmd.AddCommand(project.ProjectCmd)
@@ -72,12 +48,7 @@ func init() {
 	RootCmd.AddCommand(region.RegionCmd)
 
 	// task
-	taskCmd := &cobra.Command{
-		Use: "task",
-	}
-	taskCmd.AddCommand(task.CreateCmd)
-	taskCmd.AddCommand(task.GetCmd)
-	RootCmd.AddCommand(taskCmd)
+	RootCmd.AddCommand(task.TaskCmd)
 
 	// version
 	RootCmd.AddCommand(version.Cmd)

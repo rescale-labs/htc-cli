@@ -9,8 +9,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	oapi "github.com/rescale/htc-storage-cli/v2/api/_oas"
-	"github.com/rescale/htc-storage-cli/v2/common"
+	oapi "github.com/rescale-labs/htc-cli/v2/api/_oas"
+	"github.com/rescale-labs/htc-cli/v2/common"
 )
 
 type submitRequest struct {
@@ -50,20 +50,14 @@ func Submit(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("Error setting group: %w", err)
 	}
 
-	var r *os.File
 	if len(args) != 1 {
 		return fmt.Errorf("Error: job yaml not provided")
 	}
-	if args[0] == "-" {
-		r = os.Stdin
-	} else {
-		var err error
-		r, err = os.Open(args[0])
-		if err != nil {
-			return fmt.Errorf("Error opening %s: %v", args[0], err)
-		}
-		defer r.Close()
+	f, err := common.OpenArg(args[0])
+	if err != nil {
+		return err
 	}
+	defer f.Close()
 
 	req := submitRequest{
 		params: oapi.SubmitJobsParams{
@@ -73,7 +67,7 @@ func Submit(cmd *cobra.Command, args []string) error {
 		},
 	}
 
-	dec := json.NewDecoder(r)
+	dec := json.NewDecoder(f)
 	if err := dec.Decode(&req.batch); err != nil {
 		return fmt.Errorf("Error parsing %s: %v", args[0], err)
 	}
@@ -87,15 +81,50 @@ func Submit(cmd *cobra.Command, args []string) error {
 }
 
 var SubmitCmd = &cobra.Command{
-	Use:   "submit JOB_BATCH_JSON",
+	Use:   "submit JSON_FILE",
 	Args:  cobra.ExactArgs(1),
 	Short: "Submits jobs for a given task and project",
-	// Long:
-	Run: common.WrapRunE(Submit),
+	Run:   common.WrapRunE(Submit),
 }
 
 func init() {
+	// Prepare a sample JSON payload for our example.
+	job := oapi.HTCJobSubmitRequest{
+		JobName: oapi.NewOptString("a-rescale-htc-job"),
+		HtcJobDefinition: oapi.HTCJobDefinition{
+			ImageName:  "rescale-rsj-load-test-image_alpine_x86:latest",
+			MaxVCpus:   oapi.NewOptInt32(1),
+			MaxMemory:  oapi.NewOptInt32(128),
+			MaxDiskGiB: oapi.NewOptInt32(1),
+			Commands:   []string{"/bin/sh", "-c", "sleep 5m; echo all done"},
+			Envs: []oapi.EnvPair{
+				oapi.EnvPair{"INPUT_BUCKET", "htc-rescale-bucket"},
+			},
+			ExecTimeoutSeconds: oapi.NewOptInt32(3600),
+			Priority:           oapi.NewOptJobPriority(oapi.JobPriorityONDEMANDPRIORITY),
+		},
+		BatchSize: oapi.NewOptInt32(1),
+		Regions: []oapi.RescaleRegion{
+			oapi.RescaleRegionGCPEUWEST2,
+		},
+		RetryStrategy: oapi.NewOptHTCRetryStrategy(
+			oapi.HTCRetryStrategy{MaxRetries: oapi.NewOptInt32(1)},
+		),
+	}
+
+	b, err := json.MarshalIndent(&job, "", "  ")
+	if err != nil {
+		panic("Unable to serialize `job create` JSON example: " + err.Error())
+	}
+
 	SubmitCmd.Flags().String("project-id", "", "HTC project ID (required)")
 	SubmitCmd.Flags().String("task-id", "", "HTC task ID (required)")
 	SubmitCmd.Flags().String("group", "", "Group")
+
+	SubmitCmd.Long = SubmitCmd.Short + `
+JSON_FILE is a path to a JSON file or - for stdin.`
+	SubmitCmd.Example = fmt.Sprintf(`
+htc job submit - <<'EOF'
+  %s
+EOF`, string(b))
 }

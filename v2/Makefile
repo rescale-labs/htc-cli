@@ -21,7 +21,7 @@ ifeq ($(UNAME_S),Darwin)
 	HOST_OS := darwin
 endif
 
-GO_PACKAGE := github.com/rescale/htc-storage-cli/v2
+GO_PACKAGE := github.com/rescale-labs/htc-cli/v2
 
 # Create statically linked binaries.
 GO_BUILD := CGO_ENABLED=0 go build
@@ -134,30 +134,6 @@ test:
 	$(GO_OPTS) go test ./...
 
 godoc:
-	@echo "view oapi docs on: http://localhost:6060/pkg/github.com/rescale/htc-storage-cli/v2/api/_oas/"
+	@echo "view oapi docs on: http://localhost:6060/pkg/github.com/rescale-labs/htc-cli/v2/api/_oas/"
 	@echo
 	godoc -http=localhost:6060
-
-#
-# Uploading to S3
-#
-# Will be removed if we switch the repo over to rescale labs and open
-# source it.
-
-S3_CP := aws --profile dev s3 cp
-S3_BUCKET := rescale-htc-cli-agae5ucedee8kohtaet8naekx
-S3_DIR := rescale-htc-storage/htc-cli
-S3_PREFIX := s3://$(S3_BUCKET)/$(S3_DIR)
-S3_HTTPS_URL := https://$(S3_BUCKET).s3.eu-west-1.amazonaws.com/$(S3_DIR)
-
-.PHONY: login-s3
-login-s3:
-	aws sso login --profile dev
-
-.PHONY: upload
-upload:
-	$(foreach archive,$(DIST_ARCHIVES),$(S3_CP) $(archive) $(S3_PREFIX)/$(notdir $(archive));)
-	@echo
-	@echo "Archives available at"
-	@echo
-	@$(foreach archive,$(DIST_ARCHIVES),echo "  " $(S3_HTTPS_URL)/$(notdir $(archive));)

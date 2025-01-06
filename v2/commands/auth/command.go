@@ -5,7 +5,8 @@ import (
 )
 
 var AuthCmd = &cobra.Command{
-	Use: "auth",
+	Use:   "auth",
+	Short: "Log in and out of HTC",
 }
 
 func init() {

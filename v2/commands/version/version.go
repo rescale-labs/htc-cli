@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/rescale/htc-storage-cli/v2/common"
+	"github.com/rescale-labs/htc-cli/v2/common"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +20,7 @@ var Version = "devel"
 
 var Cmd = &cobra.Command{
 	Use:   "version",
-	Short: "Returns HTC tasks in a given project.",
+	Short: "Prints version of this CLI tool",
 	Run: common.WrapRunE(
 		func(cmd *cobra.Command, _ []string) error {
 			_, err := fmt.Printf(

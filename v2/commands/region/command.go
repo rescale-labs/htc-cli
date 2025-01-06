@@ -3,9 +3,9 @@ package region
 import (
 	"os"
 
-	oapi "github.com/rescale/htc-storage-cli/v2/api/_oas"
-	"github.com/rescale/htc-storage-cli/v2/common"
-	"github.com/rescale/htc-storage-cli/v2/tabler"
+	oapi "github.com/rescale-labs/htc-cli/v2/api/_oas"
+	"github.com/rescale-labs/htc-cli/v2/common"
+	"github.com/rescale-labs/htc-cli/v2/tabler"
 	"github.com/spf13/cobra"
 )
 
@@ -24,7 +24,8 @@ func getRegions(cmd *cobra.Command, _ []string) error {
 }
 
 var RegionCmd = &cobra.Command{
-	Use: "region",
+	Use:   "region",
+	Short: "List HTC regions",
 }
 
 var GetCmd = &cobra.Command{

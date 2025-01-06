@@ -8,9 +8,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	oapi "github.com/rescale/htc-storage-cli/v2/api/_oas"
-	"github.com/rescale/htc-storage-cli/v2/common"
-	"github.com/rescale/htc-storage-cli/v2/tabler"
+	oapi "github.com/rescale-labs/htc-cli/v2/api/_oas"
+	"github.com/rescale-labs/htc-cli/v2/common"
+	"github.com/rescale-labs/htc-cli/v2/tabler"
 )
 
 func DimensionsGet(cmd *cobra.Command, args []string) error {

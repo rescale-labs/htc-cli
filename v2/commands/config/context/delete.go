@@ -3,8 +3,8 @@ package context
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/rescale/htc-storage-cli/v2/common"
-	"github.com/rescale/htc-storage-cli/v2/config"
+	"github.com/rescale-labs/htc-cli/v2/common"
+	"github.com/rescale-labs/htc-cli/v2/config"
 )
 
 func deleteCmd(cmd *cobra.Command, args []string) error {
