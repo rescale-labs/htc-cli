@@ -3,7 +3,7 @@ package tabler
 import (
 	"time"
 
-	oapi "github.com/rescale/htc-storage-cli/v2/api/_oas"
+	oapi "github.com/rescale-labs/htc-cli/v2/api/_oas"
 )
 
 // Generic function for handling oapi.OptInstant, OptDateTime, and

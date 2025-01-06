@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/rescale/htc-storage-cli/v2/commands"
+	"github.com/rescale-labs/htc-cli/v2/commands"
 )
 
 func main() {

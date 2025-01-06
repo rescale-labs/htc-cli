@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/rescale/htc-storage-cli/v2/common"
+	"github.com/rescale-labs/htc-cli/v2/common"
 	"github.com/spf13/cobra"
 )
 

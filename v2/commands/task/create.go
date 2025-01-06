@@ -8,8 +8,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	oapi "github.com/rescale/htc-storage-cli/v2/api/_oas"
-	"github.com/rescale/htc-storage-cli/v2/common"
+	oapi "github.com/rescale-labs/htc-cli/v2/api/_oas"
+	"github.com/rescale-labs/htc-cli/v2/common"
 )
 
 func createTask(ctx context.Context, c oapi.TaskInvoker, projectId, name, desc string) (*oapi.HTCTask, error) {

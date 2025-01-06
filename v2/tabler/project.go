@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	oapi "github.com/rescale/htc-storage-cli/v2/api/_oas"
+	oapi "github.com/rescale-labs/htc-cli/v2/api/_oas"
 )
 
 type HTCProjects []oapi.HTCProject

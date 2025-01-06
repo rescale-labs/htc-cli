@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"github.com/rescale/htc-storage-cli/cli"
+	"github.com/rescale-labs/htc-cli/cli"
 	"log"
 	"os"
 )

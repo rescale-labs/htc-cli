@@ -3,15 +3,15 @@ package commands
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/rescale/htc-storage-cli/v2/commands/auth"
-	"github.com/rescale/htc-storage-cli/v2/commands/config"
-	"github.com/rescale/htc-storage-cli/v2/commands/image"
-	"github.com/rescale/htc-storage-cli/v2/commands/job"
-	"github.com/rescale/htc-storage-cli/v2/commands/metrics"
-	"github.com/rescale/htc-storage-cli/v2/commands/project"
-	"github.com/rescale/htc-storage-cli/v2/commands/region"
-	"github.com/rescale/htc-storage-cli/v2/commands/task"
-	"github.com/rescale/htc-storage-cli/v2/commands/version"
+	"github.com/rescale-labs/htc-cli/v2/commands/auth"
+	"github.com/rescale-labs/htc-cli/v2/commands/config"
+	"github.com/rescale-labs/htc-cli/v2/commands/image"
+	"github.com/rescale-labs/htc-cli/v2/commands/job"
+	"github.com/rescale-labs/htc-cli/v2/commands/metrics"
+	"github.com/rescale-labs/htc-cli/v2/commands/project"
+	"github.com/rescale-labs/htc-cli/v2/commands/region"
+	"github.com/rescale-labs/htc-cli/v2/commands/task"
+	"github.com/rescale-labs/htc-cli/v2/commands/version"
 )
 
 var RootCmd = &cobra.Command{

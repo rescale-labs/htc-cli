@@ -1,7 +1,7 @@
 package config
 
 import (
-	cfgcontext "github.com/rescale/htc-storage-cli/v2/commands/config/context"
+	cfgcontext "github.com/rescale-labs/htc-cli/v2/commands/config/context"
 	"github.com/spf13/cobra"
 )
 

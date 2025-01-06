@@ -5,7 +5,7 @@ import (
 	"io"
 	"unicode/utf8"
 
-	"github.com/rescale/htc-storage-cli/v2/config"
+	"github.com/rescale-labs/htc-cli/v2/config"
 )
 
 type ContextIdentity struct {
