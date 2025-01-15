@@ -31,7 +31,7 @@ func submit(ctx context.Context, c oapi.JobInvoker, r *submitRequest) (*oapi.HTC
 		return nil, fmt.Errorf("%s: %s", res.ErrorDescription.Value, res.Message.Value)
 	}
 
-	return nil, fmt.Errorf("Unknown response type: %s", res)
+	return nil, fmt.Errorf("Unknown response type: %T", res)
 }
 
 func Submit(cmd *cobra.Command, args []string) error {
