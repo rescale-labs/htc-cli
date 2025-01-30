@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/rescale-labs/htc-cli/v2/config"
 	"os"
 	"strings"
 	"time"
@@ -13,6 +12,7 @@ import (
 
 	oapi "github.com/rescale-labs/htc-cli/v2/api/_oas"
 	"github.com/rescale-labs/htc-cli/v2/common"
+	"github.com/rescale-labs/htc-cli/v2/config"
 )
 
 type submitRequest struct {
