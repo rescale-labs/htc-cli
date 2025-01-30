@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/rescale-labs/htc-cli/v2/config"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -50,6 +52,19 @@ func Submit(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("Error setting group: %w", err)
 	}
 
+	envMap := make(map[string]string)
+	env, err := cmd.Flags().GetString("env")
+	if err != nil {
+		return fmt.Errorf("Error setting env: %w", err)
+	}
+	for _, token := range strings.Split(env, ",") {
+		key, value, ok := strings.Cut(token, "=")
+		if !ok {
+			return config.UsageErrorf("Error: env option has invalid format")
+		}
+		envMap[key] = value
+	}
+
 	if len(args) != 1 {
 		return fmt.Errorf("Error: job yaml not provided")
 	}
@@ -70,6 +85,16 @@ func Submit(cmd *cobra.Command, args []string) error {
 	dec := json.NewDecoder(f)
 	if err := dec.Decode(&req.batch); err != nil {
 		return fmt.Errorf("Error parsing %s: %v", args[0], err)
+	}
+
+	// Patch job environment with envMap
+	if len(envMap) > 0 {
+		for i := range req.batch {
+			for k, v := range envMap {
+				req.batch[i].HtcJobDefinition.Envs = append(req.batch[i].HtcJobDefinition.Envs,
+					oapi.EnvPair{Name: k, Value: v})
+			}
+		}
 	}
 
 	ctx := context.Background()
@@ -120,6 +145,7 @@ func init() {
 	SubmitCmd.Flags().String("project-id", "", "HTC project ID (required)")
 	SubmitCmd.Flags().String("task-id", "", "HTC task ID (required)")
 	SubmitCmd.Flags().String("group", "", "Group")
+	SubmitCmd.Flags().StringP("env", "e", "", "Set job environment variables using comma-delimited KEY=VALUE pairs")
 
 	SubmitCmd.Long = SubmitCmd.Short + `
 JSON_FILE is a path to a JSON file or - for stdin.`
