@@ -133,7 +133,12 @@ clean:
 test:
 	$(GO_OPTS) go test ./...
 
+.PHONY: godoc
 godoc:
+	@if ! which godoc >/dev/null 2>/dev/null; then \
+		echo 'godoc not found. Please install, e.g. with `(cd $$HOME && go install golang.org/x/tools/cmd/godoc@latest)`'; \
+		false; \
+		fi
 	@echo "view oapi docs on: http://localhost:6060/pkg/github.com/rescale-labs/htc-cli/v2/api/_oas/"
 	@echo
 	godoc -http=localhost:6060
