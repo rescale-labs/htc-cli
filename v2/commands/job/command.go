@@ -6,7 +6,7 @@ import (
 
 var JobCmd = &cobra.Command{
 	Use:   "job",
-	Short: "Commands for HTC projects",
+	Short: "Commands for HTC jobs",
 }
 
 func init() {
