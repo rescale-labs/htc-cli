@@ -135,6 +135,15 @@ func (UnimplementedHandler) GetLimits(ctx context.Context, params GetLimitsParam
 	return r, ht.ErrNotImplemented
 }
 
+// GetLogs implements getLogs operation.
+//
+// This endpoint will get job logs.
+//
+// GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/logs
+func (UnimplementedHandler) GetLogs(ctx context.Context, params GetLogsParams) (r GetLogsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetMetrics implements getMetrics operation.
 //
 // Get all HTC Metrics for a workspace.
@@ -423,15 +432,6 @@ func (UnimplementedHandler) HtcProjectsProjectIdTasksTaskIdGroupsGet(ctx context
 //
 // GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events
 func (UnimplementedHandler) HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetParams) (r HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGet implements GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/logs operation.
-//
-// This endpoint will get job logs.
-//
-// GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/logs
-func (UnimplementedHandler) HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetParams) (r HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

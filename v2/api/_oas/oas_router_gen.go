@@ -961,7 +961,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 																// Leaf node.
 																switch r.Method {
 																case "GET":
-																	s.handleHtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetRequest([3]string{
+																	s.handleGetLogsRequest([3]string{
 																		args[0],
 																		args[1],
 																		args[2],
@@ -2479,9 +2479,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 																// Leaf node.
 																switch method {
 																case "GET":
-																	r.name = "HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGet"
+																	r.name = "GetLogs"
 																	r.summary = "Get Job Logs"
-																	r.operationID = ""
+																	r.operationID = "getLogs"
 																	r.pathPattern = "/htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/logs"
 																	r.args = args
 																	r.count = 3
