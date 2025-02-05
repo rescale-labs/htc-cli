@@ -34,8 +34,20 @@ func Cancel(cmd *cobra.Command, args []string) error {
 
 	ctx := context.Background()
 	res, err := runner.Client.CancelJobs(ctx, oapi.CancelJobsParams{p.ProjectId, p.TaskId, oapi.NewOptString(group)})
+	if err != nil {
+		return err
+	}
 
-	return runner.PrintResult(res, os.Stdout)
+	switch res.(type) {
+	case *oapi.CancelJobsOK:
+		return runner.PrintResult("Cancel request sent successfully!", os.Stdout)
+	case *oapi.CancelJobsForbidden:
+		return runner.PrintResult("Make sure you are accessing your own project and task!", os.Stderr)
+	case *oapi.CancelJobsUnauthorized:
+		return runner.PrintResult("Refresh your auth!", os.Stderr)
+	default:
+		return runner.PrintResult(fmt.Errorf("unknown operation %s", res), os.Stderr)
+	}
 }
 
 var CancelCmd = &cobra.Command{
