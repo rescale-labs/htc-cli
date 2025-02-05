@@ -12,7 +12,7 @@ So, steps here are:
 
 * Create the initial main.go, import `_oas`, and implement auth and at
   least one read method.
-* Get other read mehods working here in  own directory (here).
+* Get other read methods working here in  own directory (here).
 * Sketch the long term CLI design.
 * Integrate this down into the main htccli.
 * Document and issue as the tool for talking to HTC API.
