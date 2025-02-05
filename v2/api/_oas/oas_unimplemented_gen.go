@@ -22,6 +22,16 @@ func (UnimplementedHandler) AuthTokenWhoamiGet(ctx context.Context) (r AuthToken
 	return r, ht.ErrNotImplemented
 }
 
+// CancelJobs implements cancelJobs operation.
+//
+// This endpoint will attempt to cancel submitted jobs.
+// Note a 200 response status code does not mean all jobs were cancelled.
+//
+// POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel
+func (UnimplementedHandler) CancelJobs(ctx context.Context, params CancelJobsParams) (r CancelJobsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // CreateProject implements createProject operation.
 //
 // This endpoint will create a project. A project is a collection of tasks and container images used
@@ -404,16 +414,6 @@ func (UnimplementedHandler) HtcProjectsProjectIdTasksTaskIdGroupSummaryStatistic
 //
 // GET /htc/projects/{projectId}/tasks/{taskId}/groups
 func (UnimplementedHandler) HtcProjectsProjectIdTasksTaskIdGroupsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdGroupsGetParams) (r HtcProjectsProjectIdTasksTaskIdGroupsGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcProjectsProjectIdTasksTaskIdJobsCancelPost implements POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel operation.
-//
-// This endpoint will attempt to cancel submitted jobs.
-// Note a 200 response status code does not mean all jobs were cancelled.
-//
-// POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel
-func (UnimplementedHandler) HtcProjectsProjectIdTasksTaskIdJobsCancelPost(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsCancelPostParams) (r HtcProjectsProjectIdTasksTaskIdJobsCancelPostRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

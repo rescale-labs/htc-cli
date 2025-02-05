@@ -49,6 +49,28 @@ func encodeAuthTokenWhoamiGetResponse(response AuthTokenWhoamiGetRes, w http.Res
 	}
 }
 
+func encodeCancelJobsResponse(response CancelJobsRes, w http.ResponseWriter) error {
+	switch response := response.(type) {
+	case *CancelJobsOK:
+		w.WriteHeader(200)
+
+		return nil
+
+	case *CancelJobsUnauthorized:
+		w.WriteHeader(401)
+
+		return nil
+
+	case *CancelJobsForbidden:
+		w.WriteHeader(403)
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeCreateProjectResponse(response CreateProjectRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCProject:
@@ -1056,28 +1078,6 @@ func encodeHtcProjectsProjectIdTasksTaskIdGroupsGetResponse(response HtcProjects
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdGroupsGetForbidden:
-		w.WriteHeader(403)
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeHtcProjectsProjectIdTasksTaskIdJobsCancelPostResponse(response HtcProjectsProjectIdTasksTaskIdJobsCancelPostRes, w http.ResponseWriter) error {
-	switch response := response.(type) {
-	case *HtcProjectsProjectIdTasksTaskIdJobsCancelPostOK:
-		w.WriteHeader(200)
-
-		return nil
-
-	case *HtcProjectsProjectIdTasksTaskIdJobsCancelPostUnauthorized:
-		w.WriteHeader(401)
-
-		return nil
-
-	case *HtcProjectsProjectIdTasksTaskIdJobsCancelPostForbidden:
 		w.WriteHeader(403)
 
 		return nil

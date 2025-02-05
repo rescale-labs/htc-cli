@@ -5,6 +5,10 @@ type AuthTokenWhoamiGetRes interface {
 	authTokenWhoamiGetRes()
 }
 
+type CancelJobsRes interface {
+	cancelJobsRes()
+}
+
 type CreateProjectRes interface {
 	createProjectRes()
 }
@@ -139,10 +143,6 @@ type HtcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGetRes interface {
 
 type HtcProjectsProjectIdTasksTaskIdGroupsGetRes interface {
 	htcProjectsProjectIdTasksTaskIdGroupsGetRes()
-}
-
-type HtcProjectsProjectIdTasksTaskIdJobsCancelPostRes interface {
-	htcProjectsProjectIdTasksTaskIdJobsCancelPostRes()
 }
 
 type HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes interface {

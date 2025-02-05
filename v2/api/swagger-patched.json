@@ -3991,6 +3991,7 @@
       "/htc/projects/{projectId}/tasks/{taskId}/jobs/cancel": {
          "post": {
             "description": "This endpoint will attempt to cancel submitted jobs.\n\nNote a 200 response status code does not mean all jobs were cancelled.",
+            "operationId": "cancelJobs",
             "parameters": [
                {
                   "in": "path",
@@ -4036,7 +4037,8 @@
             "summary": "Cancel Jobs",
             "tags": [
                "Job Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Job"
          }
       },
       "/htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}": {
