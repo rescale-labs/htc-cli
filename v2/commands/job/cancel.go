@@ -3,18 +3,14 @@ package job
 import (
 	"context"
 	"fmt"
-	oapi "github.com/rescale-labs/htc-cli/v2/api/_oas"
 	"os"
 	"time"
 
 	"github.com/spf13/cobra"
 
+	oapi "github.com/rescale-labs/htc-cli/v2/api/_oas"
 	"github.com/rescale-labs/htc-cli/v2/common"
 )
-
-type cancelRequest struct {
-	params oapi.CancelJobsParams
-}
 
 func Cancel(cmd *cobra.Command, args []string) error {
 	runner, err := common.NewRunnerWithToken(cmd, time.Now())
