@@ -3,8 +3,11 @@ package job
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log/slog"
 	"os"
+	"path"
 	"strings"
 	"time"
 
@@ -52,6 +55,11 @@ func Submit(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("Error setting group: %w", err)
 	}
 
+	userProvidedWorkingDirectory, err := cmd.Flags().GetString("working-dir")
+	if err != nil {
+		return fmt.Errorf("Error setting working-directory: %w", err)
+	}
+
 	envMap := make(map[string]string)
 	env, err := cmd.Flags().GetString("env")
 	if err != nil {
@@ -61,7 +69,7 @@ func Submit(cmd *cobra.Command, args []string) error {
 		for _, token := range strings.Split(env, ",") {
 			key, value, ok := strings.Cut(token, "=")
 			if !ok {
-				return config.UsageErrorf("Error: env option has invalid format")
+				return config.UsageErrorf("env option has invalid format")
 			}
 			envMap[key] = value
 		}
@@ -80,7 +88,7 @@ func Submit(cmd *cobra.Command, args []string) error {
 		params: oapi.SubmitJobsParams{
 			ProjectId: p.ProjectId,
 			TaskId:    p.TaskId,
-			Group:     oapi.NewOptString(group),
+			Group:     oapi.OptString{group, group != ""},
 		},
 	}
 
@@ -96,6 +104,40 @@ func Submit(cmd *cobra.Command, args []string) error {
 				req.batch[i].HtcJobDefinition.Envs = append(req.batch[i].HtcJobDefinition.Envs,
 					oapi.EnvPair{Name: k, Value: v})
 			}
+		}
+	}
+
+	// Only execute if user actually opted-in for a flag
+	if cmd.Flags().Changed("working-dir") {
+		workingDirectory, err := os.Getwd()
+		if len(userProvidedWorkingDirectory) > 0 && userProvidedWorkingDirectory != "." && userProvidedWorkingDirectory != "noopt" {
+			// User wanted an override from CWD
+			_, err := os.Stat(userProvidedWorkingDirectory)
+			if err != nil {
+				slog.Warn("Warning: passed directory is not present on the system! Job will still be submitted with provided", "path", userProvidedWorkingDirectory)
+			}
+			// Only allow absolute paths
+			if !path.IsAbs(userProvidedWorkingDirectory) {
+				return errors.New("only absolute paths are allowed when using working directory flag")
+			}
+			workingDirectory = userProvidedWorkingDirectory
+		} else {
+			// Handle if user wanted CWD, but we failed to get it from os.Getwd()
+			if err != nil {
+				return fmt.Errorf("cannot get current working directory %v", err)
+			}
+		}
+
+		// Set the workingDirectory and CFS experimental
+		for i := range req.batch {
+			req.batch[i].Experimental = oapi.OptExperimentalFields{
+				Value: oapi.ExperimentalFields{
+					KubernetesSwap:   oapi.OptBool{Set: false},
+					CloudFileSystems: oapi.OptBool{Value: true, Set: true},
+				},
+				Set: true,
+			}
+			req.batch[i].HtcJobDefinition.WorkingDir = oapi.OptString{Value: workingDirectory, Set: true}
 		}
 	}
 
@@ -148,7 +190,13 @@ func init() {
 	SubmitCmd.Flags().String("task-id", "", "HTC task ID (required)")
 	SubmitCmd.Flags().String("group", "", "Group")
 	SubmitCmd.Flags().StringP("env", "e", "", "Set job environment variables using comma-delimited KEY=VALUE pairs")
-	SubmitCmd.Flags().StringP("working-dir", "wd", "", "Set working directory for a job. Experimental feature")
+	// We wanted to be able to pass in just the -W flag which would mean CWD.
+	// There was a choice to create 2 separate flags (boolean:-W and string:--working-dir), but I did not want 2 flags
+	SubmitCmd.Flags().StringP("working-dir", "W", ".", "Set current working directory (pwd) for a job commands execution. If no input given assumes current directory from which command is executed. Experimental feature")
+	// There are 2 caveats with NoOptDefVal:
+	// 1. Without it "flag needs an argument" gets raised, eg `htc job submit job_def.json -W` is now allowed even with default value. See: https://github.com/spf13/cobra/issues/1756
+	// 2. NoOptDefVal It forces "=" assignment. https://github.com/spf13/pflag/issues/321
+	SubmitCmd.Flag("working-dir").NoOptDefVal = "noopt"
 
 	SubmitCmd.Long = SubmitCmd.Short + `
 JSON_FILE is a path to a JSON file or - for stdin.`
