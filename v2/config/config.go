@@ -49,6 +49,9 @@ type Config struct {
 
 	// Task ID (optional)
 	TaskId string
+
+	// Job ID (optional)
+	JobId string
 }
 
 func (c *Config) configPath() string {
@@ -358,6 +361,16 @@ func NewConfig(cmd *cobra.Command) (*Config, error) {
 	}
 	if c.TaskId == "" {
 		c.TaskId = contextConf.TaskId
+	}
+
+	if flagset.Lookup("job-id") != nil {
+		jobId, err := cmd.Flags().GetString("job-id")
+		if err != nil {
+			return nil, UsageErrorf("Error reading --job-id: %w", err)
+		}
+		if jobId != "" {
+			c.JobId = jobId
+		}
 	}
 
 	//
