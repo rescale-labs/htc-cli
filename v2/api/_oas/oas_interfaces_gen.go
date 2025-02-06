@@ -41,6 +41,10 @@ type GetLimitsRes interface {
 	getLimitsRes()
 }
 
+type GetLogsRes interface {
+	getLogsRes()
+}
+
 type GetMetricsRes interface {
 	getMetricsRes()
 }
@@ -147,10 +151,6 @@ type HtcProjectsProjectIdTasksTaskIdJobsCancelPostRes interface {
 
 type HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes interface {
 	htcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes()
-}
-
-type HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetRes interface {
-	htcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetRes()
 }
 
 type HtcProjectsProjectIdTasksTaskIdPatchRes interface {

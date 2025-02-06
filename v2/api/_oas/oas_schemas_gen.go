@@ -449,6 +449,16 @@ type GetLimitsUnauthorized struct{}
 
 func (*GetLimitsUnauthorized) getLimitsRes() {}
 
+// GetLogsForbidden is response for GetLogs operation.
+type GetLogsForbidden struct{}
+
+func (*GetLogsForbidden) getLogsRes() {}
+
+// GetLogsUnauthorized is response for GetLogs operation.
+type GetLogsUnauthorized struct{}
+
+func (*GetLogsUnauthorized) getLogsRes() {}
+
 // GetMetricsForbidden is response for GetMetrics operation.
 type GetMetricsForbidden struct{}
 
@@ -1839,6 +1849,34 @@ func (s *HTCJobFailureCode) UnmarshalText(data []byte) error {
 	}
 }
 
+// Ref: #/components/schemas/HTCJobLogs
+type HTCJobLogs struct {
+	Items []HTCLogEvent `json:"items"`
+	Next  OptURI        `json:"next"`
+}
+
+// GetItems returns the value of Items.
+func (s *HTCJobLogs) GetItems() []HTCLogEvent {
+	return s.Items
+}
+
+// GetNext returns the value of Next.
+func (s *HTCJobLogs) GetNext() OptURI {
+	return s.Next
+}
+
+// SetItems sets the value of Items.
+func (s *HTCJobLogs) SetItems(val []HTCLogEvent) {
+	s.Items = val
+}
+
+// SetNext sets the value of Next.
+func (s *HTCJobLogs) SetNext(val OptURI) {
+	s.Next = val
+}
+
+func (*HTCJobLogs) getLogsRes() {}
+
 // Ref: #/components/schemas/HTCJobSubmitRequest
 type HTCJobSubmitRequest struct {
 	BatchSize           OptInt32              `json:"batchSize"`
@@ -2101,6 +2139,32 @@ func (s *HTCLimitUpdate) GetVCPUs() int32 {
 // SetVCPUs sets the value of VCPUs.
 func (s *HTCLimitUpdate) SetVCPUs(val int32) {
 	s.VCPUs = val
+}
+
+// Ref: #/components/schemas/HTCLogEvent
+type HTCLogEvent struct {
+	Message   OptString  `json:"message"`
+	Timestamp OptInstant `json:"timestamp"`
+}
+
+// GetMessage returns the value of Message.
+func (s *HTCLogEvent) GetMessage() OptString {
+	return s.Message
+}
+
+// GetTimestamp returns the value of Timestamp.
+func (s *HTCLogEvent) GetTimestamp() OptInstant {
+	return s.Timestamp
+}
+
+// SetMessage sets the value of Message.
+func (s *HTCLogEvent) SetMessage(val OptString) {
+	s.Message = val
+}
+
+// SetTimestamp sets the value of Timestamp.
+func (s *HTCLogEvent) SetTimestamp(val OptInstant) {
+	s.Timestamp = val
 }
 
 // Ref: #/components/schemas/HTCNodePool
@@ -2988,6 +3052,7 @@ func (s *HTCRequestError) SetMessage(val OptString) {
 }
 
 func (*HTCRequestError) getJobRes()     {}
+func (*HTCRequestError) getLogsRes()    {}
 func (*HTCRequestError) submitJobsRes() {}
 
 // Ref: #/components/schemas/HTCRetryStrategy
@@ -3844,23 +3909,6 @@ func (*HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetOKApplicationJSON) htcPr
 type HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetUnauthorized struct{}
 
 func (*HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetUnauthorized) htcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes() {
-}
-
-// HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetForbidden is response for HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGet operation.
-type HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetForbidden struct{}
-
-func (*HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetForbidden) htcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetRes() {
-}
-
-type HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetOKApplicationJSON jx.Raw
-
-func (*HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetOKApplicationJSON) htcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetRes() {
-}
-
-// HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetUnauthorized is response for HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGet operation.
-type HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetUnauthorized struct{}
-
-func (*HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetUnauthorized) htcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetRes() {
 }
 
 // HtcProjectsProjectIdTasksTaskIdPatchForbidden is response for HtcProjectsProjectIdTasksTaskIdPatch operation.

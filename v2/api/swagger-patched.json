@@ -495,6 +495,22 @@
             "nullable": true,
             "type": "string"
          },
+         "HTCJobLogs": {
+            "properties": {
+               "items": {
+                  "items": {
+                     "$ref": "#/components/schemas/HTCLogEvent"
+                  },
+                  "type": "array"
+               },
+               "next": {
+                  "example": "https://page2.com",
+                  "format": "uri",
+                  "type": "string"
+               }
+            },
+            "type": "object"
+         },
          "HTCJobStatusEvent": {
             "properties": {
                "statusReason": {
@@ -4197,6 +4213,7 @@
       "/htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/logs": {
          "get": {
             "description": "This endpoint will get job logs",
+            "operationId": "getLogs",
             "parameters": [
                {
                   "in": "path",
@@ -4245,19 +4262,7 @@
                   "content": {
                      "application/json": {
                         "schema": {
-                           "properties": {
-                              "items": {
-                                 "items": {
-                                    "$ref": "#/components/schemas/HTCLogEvent"
-                                 },
-                                 "type": "array"
-                              },
-                              "next": {
-                                 "example": "https://page2.com",
-                                 "format": "uri",
-                                 "type": "string"
-                              }
-                           }
+                           "$ref": "#/components/schemas/HTCJobLogs"
                         }
                      }
                   },
@@ -4268,6 +4273,15 @@
                },
                "403": {
                   "description": "Not Allowed"
+               },
+               "404": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCRequestError"
+                        }
+                     }
+                  }
                }
             },
             "security": [
@@ -4278,7 +4292,8 @@
             "summary": "Get Job Logs",
             "tags": [
                "Job Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Job"
          }
       },
       "/htc/projects/{projectId}/tasks/{taskId}/storage/presigned-url": {
