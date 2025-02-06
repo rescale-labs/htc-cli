@@ -186,15 +186,6 @@ func (r *Runner) GetIds(p *IDParams) error {
 		}
 	}
 
-	if p.RequireJobId {
-		if r.Config.JobId == "" {
-			errors = append(errors,
-				config.UsageErrorf("Error: missing job ID."))
-		} else {
-			p.JobId = r.Config.JobId
-		}
-	}
-
 	if len(errors) == 1 {
 		return errors[0]
 	} else if len(errors) > 0 {

@@ -20,7 +20,7 @@ func logs(ctx context.Context, c oapi.JobInvoker, projectId, taskId, jobId, page
 		TaskId:    taskId,
 		JobId:     jobId,
 		PageSize:  oapi.NewOptInt32(pageSize),
-		PageIndex: oapi.NewOptString(pageIndex),
+		PageIndex: oapi.OptString{pageIndex, pageIndex != ""},
 	})
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func logs(ctx context.Context, c oapi.JobInvoker, projectId, taskId, jobId, page
 		*oapi.GetLogsForbidden:
 		return nil, fmt.Errorf("forbidden: %s", res)
 	}
-	return nil, fmt.Errorf("Unknown response type: %s", res)
+	return nil, fmt.Errorf("Unknown response type: %T", res)
 }
 
 func Logs(cmd *cobra.Command, args []string) error {
@@ -42,10 +42,16 @@ func Logs(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	p := common.IDParams{RequireProjectId: true, RequireTaskId: true, RequireJobId: true}
+	p := common.IDParams{RequireProjectId: true, RequireTaskId: true}
 	if err := runner.GetIds(&p); err != nil {
 		return err
 	}
+
+	if len(args) != 1 {
+		return fmt.Errorf("Error: job ID not provided")
+	}
+
+	jobId := args[0]
 
 	flags := cmd.Flags()
 	limit, err := flags.GetInt("limit")
@@ -58,7 +64,7 @@ func Logs(cmd *cobra.Command, args []string) error {
 	var items []oapi.HTCLogEvent
 
 	for {
-		res, err := logs(ctx, runner.Client, p.ProjectId, p.TaskId, p.JobId, pageIndex)
+		res, err := logs(ctx, runner.Client, p.ProjectId, p.TaskId, jobId, pageIndex)
 		if err != nil {
 			return err
 		}
@@ -77,9 +83,10 @@ func Logs(cmd *cobra.Command, args []string) error {
 }
 
 var LogsCmd = &cobra.Command{
-	Use:   "logs",
+	Use:   "logs [JOB_UUID]",
 	Short: "Returns HTC job logs given a job ID.",
 	Run:   common.WrapRunE(Logs),
+	Args:  cobra.ExactArgs(1),
 }
 
 func init() {
@@ -88,5 +95,4 @@ func init() {
 	flags.IntP("limit", "l", 0, "Limit response to N items")
 	flags.String("project-id", "", "HTC project ID")
 	flags.String("task-id", "", "HTC task ID")
-	flags.String("job-id", "", "HTC job ID")
 }
