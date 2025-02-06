@@ -57,12 +57,14 @@ func Submit(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("Error setting env: %w", err)
 	}
-	for _, token := range strings.Split(env, ",") {
-		key, value, ok := strings.Cut(token, "=")
-		if !ok {
-			return config.UsageErrorf("Error: env option has invalid format")
+	if len(env) > 0 {
+		for _, token := range strings.Split(env, ",") {
+			key, value, ok := strings.Cut(token, "=")
+			if !ok {
+				return config.UsageErrorf("Error: env option has invalid format")
+			}
+			envMap[key] = value
 		}
-		envMap[key] = value
 	}
 
 	if len(args) != 1 {

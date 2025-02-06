@@ -196,13 +196,6 @@ type Invoker interface {
 	//
 	// GET /htc/projects/{projectId}/tasks/{taskId}/groups
 	HtcProjectsProjectIdTasksTaskIdGroupsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdGroupsGetParams) (HtcProjectsProjectIdTasksTaskIdGroupsGetRes, error)
-	// HtcProjectsProjectIdTasksTaskIdJobsCancelPost invokes POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel operation.
-	//
-	// This endpoint will attempt to cancel submitted jobs.
-	// Note a 200 response status code does not mean all jobs were cancelled.
-	//
-	// POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel
-	HtcProjectsProjectIdTasksTaskIdJobsCancelPost(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsCancelPostParams) (HtcProjectsProjectIdTasksTaskIdJobsCancelPostRes, error)
 	// HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet invokes GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events operation.
 	//
 	// This endpoint will get events for a job.
@@ -422,6 +415,13 @@ type ImageInvoker interface {
 //
 // x-gen-operation-group: Job
 type JobInvoker interface {
+	// CancelJobs invokes cancelJobs operation.
+	//
+	// This endpoint will attempt to cancel submitted jobs.
+	// Note a 200 response status code does not mean all jobs were cancelled.
+	//
+	// POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel
+	CancelJobs(ctx context.Context, params CancelJobsParams) (CancelJobsRes, error)
 	// GetJob invokes getJob operation.
 	//
 	// This endpoint will get a job by id.
@@ -631,6 +631,134 @@ func (c *Client) sendAuthTokenWhoamiGet(ctx context.Context) (res AuthTokenWhoam
 	defer resp.Body.Close()
 
 	result, err := decodeAuthTokenWhoamiGetResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CancelJobs invokes cancelJobs operation.
+//
+// This endpoint will attempt to cancel submitted jobs.
+// Note a 200 response status code does not mean all jobs were cancelled.
+//
+// POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel
+func (c *Client) CancelJobs(ctx context.Context, params CancelJobsParams) (CancelJobsRes, error) {
+	res, err := c.sendCancelJobs(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendCancelJobs(ctx context.Context, params CancelJobsParams) (res CancelJobsRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [5]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/tasks/"
+	{
+		// Encode "taskId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "taskId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.TaskId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	pathParts[4] = "/jobs/cancel"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "group" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "group",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Group.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "CancelJobs", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeCancelJobsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -4229,134 +4357,6 @@ func (c *Client) sendHtcProjectsProjectIdTasksTaskIdGroupsGet(ctx context.Contex
 	defer resp.Body.Close()
 
 	result, err := decodeHtcProjectsProjectIdTasksTaskIdGroupsGetResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcProjectsProjectIdTasksTaskIdJobsCancelPost invokes POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel operation.
-//
-// This endpoint will attempt to cancel submitted jobs.
-// Note a 200 response status code does not mean all jobs were cancelled.
-//
-// POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel
-func (c *Client) HtcProjectsProjectIdTasksTaskIdJobsCancelPost(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsCancelPostParams) (HtcProjectsProjectIdTasksTaskIdJobsCancelPostRes, error) {
-	res, err := c.sendHtcProjectsProjectIdTasksTaskIdJobsCancelPost(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendHtcProjectsProjectIdTasksTaskIdJobsCancelPost(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsCancelPostParams) (res HtcProjectsProjectIdTasksTaskIdJobsCancelPostRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [5]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/tasks/"
-	{
-		// Encode "taskId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "taskId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.TaskId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[3] = encoded
-	}
-	pathParts[4] = "/jobs/cancel"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	q := uri.NewQueryEncoder()
-	{
-		// Encode "group" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "group",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Group.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	u.RawQuery = q.Values().Encode()
-
-	r, err := ht.NewRequest(ctx, "POST", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcProjectsProjectIdTasksTaskIdJobsCancelPost", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcProjectsProjectIdTasksTaskIdJobsCancelPostResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

@@ -97,6 +97,21 @@ func decodeAuthTokenWhoamiGetResponse(resp *http.Response) (res AuthTokenWhoamiG
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
+func decodeCancelJobsResponse(resp *http.Response) (res CancelJobsRes, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		return &CancelJobsOK{}, nil
+	case 401:
+		// Code 401.
+		return &CancelJobsUnauthorized{}, nil
+	case 403:
+		// Code 403.
+		return &CancelJobsForbidden{}, nil
+	}
+	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+}
+
 func decodeCreateProjectResponse(resp *http.Response) (res CreateProjectRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
@@ -1957,21 +1972,6 @@ func decodeHtcProjectsProjectIdTasksTaskIdGroupsGetResponse(resp *http.Response)
 	case 403:
 		// Code 403.
 		return &HtcProjectsProjectIdTasksTaskIdGroupsGetForbidden{}, nil
-	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
-}
-
-func decodeHtcProjectsProjectIdTasksTaskIdJobsCancelPostResponse(resp *http.Response) (res HtcProjectsProjectIdTasksTaskIdJobsCancelPostRes, _ error) {
-	switch resp.StatusCode {
-	case 200:
-		// Code 200.
-		return &HtcProjectsProjectIdTasksTaskIdJobsCancelPostOK{}, nil
-	case 401:
-		// Code 401.
-		return &HtcProjectsProjectIdTasksTaskIdJobsCancelPostUnauthorized{}, nil
-	case 403:
-		// Code 403.
-		return &HtcProjectsProjectIdTasksTaskIdJobsCancelPostForbidden{}, nil
 	}
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }

@@ -184,7 +184,7 @@ func Get(cmd *cobra.Command, args []string) error {
 }
 
 var GetCmd = &cobra.Command{
-	Use:   "get",
+	Use:   "get [JOB_UUID]",
 	Short: "Returns HTC jobs in a given task.",
 	Run:   common.WrapRunE(Get),
 	Args:  cobra.RangeArgs(0, 1),

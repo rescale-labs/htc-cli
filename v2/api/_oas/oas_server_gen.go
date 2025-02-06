@@ -187,13 +187,6 @@ type Handler interface {
 	//
 	// GET /htc/projects/{projectId}/tasks/{taskId}/groups
 	HtcProjectsProjectIdTasksTaskIdGroupsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdGroupsGetParams) (HtcProjectsProjectIdTasksTaskIdGroupsGetRes, error)
-	// HtcProjectsProjectIdTasksTaskIdJobsCancelPost implements POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel operation.
-	//
-	// This endpoint will attempt to cancel submitted jobs.
-	// Note a 200 response status code does not mean all jobs were cancelled.
-	//
-	// POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel
-	HtcProjectsProjectIdTasksTaskIdJobsCancelPost(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsCancelPostParams) (HtcProjectsProjectIdTasksTaskIdJobsCancelPostRes, error)
 	// HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet implements GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events operation.
 	//
 	// This endpoint will get events for a job.
@@ -413,6 +406,13 @@ type ImageHandler interface {
 //
 // x-ogen-operation-group: Job
 type JobHandler interface {
+	// CancelJobs implements cancelJobs operation.
+	//
+	// This endpoint will attempt to cancel submitted jobs.
+	// Note a 200 response status code does not mean all jobs were cancelled.
+	//
+	// POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel
+	CancelJobs(ctx context.Context, params CancelJobsParams) (CancelJobsRes, error)
 	// GetJob implements getJob operation.
 	//
 	// This endpoint will get a job by id.

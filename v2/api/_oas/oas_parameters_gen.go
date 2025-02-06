@@ -15,6 +15,176 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
+// CancelJobsParams is parameters of cancelJobs operation.
+type CancelJobsParams struct {
+	ProjectId string
+	TaskId    string
+	Group     OptString
+}
+
+func unpackCancelJobsParams(packed middleware.Parameters) (params CancelJobsParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "projectId",
+			In:   "path",
+		}
+		params.ProjectId = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "taskId",
+			In:   "path",
+		}
+		params.TaskId = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "group",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Group = v.(OptString)
+		}
+	}
+	return params
+}
+
+func decodeCancelJobsParams(args [2]string, argsEscaped bool, r *http.Request) (params CancelJobsParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode path: projectId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "projectId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.ProjectId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "projectId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode path: taskId.
+	if err := func() error {
+		param := args[1]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[1])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "taskId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.TaskId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "taskId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode query: group.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "group",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotGroupVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotGroupVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Group.SetTo(paramsDotGroupVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "group",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // CreateRepoParams is parameters of createRepo operation.
 type CreateRepoParams struct {
 	ProjectId string
@@ -3705,176 +3875,6 @@ func decodeHtcProjectsProjectIdTasksTaskIdGroupsGetParams(args [2]string, argsEs
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "pageSize",
-			In:   "query",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
-// HtcProjectsProjectIdTasksTaskIdJobsCancelPostParams is parameters of POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel operation.
-type HtcProjectsProjectIdTasksTaskIdJobsCancelPostParams struct {
-	ProjectId string
-	TaskId    string
-	Group     OptString
-}
-
-func unpackHtcProjectsProjectIdTasksTaskIdJobsCancelPostParams(packed middleware.Parameters) (params HtcProjectsProjectIdTasksTaskIdJobsCancelPostParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "projectId",
-			In:   "path",
-		}
-		params.ProjectId = packed[key].(string)
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "taskId",
-			In:   "path",
-		}
-		params.TaskId = packed[key].(string)
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "group",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.Group = v.(OptString)
-		}
-	}
-	return params
-}
-
-func decodeHtcProjectsProjectIdTasksTaskIdJobsCancelPostParams(args [2]string, argsEscaped bool, r *http.Request) (params HtcProjectsProjectIdTasksTaskIdJobsCancelPostParams, _ error) {
-	q := uri.NewQueryDecoder(r.URL.Query())
-	// Decode path: projectId.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "projectId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.ProjectId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "projectId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	// Decode path: taskId.
-	if err := func() error {
-		param := args[1]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[1])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "taskId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.TaskId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "taskId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	// Decode query: group.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "group",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotGroupVal string
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotGroupVal = c
-					return nil
-				}(); err != nil {
-					return err
-				}
-				params.Group.SetTo(paramsDotGroupVal)
-				return nil
-			}); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "group",
 			In:   "query",
 			Err:  err,
 		}

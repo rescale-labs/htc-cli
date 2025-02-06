@@ -201,6 +201,12 @@ local patches = {
         },
       },
     },
+    '/htc/projects/{projectId}/tasks/{taskId}/jobs/cancel'+: {
+      post+: {
+        'x-ogen-operation-group': 'Job',
+        operationId: 'cancelJobs',
+      },
+    },
   },
   components+: {
     schemas+: {
