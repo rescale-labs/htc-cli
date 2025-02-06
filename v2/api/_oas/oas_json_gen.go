@@ -1825,6 +1825,12 @@ func (s *HTCJob) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.MinVCpus.Set {
+			e.FieldStart("minVCpus")
+			s.MinVCpus.Encode(e)
+		}
+	}
+	{
 		if s.ProjectId.Set {
 			e.FieldStart("projectId")
 			s.ProjectId.Encode(e)
@@ -1890,7 +1896,7 @@ func (s *HTCJob) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfHTCJob = [29]string{
+var jsonFieldsNameOfHTCJob = [30]string{
 	0:  "architecture",
 	1:  "commands",
 	2:  "completedAt",
@@ -1910,16 +1916,17 @@ var jsonFieldsNameOfHTCJob = [29]string{
 	16: "maxMemory",
 	17: "maxSwap",
 	18: "maxVCpus",
-	19: "projectId",
-	20: "providerJobId",
-	21: "region",
-	22: "startedAt",
-	23: "status",
-	24: "statusReason",
-	25: "tags",
-	26: "taskId",
-	27: "updatedAt",
-	28: "workspaceId",
+	19: "minVCpus",
+	20: "projectId",
+	21: "providerJobId",
+	22: "region",
+	23: "startedAt",
+	24: "status",
+	25: "statusReason",
+	26: "tags",
+	27: "taskId",
+	28: "updatedAt",
+	29: "workspaceId",
 }
 
 // Decode decodes HTCJob from json.
@@ -2137,6 +2144,16 @@ func (s *HTCJob) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"maxVCpus\"")
+			}
+		case "minVCpus":
+			if err := func() error {
+				s.MinVCpus.Reset()
+				if err := s.MinVCpus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"minVCpus\"")
 			}
 		case "projectId":
 			if err := func() error {
@@ -2360,9 +2377,15 @@ func (s *HTCJobDefinition) encodeFields(e *jx.Encoder) {
 			s.Tags.Encode(e)
 		}
 	}
+	{
+		if s.WorkingDir.Set {
+			e.FieldStart("workingDir")
+			s.WorkingDir.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfHTCJobDefinition = [12]string{
+var jsonFieldsNameOfHTCJobDefinition = [13]string{
 	0:  "architecture",
 	1:  "claims",
 	2:  "commands",
@@ -2375,6 +2398,7 @@ var jsonFieldsNameOfHTCJobDefinition = [12]string{
 	9:  "maxVCpus",
 	10: "priority",
 	11: "tags",
+	12: "workingDir",
 }
 
 // Decode decodes HTCJobDefinition from json.
@@ -2530,6 +2554,16 @@ func (s *HTCJobDefinition) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"tags\"")
+			}
+		case "workingDir":
+			if err := func() error {
+				s.WorkingDir.Reset()
+				if err := s.WorkingDir.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"workingDir\"")
 			}
 		default:
 			return d.Skip()
