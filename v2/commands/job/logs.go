@@ -3,6 +3,8 @@ package job
 import (
 	"context"
 	"fmt"
+	"io"
+	"log/slog"
 	"os"
 	"time"
 
@@ -11,7 +13,6 @@ import (
 	oapi "github.com/rescale-labs/htc-cli/v2/api/_oas"
 	"github.com/rescale-labs/htc-cli/v2/common"
 	"github.com/rescale-labs/htc-cli/v2/config"
-	"github.com/rescale-labs/htc-cli/v2/tabler"
 )
 
 func logs(ctx context.Context, c oapi.JobInvoker, projectId, taskId, jobId, pageIndex string) (*oapi.HTCJobLogs, error) {
@@ -20,7 +21,7 @@ func logs(ctx context.Context, c oapi.JobInvoker, projectId, taskId, jobId, page
 		TaskId:    taskId,
 		JobId:     jobId,
 		PageSize:  oapi.NewOptInt32(pageSize),
-		PageIndex: oapi.NewOptString(pageIndex),
+		PageIndex: oapi.OptString{pageIndex, pageIndex != ""},
 	})
 	if err != nil {
 		return nil, err
@@ -33,7 +34,7 @@ func logs(ctx context.Context, c oapi.JobInvoker, projectId, taskId, jobId, page
 		*oapi.GetLogsForbidden:
 		return nil, fmt.Errorf("forbidden: %s", res)
 	}
-	return nil, fmt.Errorf("Unknown response type: %s", res)
+	return nil, fmt.Errorf("Unknown response type: %T", res)
 }
 
 func Logs(cmd *cobra.Command, args []string) error {
@@ -42,10 +43,16 @@ func Logs(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	p := common.IDParams{RequireProjectId: true, RequireTaskId: true, RequireJobId: true}
+	p := common.IDParams{RequireProjectId: true, RequireTaskId: true}
 	if err := runner.GetIds(&p); err != nil {
 		return err
 	}
+
+	if len(args) != 1 {
+		return fmt.Errorf("Error: job ID not provided")
+	}
+
+	jobId := args[0]
 
 	flags := cmd.Flags()
 	limit, err := flags.GetInt("limit")
@@ -55,31 +62,66 @@ func Logs(cmd *cobra.Command, args []string) error {
 
 	ctx := context.Background()
 	var pageIndex string
-	var items []oapi.HTCLogEvent
+	total := 0
+
+	err = writeHeader(os.Stdout)
+	if err != nil {
+		return fmt.Errorf("Error: unable to write header")
+	}
 
 	for {
-		res, err := logs(ctx, runner.Client, p.ProjectId, p.TaskId, p.JobId, pageIndex)
+		// write rows as the batches come in up to the limit
+		if limit > 0 && limit <= total {
+			break
+		}
+
+		res, err := logs(ctx, runner.Client, p.ProjectId, p.TaskId, jobId, pageIndex)
 		if err != nil {
 			return err
 		}
-		items = append(items, res.Items...)
-		if limit > 0 && len(items) >= limit {
-			items = items[:limit]
-			break
+
+		currentPage := len(res.Items)
+		if total+currentPage >= limit {
+			currentPage = limit - total
+		}
+
+		// only write up to the current page limit
+		if limit > 0 {
+			writeRows(res.Items[:currentPage], os.Stdout)
+		} else {
+			writeRows(res.Items, os.Stdout)
 		}
 
 		pageIndex = res.Next.Value.Query().Get("pageIndex")
 		if pageIndex == "" {
 			break
 		}
+		total += len(res.Items)
 	}
-	return runner.PrintResult(tabler.HTCJobLog(items), os.Stdout)
+	return nil
+}
+
+func writeHeader(w io.Writer) error {
+	if _, err := fmt.Fprintf(w, "%-38s %19s\n", "Timestamp", "Message"); err != nil {
+		return err
+	}
+	return nil
+}
+
+func writeRows(rows []oapi.HTCLogEvent, w io.Writer) {
+	for _, row := range rows {
+		timestamp := time.Time(row.Timestamp.Value).Format(time.DateTime)
+		if _, err := fmt.Fprintf(w, "%-38s %19s\n", timestamp, row.Message.Value); err != nil {
+			slog.Warn("Unable to write line")
+		}
+	}
 }
 
 var LogsCmd = &cobra.Command{
-	Use:   "logs",
-	Short: "Returns HTC job logs given a job ID.",
+	Use:   "logs [JOB_UUID]",
+	Short: "Returns N latest HTC job logs given a job ID.",
 	Run:   common.WrapRunE(Logs),
+	Args:  cobra.ExactArgs(1),
 }
 
 func init() {
@@ -88,5 +130,4 @@ func init() {
 	flags.IntP("limit", "l", 0, "Limit response to N items")
 	flags.String("project-id", "", "HTC project ID")
 	flags.String("task-id", "", "HTC task ID")
-	flags.String("job-id", "", "HTC job ID")
 }
