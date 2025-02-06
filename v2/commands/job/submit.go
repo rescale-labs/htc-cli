@@ -148,6 +148,7 @@ func init() {
 	SubmitCmd.Flags().String("task-id", "", "HTC task ID (required)")
 	SubmitCmd.Flags().String("group", "", "Group")
 	SubmitCmd.Flags().StringP("env", "e", "", "Set job environment variables using comma-delimited KEY=VALUE pairs")
+	SubmitCmd.Flags().StringP("working-dir", "wd", "", "Set working directory for a job. Experimental feature")
 
 	SubmitCmd.Long = SubmitCmd.Short + `
 JSON_FILE is a path to a JSON file or - for stdin.`

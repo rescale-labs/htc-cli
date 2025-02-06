@@ -1312,6 +1312,7 @@ type HTCJob struct {
 	MaxMemory               OptInt32                   `json:"maxMemory"`
 	MaxSwap                 OptInt32                   `json:"maxSwap"`
 	MaxVCpus                OptInt32                   `json:"maxVCpus"`
+	MinVCpus                OptInt32                   `json:"minVCpus"`
 	ProjectId               OptString                  `json:"projectId"`
 	ProviderJobId           OptString                  `json:"providerJobId"`
 	Region                  OptRescaleRegion           `json:"region"`
@@ -1417,6 +1418,11 @@ func (s *HTCJob) GetMaxSwap() OptInt32 {
 // GetMaxVCpus returns the value of MaxVCpus.
 func (s *HTCJob) GetMaxVCpus() OptInt32 {
 	return s.MaxVCpus
+}
+
+// GetMinVCpus returns the value of MinVCpus.
+func (s *HTCJob) GetMinVCpus() OptInt32 {
+	return s.MinVCpus
 }
 
 // GetProjectId returns the value of ProjectId.
@@ -1564,6 +1570,11 @@ func (s *HTCJob) SetMaxVCpus(val OptInt32) {
 	s.MaxVCpus = val
 }
 
+// SetMinVCpus sets the value of MinVCpus.
+func (s *HTCJob) SetMinVCpus(val OptInt32) {
+	s.MinVCpus = val
+}
+
 // SetProjectId sets the value of ProjectId.
 func (s *HTCJob) SetProjectId(val OptString) {
 	s.ProjectId = val
@@ -1630,10 +1641,11 @@ type HTCJobDefinition struct {
 	// On AWS, maxSwap allows swap memory to be used, up to the limit. On other providers, swap is not
 	// available, but maxSwap is added to the maxMemory to provide the same amount of available space.
 	// The default value is 2000 MB.
-	MaxSwap  OptInt32                `json:"maxSwap"`
-	MaxVCpus OptInt32                `json:"maxVCpus"`
-	Priority OptJobPriority          `json:"priority"`
-	Tags     OptHTCJobDefinitionTags `json:"tags"`
+	MaxSwap    OptInt32                `json:"maxSwap"`
+	MaxVCpus   OptInt32                `json:"maxVCpus"`
+	Priority   OptJobPriority          `json:"priority"`
+	Tags       OptHTCJobDefinitionTags `json:"tags"`
+	WorkingDir OptString               `json:"workingDir"`
 }
 
 // GetArchitecture returns the value of Architecture.
@@ -1696,6 +1708,11 @@ func (s *HTCJobDefinition) GetTags() OptHTCJobDefinitionTags {
 	return s.Tags
 }
 
+// GetWorkingDir returns the value of WorkingDir.
+func (s *HTCJobDefinition) GetWorkingDir() OptString {
+	return s.WorkingDir
+}
+
 // SetArchitecture sets the value of Architecture.
 func (s *HTCJobDefinition) SetArchitecture(val OptArchitecture) {
 	s.Architecture = val
@@ -1754,6 +1771,11 @@ func (s *HTCJobDefinition) SetPriority(val OptJobPriority) {
 // SetTags sets the value of Tags.
 func (s *HTCJobDefinition) SetTags(val OptHTCJobDefinitionTags) {
 	s.Tags = val
+}
+
+// SetWorkingDir sets the value of WorkingDir.
+func (s *HTCJobDefinition) SetWorkingDir(val OptString) {
+	s.WorkingDir = val
 }
 
 type HTCJobDefinitionTags map[string]string
