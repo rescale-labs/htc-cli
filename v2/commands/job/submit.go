@@ -194,8 +194,8 @@ func init() {
 	// There was a choice to create 2 separate flags (boolean:-W and string:--working-dir), but I did not want 2 flags
 	SubmitCmd.Flags().StringP("working-dir", "W", ".", "Set current working directory (pwd) for a job commands execution. If no input given assumes current directory from which command is executed. Experimental feature")
 	// There are 2 caveats with NoOptDefVal:
-	// 1. Without it "flag needs an argument" gets raised, eg `htc job submit job_def.json -W` is now allowed even with default value. See: https://github.com/spf13/cobra/issues/1756
-	// 2. NoOptDefVal It forces "=" assignment. https://github.com/spf13/pflag/issues/321
+	// 1. Without NoOptDefVal "flag needs an argument" gets raised, eg `htc job submit job_def.json -W` is now allowed even with default value. See: https://github.com/spf13/cobra/issues/1756
+	// 2. NoOptDefVal forces "=" assignment. https://github.com/spf13/pflag/issues/321
 	SubmitCmd.Flag("working-dir").NoOptDefVal = "noopt"
 
 	SubmitCmd.Long = SubmitCmd.Short + `
