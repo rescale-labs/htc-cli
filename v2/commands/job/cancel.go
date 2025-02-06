@@ -2,6 +2,7 @@ package job
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -11,6 +12,23 @@ import (
 	oapi "github.com/rescale-labs/htc-cli/v2/api/_oas"
 	"github.com/rescale-labs/htc-cli/v2/common"
 )
+
+func cancelJobs(ctx context.Context, c oapi.JobInvoker, params *oapi.CancelJobsParams) (*oapi.CancelJobsOK, error) {
+	res, err := c.CancelJobs(ctx, *params)
+	if err != nil {
+		return nil, err
+	}
+	switch res := res.(type) {
+	case *oapi.CancelJobsOK:
+		return res, nil
+	case *oapi.CancelJobsForbidden:
+		return nil, errors.New("make sure you are accessing your own project and task")
+	case *oapi.CancelJobsUnauthorized:
+		return nil, errors.New("refresh your auth with `htc auth login`")
+	default:
+		return nil, fmt.Errorf("unknown operation %s", res)
+	}
+}
 
 func Cancel(cmd *cobra.Command, args []string) error {
 	runner, err := common.NewRunnerWithToken(cmd, time.Now())
@@ -25,25 +43,21 @@ func Cancel(cmd *cobra.Command, args []string) error {
 
 	group, err := cmd.Flags().GetString("group")
 	if err != nil {
-		return fmt.Errorf("Error setting group: %w", err)
+		return fmt.Errorf("error setting group: %w", err)
+	}
+
+	params := oapi.CancelJobsParams{
+		ProjectId: p.ProjectId,
+		TaskId:    p.TaskId,
+		Group:     oapi.OptString{Value: group, Set: group != ""},
 	}
 
 	ctx := context.Background()
-	res, err := runner.Client.CancelJobs(ctx, oapi.CancelJobsParams{p.ProjectId, p.TaskId, oapi.NewOptString(group)})
+	_, err = cancelJobs(ctx, runner.Client, &params)
 	if err != nil {
 		return err
 	}
-
-	switch res.(type) {
-	case *oapi.CancelJobsOK:
-		return runner.PrintResult("Cancel request sent successfully!", os.Stdout)
-	case *oapi.CancelJobsForbidden:
-		return runner.PrintResult("Make sure you are accessing your own project and task!", os.Stderr)
-	case *oapi.CancelJobsUnauthorized:
-		return runner.PrintResult("Refresh your auth!", os.Stderr)
-	default:
-		return runner.PrintResult(fmt.Errorf("unknown operation %s", res), os.Stderr)
-	}
+	return runner.PrintResult("Cancel request sent successfully!", os.Stdout)
 }
 
 var CancelCmd = &cobra.Command{
