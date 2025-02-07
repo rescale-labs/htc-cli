@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log/slog"
 	"os"
 	"time"
 
@@ -49,7 +48,7 @@ func Logs(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(args) != 1 {
-		return fmt.Errorf("Error: job ID not provided")
+		return config.UsageErrorf("Error: job ID not provided")
 	}
 
 	jobId := args[0]
@@ -64,8 +63,7 @@ func Logs(cmd *cobra.Command, args []string) error {
 	var pageIndex string
 	total := 0
 
-	err = writeHeader(os.Stdout)
-	if err != nil {
+	if _, err := fmt.Fprintf(os.Stdout, "%-38s %19s\n", "Timestamp", "Message"); err != nil {
 		return fmt.Errorf("Error: unable to write header")
 	}
 
@@ -87,9 +85,12 @@ func Logs(cmd *cobra.Command, args []string) error {
 
 		// only write up to the current page limit
 		if limit > 0 {
-			writeRows(res.Items[:currentPage], os.Stdout)
+			err = writeRows(res.Items[:currentPage], os.Stdout)
 		} else {
-			writeRows(res.Items, os.Stdout)
+			err = writeRows(res.Items, os.Stdout)
+		}
+		if err != nil {
+			return err
 		}
 
 		pageIndex = res.Next.Value.Query().Get("pageIndex")
@@ -101,25 +102,19 @@ func Logs(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func writeHeader(w io.Writer) error {
-	if _, err := fmt.Fprintf(w, "%-38s %19s\n", "Timestamp", "Message"); err != nil {
-		return err
+func writeRows(rows []oapi.HTCLogEvent, w io.Writer) error {
+	for _, row := range rows {
+		timestamp := time.Time(row.Timestamp.Value).Format(time.DateTime)
+		if _, err := fmt.Fprintf(w, "%-38s %19s\n", timestamp, row.Message.Value); err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
-func writeRows(rows []oapi.HTCLogEvent, w io.Writer) {
-	for _, row := range rows {
-		timestamp := time.Time(row.Timestamp.Value).Format(time.DateTime)
-		if _, err := fmt.Fprintf(w, "%-38s %19s\n", timestamp, row.Message.Value); err != nil {
-			slog.Warn("Unable to write line")
-		}
-	}
-}
-
 var LogsCmd = &cobra.Command{
 	Use:   "logs [JOB_UUID]",
-	Short: "Returns N latest HTC job logs given a job ID.",
+	Short: "Returns latest HTC job logs given a job ID.",
 	Run:   common.WrapRunE(Logs),
 	Args:  cobra.ExactArgs(1),
 }
