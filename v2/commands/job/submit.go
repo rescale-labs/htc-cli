@@ -3,8 +3,11 @@ package job
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log/slog"
 	"os"
+	"path"
 	"strings"
 	"time"
 
@@ -52,6 +55,11 @@ func Submit(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("Error setting group: %w", err)
 	}
 
+	userProvidedWorkingDirectory, err := cmd.Flags().GetString("working-dir")
+	if err != nil {
+		return config.UsageErrorf("Error setting working-directory: %w", err)
+	}
+
 	envMap := make(map[string]string)
 	env, err := cmd.Flags().GetString("env")
 	if err != nil {
@@ -61,7 +69,7 @@ func Submit(cmd *cobra.Command, args []string) error {
 		for _, token := range strings.Split(env, ",") {
 			key, value, ok := strings.Cut(token, "=")
 			if !ok {
-				return config.UsageErrorf("Error: env option has invalid format")
+				return config.UsageErrorf("env option has invalid format")
 			}
 			envMap[key] = value
 		}
@@ -80,7 +88,7 @@ func Submit(cmd *cobra.Command, args []string) error {
 		params: oapi.SubmitJobsParams{
 			ProjectId: p.ProjectId,
 			TaskId:    p.TaskId,
-			Group:     oapi.NewOptString(group),
+			Group:     oapi.OptString{Value: group, Set: group != ""},
 		},
 	}
 
@@ -99,12 +107,53 @@ func Submit(cmd *cobra.Command, args []string) error {
 		}
 	}
 
+	// Only execute if user actually opted-in for a flag
+	if userProvidedWorkingDirectory != "" {
+		workingDir, err := getWorkingDir(userProvidedWorkingDirectory)
+		if err != nil {
+			return err
+		}
+
+		// Set the workingDirectory and CFS experimental
+		for i := range req.batch {
+			req.batch[i].Experimental = oapi.OptExperimentalFields{
+				Value: oapi.ExperimentalFields{
+					KubernetesSwap:   oapi.OptBool{Set: false},
+					CloudFileSystems: oapi.OptBool{Value: true, Set: true},
+				},
+				Set: true,
+			}
+			req.batch[i].HtcJobDefinition.WorkingDir = oapi.OptString{Value: *workingDir, Set: true}
+		}
+	}
+
 	ctx := context.Background()
 	res, err := submit(ctx, runner.Client, &req)
 	if err != nil {
 		return fmt.Errorf("Error on job submission: %v", err)
 	}
 	return runner.PrintResult(res, os.Stdout)
+}
+
+func getWorkingDir(userPassedDir string) (*string, error) {
+	if !path.IsAbs(userPassedDir) {
+		return nil, errors.New("only absolute paths are allowed when using working directory flag")
+	}
+
+	_, err := os.Stat(userPassedDir)
+	if err != nil {
+		slog.Warn("Warning: passed directory is not present on the system! Job will still be submitted with provided", "path", userPassedDir)
+	}
+
+	returnDirectory := userPassedDir
+	if returnDirectory == "." {
+		cwd, err := os.Getwd()
+		if err != nil {
+			return nil, fmt.Errorf("cannot get current working directory %v", err)
+		}
+		returnDirectory = cwd
+	}
+	return &returnDirectory, nil
 }
 
 var SubmitCmd = &cobra.Command{
@@ -148,6 +197,7 @@ func init() {
 	SubmitCmd.Flags().String("task-id", "", "HTC task ID (required)")
 	SubmitCmd.Flags().String("group", "", "Group")
 	SubmitCmd.Flags().StringP("env", "e", "", "Set job environment variables using comma-delimited KEY=VALUE pairs")
+	SubmitCmd.Flags().StringP("working-dir", "w", "", "Experimental feature. Set current working directory (pwd) for a job commands execution. E.g. htc job submit jobspec.json -w $(pwd)")
 
 	SubmitCmd.Long = SubmitCmd.Short + `
 JSON_FILE is a path to a JSON file or - for stdin.`
