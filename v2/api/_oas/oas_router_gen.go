@@ -875,7 +875,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 															// Leaf node.
 															switch r.Method {
 															case "POST":
-																s.handleHtcProjectsProjectIdTasksTaskIdJobsCancelPostRequest([2]string{
+																s.handleCancelJobsRequest([2]string{
 																	args[0],
 																	args[1],
 																}, elemIsEscaped, w, r)
@@ -2392,9 +2392,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 															// Leaf node.
 															switch method {
 															case "POST":
-																r.name = "HtcProjectsProjectIdTasksTaskIdJobsCancelPost"
+																r.name = "CancelJobs"
 																r.summary = "Cancel Jobs"
-																r.operationID = ""
+																r.operationID = "cancelJobs"
 																r.pathPattern = "/htc/projects/{projectId}/tasks/{taskId}/jobs/cancel"
 																r.args = args
 																r.count = 2

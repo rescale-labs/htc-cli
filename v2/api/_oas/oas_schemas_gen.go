@@ -158,6 +158,21 @@ func (s *AutoscalingProfile) UnmarshalText(data []byte) error {
 	}
 }
 
+// CancelJobsForbidden is response for CancelJobs operation.
+type CancelJobsForbidden struct{}
+
+func (*CancelJobsForbidden) cancelJobsRes() {}
+
+// CancelJobsOK is response for CancelJobs operation.
+type CancelJobsOK struct{}
+
+func (*CancelJobsOK) cancelJobsRes() {}
+
+// CancelJobsUnauthorized is response for CancelJobs operation.
+type CancelJobsUnauthorized struct{}
+
+func (*CancelJobsUnauthorized) cancelJobsRes() {}
+
 // Ref: #/components/schemas/CloudProvider
 type CloudProvider string
 
@@ -3809,24 +3824,6 @@ func (*HtcProjectsProjectIdTasksTaskIdGroupsGetOKApplicationJSON) htcProjectsPro
 type HtcProjectsProjectIdTasksTaskIdGroupsGetUnauthorized struct{}
 
 func (*HtcProjectsProjectIdTasksTaskIdGroupsGetUnauthorized) htcProjectsProjectIdTasksTaskIdGroupsGetRes() {
-}
-
-// HtcProjectsProjectIdTasksTaskIdJobsCancelPostForbidden is response for HtcProjectsProjectIdTasksTaskIdJobsCancelPost operation.
-type HtcProjectsProjectIdTasksTaskIdJobsCancelPostForbidden struct{}
-
-func (*HtcProjectsProjectIdTasksTaskIdJobsCancelPostForbidden) htcProjectsProjectIdTasksTaskIdJobsCancelPostRes() {
-}
-
-// HtcProjectsProjectIdTasksTaskIdJobsCancelPostOK is response for HtcProjectsProjectIdTasksTaskIdJobsCancelPost operation.
-type HtcProjectsProjectIdTasksTaskIdJobsCancelPostOK struct{}
-
-func (*HtcProjectsProjectIdTasksTaskIdJobsCancelPostOK) htcProjectsProjectIdTasksTaskIdJobsCancelPostRes() {
-}
-
-// HtcProjectsProjectIdTasksTaskIdJobsCancelPostUnauthorized is response for HtcProjectsProjectIdTasksTaskIdJobsCancelPost operation.
-type HtcProjectsProjectIdTasksTaskIdJobsCancelPostUnauthorized struct{}
-
-func (*HtcProjectsProjectIdTasksTaskIdJobsCancelPostUnauthorized) htcProjectsProjectIdTasksTaskIdJobsCancelPostRes() {
 }
 
 // HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetForbidden is response for HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet operation.
