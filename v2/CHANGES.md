@@ -1,7 +1,5 @@
 # Changelog
 
-[//]: # (## Pending next release)
-
 ## v0.0.9
 
 * Add `job logs [JOB_UUID]` to support viewing job logs
