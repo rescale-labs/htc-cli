@@ -1,5 +1,14 @@
 # Changelog
 
+[//]: # (## Pending next release)
+
+## v0.0.9
+
+* Add `job logs [JOB_UUID]` to support viewing job logs
+* Add `job cancel` to support attempting cancellation of all jobs in a task
+* Add option `job submit --env var1=val1` to support adding environment variables to a job
+* Add option `job submit -w $(pwd)` to support passing the current working directory to a job
+
 ## v0.0.8
 
 * Add `auth logout` for clearing existing stored API key and token.
