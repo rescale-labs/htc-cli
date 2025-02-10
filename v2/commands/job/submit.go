@@ -57,7 +57,7 @@ func Submit(cmd *cobra.Command, args []string) error {
 
 	userProvidedWorkingDirectory, err := cmd.Flags().GetString("working-dir")
 	if err != nil {
-		return fmt.Errorf("Error setting working-directory: %w", err)
+		return config.UsageErrorf("Error setting working-directory: %w", err)
 	}
 
 	envMap := make(map[string]string)
@@ -88,7 +88,7 @@ func Submit(cmd *cobra.Command, args []string) error {
 		params: oapi.SubmitJobsParams{
 			ProjectId: p.ProjectId,
 			TaskId:    p.TaskId,
-			Group:     oapi.OptString{group, group != ""},
+			Group:     oapi.OptString{Value: group, Set: group != ""},
 		},
 	}
 
@@ -139,10 +139,12 @@ func getWorkingDir(userPassedDir string) (*string, error) {
 	if !path.IsAbs(userPassedDir) {
 		return nil, errors.New("only absolute paths are allowed when using working directory flag")
 	}
+
 	_, err := os.Stat(userPassedDir)
 	if err != nil {
 		slog.Warn("Warning: passed directory is not present on the system! Job will still be submitted with provided", "path", userPassedDir)
 	}
+
 	returnDirectory := userPassedDir
 	if returnDirectory == "." {
 		cwd, err := os.Getwd()
@@ -195,13 +197,7 @@ func init() {
 	SubmitCmd.Flags().String("task-id", "", "HTC task ID (required)")
 	SubmitCmd.Flags().String("group", "", "Group")
 	SubmitCmd.Flags().StringP("env", "e", "", "Set job environment variables using comma-delimited KEY=VALUE pairs")
-	// We wanted to be able to pass in just the -W flag which would mean CWD.
-	// There was a choice to create 2 separate flags (boolean:-W and string:--working-dir), but I did not want 2 flags
-	SubmitCmd.Flags().StringP("working-dir", "W", "", "Set current working directory (pwd) for a job commands execution. If no input given assumes current directory from which command is executed. Experimental feature")
-	// There are 2 caveats with NoOptDefVal:
-	// 1. Without NoOptDefVal "flag needs an argument" gets raised, eg `htc job submit job_def.json -W` is now allowed even with default value. See: https://github.com/spf13/cobra/issues/1756
-	// 2. NoOptDefVal forces "=" assignment. https://github.com/spf13/pflag/issues/321
-	SubmitCmd.Flag("working-dir").NoOptDefVal = "."
+	SubmitCmd.Flags().StringP("working-dir", "w", "", "Experimental feature. Set current working directory (pwd) for a job commands execution. E.g. htc job submit jobspec.json -w $(pwd)")
 
 	SubmitCmd.Long = SubmitCmd.Short + `
 JSON_FILE is a path to a JSON file or - for stdin.`
