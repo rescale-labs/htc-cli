@@ -86,3 +86,11 @@ $ htc task get  -l 1 -o json | jq .[].projectId
 2024/11/13 12:26:27 HtcProjectsProjectIdTasksGet: projectId=8f9db624-62de-44da-942f-edcc244f4fcb pageIndex= pageSize=500
 "8f9db624-62de-44da-942f-edcc244f4fcb"
 ```
+
+## Setting up tab autocompletion for bash
+
+Run the following command from your terminal and consider adding it to your ~/.bash_profile:
+
+```
+source <(htc completion bash)
+```
