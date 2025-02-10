@@ -1645,7 +1645,7 @@ type HTCJobDefinition struct {
 	MaxVCpus   OptInt32                `json:"maxVCpus"`
 	Priority   OptJobPriority          `json:"priority"`
 	Tags       OptHTCJobDefinitionTags `json:"tags"`
-	WorkingDir OptString               `json:"workingDir"`
+	WorkingDir OptNilString            `json:"workingDir"`
 }
 
 // GetArchitecture returns the value of Architecture.
@@ -1709,7 +1709,7 @@ func (s *HTCJobDefinition) GetTags() OptHTCJobDefinitionTags {
 }
 
 // GetWorkingDir returns the value of WorkingDir.
-func (s *HTCJobDefinition) GetWorkingDir() OptString {
+func (s *HTCJobDefinition) GetWorkingDir() OptNilString {
 	return s.WorkingDir
 }
 
@@ -1774,7 +1774,7 @@ func (s *HTCJobDefinition) SetTags(val OptHTCJobDefinitionTags) {
 }
 
 // SetWorkingDir sets the value of WorkingDir.
-func (s *HTCJobDefinition) SetWorkingDir(val OptString) {
+func (s *HTCJobDefinition) SetWorkingDir(val OptNilString) {
 	s.WorkingDir = val
 }
 

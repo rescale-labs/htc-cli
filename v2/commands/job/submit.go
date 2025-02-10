@@ -123,7 +123,7 @@ func Submit(cmd *cobra.Command, args []string) error {
 				},
 				Set: true,
 			}
-			req.batch[i].HtcJobDefinition.WorkingDir = oapi.OptString{Value: *workingDir, Set: true}
+			req.batch[i].HtcJobDefinition.WorkingDir = oapi.OptNilString{Value: *workingDir, Set: true}
 		}
 	}
 
