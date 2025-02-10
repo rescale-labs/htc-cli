@@ -277,6 +277,14 @@ local patches = {
           rescaleProjectId+: {
             nullable: true,
           },
+
+        },
+      },
+      HTCJobDefinition+: {
+        properties+: {
+            workingDir+: {
+                nullable: true,
+            },
         },
       },
       HTCJobSubmitRequests: {
