@@ -356,6 +356,47 @@ func encodeGetLimitsResponse(response GetLimitsRes, w http.ResponseWriter) error
 	}
 }
 
+func encodeGetLogsResponse(response GetLogsRes, w http.ResponseWriter) error {
+	switch response := response.(type) {
+	case *HTCJobLogs:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetLogsUnauthorized:
+		w.WriteHeader(401)
+
+		return nil
+
+	case *GetLogsForbidden:
+		w.WriteHeader(403)
+
+		return nil
+
+	case *HTCRequestError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeGetMetricsResponse(response GetMetricsRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *GetMetricsOK:
@@ -1107,35 +1148,6 @@ func encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetResponse(response Ht
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetForbidden:
-		w.WriteHeader(403)
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetResponse(response HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetRes, w http.ResponseWriter) error {
-	switch response := response.(type) {
-	case *HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetOKApplicationJSON:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetUnauthorized:
-		w.WriteHeader(401)
-
-		return nil
-
-	case *HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetForbidden:
 		w.WriteHeader(403)
 
 		return nil

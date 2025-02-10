@@ -207,6 +207,29 @@ local patches = {
         operationId: 'cancelJobs',
       },
     },
+    '/htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/logs'+: {
+      get+: {
+        'x-ogen-operation-group': 'Job',
+        operationId: 'getLogs',
+        responses+: {
+          '200'+: {
+              content+: {
+                'application/json'+: {
+                  schema: { '$ref':
+                    '#/components/schemas/HTCJobLogs' },
+                },
+              },
+            },
+          '404': {
+            content: {
+              'application/json': {
+                schema: { '$ref': '#/components/schemas/HTCRequestError' },
+              },
+            },
+          },
+        },
+      }
+    }
   },
   components+: {
     schemas+: {
@@ -261,6 +284,22 @@ local patches = {
         items: {
           '$ref': '#/components/schemas/HTCJobSubmitRequest',
         },
+      },
+      HTCJobLogs: {
+        type: 'object',
+        properties: {
+          items: {
+            type: 'array',
+            items: {
+              '$ref': '#/components/schemas/HTCLogEvent',
+            }
+          },
+          next: {
+            format: 'uri',
+            type: 'string',
+            example: 'https://page2.com',
+          }
+        }
       },
       HTCProject+: {
         properties+: {

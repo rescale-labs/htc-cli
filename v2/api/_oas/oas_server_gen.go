@@ -193,12 +193,6 @@ type Handler interface {
 	//
 	// GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events
 	HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetParams) (HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes, error)
-	// HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGet implements GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/logs operation.
-	//
-	// This endpoint will get job logs.
-	//
-	// GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/logs
-	HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetParams) (HtcProjectsProjectIdTasksTaskIdJobsJobIdLogsGetRes, error)
 	// HtcProjectsProjectIdTasksTaskIdPatch implements PATCH /htc/projects/{projectId}/tasks/{taskId} operation.
 	//
 	// This endpoint allows for managing the lifecycle of tasks. Users may set the `LifecycleStatus` of
@@ -425,6 +419,12 @@ type JobHandler interface {
 	//
 	// GET /htc/projects/{projectId}/tasks/{taskId}/jobs
 	GetJobs(ctx context.Context, params GetJobsParams) (GetJobsRes, error)
+	// GetLogs implements getLogs operation.
+	//
+	// This endpoint will get job logs.
+	//
+	// GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/logs
+	GetLogs(ctx context.Context, params GetLogsParams) (GetLogsRes, error)
 	// SubmitJobs implements submitJobs operation.
 	//
 	// This endpoint will submit a batch of jobs for a task.
