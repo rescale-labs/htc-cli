@@ -101,7 +101,7 @@ func (s *EnvPair) Validate() error {
 			MaxLengthSet: false,
 			Email:        false,
 			Hostname:     false,
-			Regex:        regexMap["^(?!.*AWS_BATCH_|RESCALE_PROJECT_ID|RESCALE_TASK_ID|RESCALE_JOB_ID|PROJECT_SHARED_FOLDER|TASK_SHARED_FOLDER|AWS_SESSION_TOKEN|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY).*"],
+			Regex:        regexMap["^(?!.*AWS_BATCH_|RESCALE_PROJECT_ID|RESCALE_TASK_ID|RESCALE_JOB_ID|PROJECT_SHARED_FOLDER|TASK_SHARED_FOLDER|AWS_SESSION_TOKEN|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|RDF_).*"],
 		}).Validate(string(s.Name)); err != nil {
 			return errors.Wrap(err, "string")
 		}
