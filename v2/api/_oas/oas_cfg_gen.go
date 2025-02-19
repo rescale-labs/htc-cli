@@ -12,9 +12,9 @@ import (
 )
 
 var regexMap = map[string]ogenregex.Regexp{
-	"(?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*":                                                                                                           ogenregex.MustCompile("(?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*"),
-	"(?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*(:[_a-zA-Z0-9]([\\-\\._a-zA-Z0-9])*)?":                                                                      ogenregex.MustCompile("(?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*(:[_a-zA-Z0-9]([\\-\\._a-zA-Z0-9])*)?"),
-	"^(?!.*AWS_BATCH_|RESCALE_PROJECT_ID|RESCALE_TASK_ID|RESCALE_JOB_ID|PROJECT_SHARED_FOLDER|TASK_SHARED_FOLDER|AWS_SESSION_TOKEN|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY).*": ogenregex.MustCompile("^(?!.*AWS_BATCH_|RESCALE_PROJECT_ID|RESCALE_TASK_ID|RESCALE_JOB_ID|PROJECT_SHARED_FOLDER|TASK_SHARED_FOLDER|AWS_SESSION_TOKEN|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY).*"),
+	"(?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*":                                                                                                                ogenregex.MustCompile("(?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*"),
+	"(?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*(:[_a-zA-Z0-9]([\\-\\._a-zA-Z0-9])*)?":                                                                           ogenregex.MustCompile("(?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*(:[_a-zA-Z0-9]([\\-\\._a-zA-Z0-9])*)?"),
+	"^(?!.*AWS_BATCH_|RESCALE_PROJECT_ID|RESCALE_TASK_ID|RESCALE_JOB_ID|PROJECT_SHARED_FOLDER|TASK_SHARED_FOLDER|AWS_SESSION_TOKEN|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|RDF_).*": ogenregex.MustCompile("^(?!.*AWS_BATCH_|RESCALE_PROJECT_ID|RESCALE_TASK_ID|RESCALE_JOB_ID|PROJECT_SHARED_FOLDER|TASK_SHARED_FOLDER|AWS_SESSION_TOKEN|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|RDF_).*"),
 }
 
 type (
