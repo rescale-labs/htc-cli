@@ -3101,6 +3101,7 @@ func (s *HTCRequestError) SetMessage(val OptNilString) {
 
 func (*HTCRequestError) createProjectRes() {}
 func (*HTCRequestError) getJobRes()        {}
+func (*HTCRequestError) getJobsRes()       {}
 func (*HTCRequestError) getLogsRes()       {}
 func (*HTCRequestError) submitJobsRes()    {}
 
