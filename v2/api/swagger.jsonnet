@@ -169,6 +169,13 @@ local patches = {
               },
             },
           },
+          '404'+: {
+            content+: {
+              'application/json'+: {
+                schema: { '$ref': '#/components/schemas/HTCRequestError' },
+              },
+            },
+          }
         },
       },
     },

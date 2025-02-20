@@ -20,33 +20,6 @@ import (
 
 const pageSize = 500
 
-type sortOrder string
-
-const (
-	sortCompleted sortOrder = "completed"
-	sortCreated   sortOrder = "created"
-	sortStatus    sortOrder = "status"
-)
-const sortDefault = sortCompleted
-
-func (s *sortOrder) String() string {
-	return string(*s)
-}
-
-func (s *sortOrder) Set(v string) error {
-	switch sortOrder(v) {
-	case sortCompleted, sortCreated, sortStatus:
-		*s = sortOrder(v)
-		return nil
-	default:
-		return fmt.Errorf("%q is not a valid sort option", v)
-	}
-}
-
-func (s *sortOrder) Type() string {
-	return "string"
-}
-
 func getJobs(ctx context.Context, c oapi.JobInvoker, params *oapi.GetJobsParams) (*oapi.HTCJobs, error) {
 	res, err := c.GetJobs(ctx, *params)
 	if err != nil {
@@ -128,6 +101,11 @@ func Get(cmd *cobra.Command, args []string) error {
 			PageSize:  oapi.NewOptInt32(pageSize),
 			ViewType:  oapi.NewOptViewType(oapi.ViewTypeFULL),
 		}
+
+		if filterStatus != "" {
+			params.Status = oapi.NewOptRescaleJobStatus(filterStatus.ToRescaleStatus())
+		}
+
 		for {
 			res, err := getJobs(ctx, runner.Client, &params)
 			if err != nil {
@@ -147,20 +125,20 @@ func Get(cmd *cobra.Command, args []string) error {
 		}
 
 		var sortFunc func(a, b oapi.HTCJob) int
-		switch sortOrder(sort) {
-		case "", sortCreated:
+		switch common.SortOrder(sort) {
+		case "", common.SortCreated:
 			sortFunc = func(a, b oapi.HTCJob) int {
 				return time.Time(a.CreatedAt.Value).Compare(
 					time.Time(b.CreatedAt.Value))
 			}
 
-		case sortCompleted:
+		case common.SortCompleted:
 			sortFunc = func(a, b oapi.HTCJob) int {
 				return time.Time(a.CompletedAt.Value).Compare(
 					time.Time(b.CompletedAt.Value))
 			}
 
-		case sortStatus:
+		case common.SortStatus:
 			sortFunc = func(a, b oapi.HTCJob) int {
 				ret := cmp.Compare(a.Status.Value, b.Status.Value)
 				if ret == 0 {
@@ -182,7 +160,7 @@ func Get(cmd *cobra.Command, args []string) error {
 		}
 
 		slices.SortFunc(items, sortFunc)
-		if latest > 0 {
+		if latest > 0 && len(items) >= latest {
 			items = items[:latest]
 		}
 		return runner.PrintResult(tabler.HTCJobs(items), os.Stdout)
@@ -202,7 +180,13 @@ var GetCmd = &cobra.Command{
 	Args:  cobra.RangeArgs(0, 1),
 }
 
-var sort sortOrder
+var sort common.SortOrder
+
+const sortDefault = common.SortCompleted
+
+var filterStatus common.StatusFilter
+
+const filterDefault = ""
 
 func init() {
 	flags := GetCmd.Flags()
@@ -215,10 +199,22 @@ func init() {
 	flags.Var(&sort, "sort", fmt.Sprintf(
 		"Sort job output (%s, default %q)",
 		strings.Join([]string{
-			string(sortCompleted),
-			string(sortCreated),
-			string(sortStatus),
+			string(common.SortCompleted),
+			string(common.SortCreated),
+			string(common.SortStatus),
 		}, "|"),
 		sortDefault))
+	flags.Var(&filterStatus, "filter", fmt.Sprintf(
+		"Filter job output (%s, default %q)",
+		strings.Join(func() []string {
+			var strs []string
+			var rescaleJobStatus oapi.RescaleJobStatus
+			allStatuses := rescaleJobStatus.AllValues()
+			for _, s := range allStatuses {
+				strs = append(strs, string(s))
+			}
+			return strs
+		}(), "|"),
+		filterDefault))
 	flags.BoolP("reverse", "r", false, "Reverse sort order")
 }
