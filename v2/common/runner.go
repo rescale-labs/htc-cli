@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"reflect"
 	"strings"
 	"time"
@@ -26,6 +27,11 @@ type ClientWrapper struct {
 }
 
 func (c *ClientWrapper) Do(r *http.Request) (*http.Response, error) {
+	// when in dev mode, add the X-Rescale-Environment header.
+	if rescaleEnv := os.Getenv("X_RESCALE_ENVIRONMENT"); rescaleEnv != "" {
+		r.Header.Set("X-Rescale-Environment", rescaleEnv)
+	}
+
 	// GET /auth/token must use Token, not Bearer, in its auth.
 	if r.Method == "GET" {
 		switch {
