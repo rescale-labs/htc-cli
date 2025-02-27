@@ -101,6 +101,15 @@ func Get(cmd *cobra.Command, args []string) error {
 			return config.UsageErrorf("Error setting limit: %w", err)
 		}
 
+		latest, err := flags.GetInt("latest")
+		if err != nil {
+			return config.UsageErrorf("Error setting latest: %w", err)
+		}
+
+		if latest > 0 && limit > 0 {
+			return config.UsageErrorf("Cannot use limit and latest in same command")
+		}
+
 		group, err := flags.GetString("group")
 		if err != nil {
 			return config.UsageErrorf("Error setting group: %w", err)
@@ -173,6 +182,9 @@ func Get(cmd *cobra.Command, args []string) error {
 		}
 
 		slices.SortFunc(items, sortFunc)
+		if latest > 0 {
+			items = items[:latest]
+		}
 		return runner.PrintResult(tabler.HTCJobs(items), os.Stdout)
 	}
 
@@ -195,7 +207,8 @@ var sort sortOrder
 func init() {
 	flags := GetCmd.Flags()
 
-	flags.IntP("limit", "l", 0, "Limit response to N items")
+	flags.IntP("limit", "l", 0, "Limit response from API to N items. Use for tasks with large # of jobs")
+	flags.IntP("latest", "", 0, "Cannot be used together with limit. Get latest N jobs in a task. This option can be combined with filter, sort and reverse.")
 	flags.String("project-id", "", "HTC project ID")
 	flags.String("task-id", "", "HTC task ID")
 	flags.String("group", "", "HTC job batch group")
