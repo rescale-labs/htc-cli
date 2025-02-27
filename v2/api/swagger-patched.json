@@ -104,6 +104,23 @@
             ],
             "type": "object"
          },
+         "SecretEnvPair": {
+            "properties": {
+               "name": {
+                  "example": "FOO",
+                  "type": "string"
+               },
+               "value": {
+                  "example": "bar",
+                  "type": "string"
+               }
+            },
+            "required": [
+               "name",
+               "value"
+            ],
+            "type": "object"
+         },
          "ExperimentalFields": {
             "properties": {
                "cloudFileSystems": {
@@ -429,7 +446,7 @@
                },
                "secretEnvs": {
                   "items": {
-                     "$ref": "#/components/schemas/EnvPair"
+                     "$ref": "#/components/schemas/SecretEnvPair"
                   },
                   "type": "array"
                },
