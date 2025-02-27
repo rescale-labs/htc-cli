@@ -327,8 +327,9 @@ func (s *EnvPair) SetValue(val string) {
 
 // Ref: #/components/schemas/ExperimentalFields
 type ExperimentalFields struct {
-	CloudFileSystems OptBool `json:"cloudFileSystems"`
-	KubernetesSwap   OptBool `json:"kubernetesSwap"`
+	CloudFileSystems     OptBool `json:"cloudFileSystems"`
+	KubernetesSwap       OptBool `json:"kubernetesSwap"`
+	RescaleFilesRDFAgent OptBool `json:"rescaleFilesRDFAgent"`
 }
 
 // GetCloudFileSystems returns the value of CloudFileSystems.
@@ -341,6 +342,11 @@ func (s *ExperimentalFields) GetKubernetesSwap() OptBool {
 	return s.KubernetesSwap
 }
 
+// GetRescaleFilesRDFAgent returns the value of RescaleFilesRDFAgent.
+func (s *ExperimentalFields) GetRescaleFilesRDFAgent() OptBool {
+	return s.RescaleFilesRDFAgent
+}
+
 // SetCloudFileSystems sets the value of CloudFileSystems.
 func (s *ExperimentalFields) SetCloudFileSystems(val OptBool) {
 	s.CloudFileSystems = val
@@ -349,6 +355,11 @@ func (s *ExperimentalFields) SetCloudFileSystems(val OptBool) {
 // SetKubernetesSwap sets the value of KubernetesSwap.
 func (s *ExperimentalFields) SetKubernetesSwap(val OptBool) {
 	s.KubernetesSwap = val
+}
+
+// SetRescaleFilesRDFAgent sets the value of RescaleFilesRDFAgent.
+func (s *ExperimentalFields) SetRescaleFilesRDFAgent(val OptBool) {
+	s.RescaleFilesRDFAgent = val
 }
 
 // Ref: #/components/schemas/FeatureFlagsResult
@@ -1633,6 +1644,7 @@ type HTCJobDefinition struct {
 	Claims             []NameValuePair `json:"claims"`
 	Commands           []string        `json:"commands"`
 	Envs               []EnvPair       `json:"envs"`
+	SecretEnvs         []SecretEnvPair `json:"secretEnvs"`
 	ExecTimeoutSeconds OptInt32        `json:"execTimeoutSeconds"`
 	ImageName          string          `json:"imageName"`
 	// MaxDiskGiB is supported on GCP only.
@@ -1666,6 +1678,11 @@ func (s *HTCJobDefinition) GetCommands() []string {
 // GetEnvs returns the value of Envs.
 func (s *HTCJobDefinition) GetEnvs() []EnvPair {
 	return s.Envs
+}
+
+// GetSecretEnvs returns the value of SecretEnvs.
+func (s *HTCJobDefinition) GetSecretEnvs() []SecretEnvPair {
+	return s.SecretEnvs
 }
 
 // GetExecTimeoutSeconds returns the value of ExecTimeoutSeconds.
@@ -1731,6 +1748,11 @@ func (s *HTCJobDefinition) SetCommands(val []string) {
 // SetEnvs sets the value of Envs.
 func (s *HTCJobDefinition) SetEnvs(val []EnvPair) {
 	s.Envs = val
+}
+
+// SetSecretEnvs sets the value of SecretEnvs.
+func (s *HTCJobDefinition) SetSecretEnvs(val []SecretEnvPair) {
+	s.SecretEnvs = val
 }
 
 // SetExecTimeoutSeconds sets the value of ExecTimeoutSeconds.
@@ -8001,6 +8023,32 @@ func (s *RescaleUser) SetWorkspace(val OptWorkspace) {
 // SetWorkspaceAdmin sets the value of WorkspaceAdmin.
 func (s *RescaleUser) SetWorkspaceAdmin(val OptBool) {
 	s.WorkspaceAdmin = val
+}
+
+// Ref: #/components/schemas/SecretEnvPair
+type SecretEnvPair struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+// GetName returns the value of Name.
+func (s *SecretEnvPair) GetName() string {
+	return s.Name
+}
+
+// GetValue returns the value of Value.
+func (s *SecretEnvPair) GetValue() string {
+	return s.Value
+}
+
+// SetName sets the value of Name.
+func (s *SecretEnvPair) SetName(val string) {
+	s.Name = val
+}
+
+// SetValue sets the value of Value.
+func (s *SecretEnvPair) SetValue(val string) {
+	s.Value = val
 }
 
 type SecurityScheme struct {
