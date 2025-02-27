@@ -1644,7 +1644,7 @@ type HTCJobDefinition struct {
 	Claims             []NameValuePair `json:"claims"`
 	Commands           []string        `json:"commands"`
 	Envs               []EnvPair       `json:"envs"`
-	SecretEnvs         []EnvPair       `json:"secretEnvs"`
+	SecretEnvs         []SecretEnvPair `json:"secretEnvs"`
 	ExecTimeoutSeconds OptInt32        `json:"execTimeoutSeconds"`
 	ImageName          string          `json:"imageName"`
 	// MaxDiskGiB is supported on GCP only.
@@ -1681,7 +1681,7 @@ func (s *HTCJobDefinition) GetEnvs() []EnvPair {
 }
 
 // GetSecretEnvs returns the value of SecretEnvs.
-func (s *HTCJobDefinition) GetSecretEnvs() []EnvPair {
+func (s *HTCJobDefinition) GetSecretEnvs() []SecretEnvPair {
 	return s.SecretEnvs
 }
 
@@ -1751,7 +1751,7 @@ func (s *HTCJobDefinition) SetEnvs(val []EnvPair) {
 }
 
 // SetSecretEnvs sets the value of SecretEnvs.
-func (s *HTCJobDefinition) SetSecretEnvs(val []EnvPair) {
+func (s *HTCJobDefinition) SetSecretEnvs(val []SecretEnvPair) {
 	s.SecretEnvs = val
 }
 
@@ -8025,6 +8025,32 @@ func (s *RescaleUser) SetWorkspace(val OptWorkspace) {
 // SetWorkspaceAdmin sets the value of WorkspaceAdmin.
 func (s *RescaleUser) SetWorkspaceAdmin(val OptBool) {
 	s.WorkspaceAdmin = val
+}
+
+// Ref: #/components/schemas/SecretEnvPair
+type SecretEnvPair struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+// GetName returns the value of Name.
+func (s *SecretEnvPair) GetName() string {
+	return s.Name
+}
+
+// GetValue returns the value of Value.
+func (s *SecretEnvPair) GetValue() string {
+	return s.Value
+}
+
+// SetName sets the value of Name.
+func (s *SecretEnvPair) SetName(val string) {
+	s.Name = val
+}
+
+// SetValue sets the value of Value.
+func (s *SecretEnvPair) SetValue(val string) {
+	s.Value = val
 }
 
 type SecurityScheme struct {
