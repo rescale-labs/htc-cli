@@ -427,6 +427,12 @@
                   },
                   "type": "array"
                },
+               "secretEnvs": {
+                  "items": {
+                     "$ref": "#/components/schemas/EnvPair"
+                  },
+                  "type": "array"
+               },
                "execTimeoutSeconds": {
                   "example": 300,
                   "format": "int32",

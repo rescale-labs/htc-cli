@@ -1644,6 +1644,7 @@ type HTCJobDefinition struct {
 	Claims             []NameValuePair `json:"claims"`
 	Commands           []string        `json:"commands"`
 	Envs               []EnvPair       `json:"envs"`
+	SecretEnvs         []EnvPair       `json:"secretEnvs"`
 	ExecTimeoutSeconds OptInt32        `json:"execTimeoutSeconds"`
 	ImageName          string          `json:"imageName"`
 	// MaxDiskGiB is supported on GCP only.
@@ -1677,6 +1678,11 @@ func (s *HTCJobDefinition) GetCommands() []string {
 // GetEnvs returns the value of Envs.
 func (s *HTCJobDefinition) GetEnvs() []EnvPair {
 	return s.Envs
+}
+
+// GetSecretEnvs returns the value of SecretEnvs.
+func (s *HTCJobDefinition) GetSecretEnvs() []EnvPair {
+	return s.SecretEnvs
 }
 
 // GetExecTimeoutSeconds returns the value of ExecTimeoutSeconds.
@@ -1742,6 +1748,11 @@ func (s *HTCJobDefinition) SetCommands(val []string) {
 // SetEnvs sets the value of Envs.
 func (s *HTCJobDefinition) SetEnvs(val []EnvPair) {
 	s.Envs = val
+}
+
+// SetSecretEnvs sets the value of SecretEnvs.
+func (s *HTCJobDefinition) SetSecretEnvs(val []EnvPair) {
+	s.SecretEnvs = val
 }
 
 // SetExecTimeoutSeconds sets the value of ExecTimeoutSeconds.

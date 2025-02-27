@@ -2349,6 +2349,16 @@ func (s *HTCJobDefinition) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.SecretEnvs != nil {
+			e.FieldStart("secretEnvs")
+			e.ArrStart()
+			for _, elem := range s.SecretEnvs {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
 		if s.ExecTimeoutSeconds.Set {
 			e.FieldStart("execTimeoutSeconds")
 			s.ExecTimeoutSeconds.Encode(e)
@@ -2402,20 +2412,21 @@ func (s *HTCJobDefinition) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfHTCJobDefinition = [13]string{
+var jsonFieldsNameOfHTCJobDefinition = [14]string{
 	0:  "architecture",
 	1:  "claims",
 	2:  "commands",
 	3:  "envs",
-	4:  "execTimeoutSeconds",
-	5:  "imageName",
-	6:  "maxDiskGiB",
-	7:  "maxMemory",
-	8:  "maxSwap",
-	9:  "maxVCpus",
-	10: "priority",
-	11: "tags",
-	12: "workingDir",
+	4:  "secretEnvs",
+	5:  "execTimeoutSeconds",
+	6:  "imageName",
+	7:  "maxDiskGiB",
+	8:  "maxMemory",
+	9:  "maxSwap",
+	10: "maxVCpus",
+	11: "priority",
+	12: "tags",
+	13: "workingDir",
 }
 
 // Decode decodes HTCJobDefinition from json.
@@ -2490,6 +2501,23 @@ func (s *HTCJobDefinition) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"envs\"")
 			}
+		case "secretEnvs":
+			if err := func() error {
+				s.SecretEnvs = make([]EnvPair, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem EnvPair
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.SecretEnvs = append(s.SecretEnvs, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"secretEnvs\"")
+			}
 		case "execTimeoutSeconds":
 			if err := func() error {
 				s.ExecTimeoutSeconds.Reset()
@@ -2501,7 +2529,7 @@ func (s *HTCJobDefinition) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"execTimeoutSeconds\"")
 			}
 		case "imageName":
-			requiredBitSet[0] |= 1 << 5
+			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
 				v, err := d.Str()
 				s.ImageName = string(v)
@@ -2592,7 +2620,7 @@ func (s *HTCJobDefinition) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
-		0b00100000,
+		0b01000000,
 		0b00000000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
