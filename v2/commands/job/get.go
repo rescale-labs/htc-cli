@@ -152,7 +152,8 @@ func Get(cmd *cobra.Command, args []string) error {
 			panic("Unrecognized sort option")
 		}
 
-		if reverse {
+		// When using latest flag we always want to reverse the order to get latest jobs
+		if reverse || (latest > 0) {
 			oldFunc := sortFunc
 			sortFunc = func(a, b oapi.HTCJob) int {
 				return -1 * oldFunc(a, b)
@@ -192,7 +193,7 @@ func init() {
 	flags := GetCmd.Flags()
 
 	flags.IntP("limit", "l", 0, "Limit response from API to N items. Use for tasks with large # of jobs")
-	flags.IntP("latest", "", 0, "Cannot be used together with limit. Get latest N jobs in a task. This option can be combined with filter, sort and reverse.")
+	flags.IntP("latest", "", 0, "Cannot be used together with limit. Get latest N jobs in a task. This option can be combined with sort and filter.")
 	flags.String("project-id", "", "HTC project ID")
 	flags.String("task-id", "", "HTC task ID")
 	flags.String("group", "", "HTC job batch group")
