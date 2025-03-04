@@ -32,10 +32,8 @@ func (s *SortOrder) Type() string {
 	return "string"
 }
 
-// Derived type
 type StatusFilter oapi.RescaleJobStatus
 
-// Implement the flag.Value interface for StatusFilter
 func (sf *StatusFilter) String() string {
 	return string(*sf)
 }
@@ -44,25 +42,25 @@ func (s *StatusFilter) Set(val string) error {
 	val = strings.ToUpper(val) // Case-insensitive
 	switch val {
 	case string(oapi.RescaleJobStatusSUBMITTEDTORESCALE):
-		*s = StatusFilter(oapi.RescaleJobStatusSUBMITTEDTORESCALE) // Conversion
+		*s = StatusFilter(oapi.RescaleJobStatusSUBMITTEDTORESCALE)
 		return nil
 	case string(oapi.RescaleJobStatusSUBMITTEDTOPROVIDER):
-		*s = StatusFilter(oapi.RescaleJobStatusSUBMITTEDTOPROVIDER) // Conversion
+		*s = StatusFilter(oapi.RescaleJobStatusSUBMITTEDTOPROVIDER)
 		return nil
 	case string(oapi.RescaleJobStatusRUNNABLE):
-		*s = StatusFilter(oapi.RescaleJobStatusRUNNABLE) // Conversion
+		*s = StatusFilter(oapi.RescaleJobStatusRUNNABLE)
 		return nil
 	case string(oapi.RescaleJobStatusSTARTING):
-		*s = StatusFilter(oapi.RescaleJobStatusSTARTING) // Conversion
+		*s = StatusFilter(oapi.RescaleJobStatusSTARTING)
 		return nil
 	case string(oapi.RescaleJobStatusRUNNING):
-		*s = StatusFilter(oapi.RescaleJobStatusRUNNING) // Conversion
+		*s = StatusFilter(oapi.RescaleJobStatusRUNNING)
 		return nil
 	case string(oapi.RescaleJobStatusSUCCEEDED):
-		*s = StatusFilter(oapi.RescaleJobStatusSUCCEEDED) // Conversion
+		*s = StatusFilter(oapi.RescaleJobStatusSUCCEEDED)
 		return nil
 	case string(oapi.RescaleJobStatusFAILED):
-		*s = StatusFilter(oapi.RescaleJobStatusFAILED) // Conversion
+		*s = StatusFilter(oapi.RescaleJobStatusFAILED)
 		return nil
 	default:
 		panic("Unknown Rescale job status for filtering!")
