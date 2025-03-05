@@ -18,8 +18,6 @@ import (
 	"github.com/rescale-labs/htc-cli/v2/tabler"
 )
 
-const pageSize = 500
-
 func getJobs(ctx context.Context, c oapi.JobInvoker, params *oapi.GetJobsParams) (*oapi.HTCJobs, error) {
 	res, err := c.GetJobs(ctx, *params)
 	if err != nil {
@@ -110,7 +108,7 @@ func Get(cmd *cobra.Command, args []string) error {
 			ProjectId: p.ProjectId,
 			TaskId:    p.TaskId,
 			Group:     oapi.OptString{group, group != ""},
-			PageSize:  oapi.NewOptInt32(pageSize),
+			PageSize:  oapi.NewOptInt32(common.PageSize),
 			ViewType:  oapi.NewOptViewType(oapi.ViewTypeFULL),
 		}
 
