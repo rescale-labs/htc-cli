@@ -83,6 +83,11 @@ func Get(cmd *cobra.Command, args []string) error {
 			return config.UsageErrorf("Cannot use limit and latest in same command")
 		}
 
+		sortOrReversedPassed := flags.Changed("sort") || flags.Changed("reverse")
+		if latest > 0 && sortOrReversedPassed {
+			return config.UsageErrorf("Latest cannot be used together with sort or reverse options.")
+		}
+
 		group, err := flags.GetString("group")
 		if err != nil {
 			return config.UsageErrorf("Error setting group: %w", err)
@@ -91,6 +96,13 @@ func Get(cmd *cobra.Command, args []string) error {
 		reverse, err := flags.GetBool("reverse")
 		if err != nil {
 			return config.UsageErrorf("Error setting reverse: %w", err)
+		}
+
+		// --latest N == --limit N --reverse --sort created
+		if latest > 0 {
+			limit = latest
+			reverse = true
+			sort = common.SortCreated
 		}
 
 		var items []oapi.HTCJob
@@ -112,7 +124,7 @@ func Get(cmd *cobra.Command, args []string) error {
 				return err
 			}
 			items = append(items, res.Items...)
-			if limit > 0 && len(items) >= limit {
+			if !(sortOrReversedPassed || latest > 0) && limit > 0 && len(items) >= limit {
 				items = items[:limit]
 				break
 			}
@@ -152,8 +164,7 @@ func Get(cmd *cobra.Command, args []string) error {
 			panic("Unrecognized sort option")
 		}
 
-		// When using latest flag we always want to reverse the order to get latest jobs
-		if reverse || (latest > 0) {
+		if reverse {
 			oldFunc := sortFunc
 			sortFunc = func(a, b oapi.HTCJob) int {
 				return -1 * oldFunc(a, b)
@@ -161,8 +172,8 @@ func Get(cmd *cobra.Command, args []string) error {
 		}
 
 		slices.SortFunc(items, sortFunc)
-		if latest > 0 && len(items) >= latest {
-			items = items[:latest]
+		if limit > 0 && len(items) >= limit {
+			items = items[:limit]
 		}
 		return runner.PrintResult(tabler.HTCJobs(items), os.Stdout)
 	}
@@ -192,8 +203,8 @@ const filterDefault = ""
 func init() {
 	flags := GetCmd.Flags()
 
-	flags.IntP("limit", "l", 0, "Limit response from API to N items. Use for tasks with large # of jobs")
-	flags.IntP("latest", "", 0, "Cannot be used together with limit. Get latest N jobs in a task. This option can be combined with sort and filter.")
+	flags.IntP("limit", "l", 0, "Limit printed response to N items")
+	flags.IntP("latest", "L", 0, "Limit printed response to latest N items. (Equivalent to & overrides --limits N --reverse --sort created).")
 	flags.String("project-id", "", "HTC project ID")
 	flags.String("task-id", "", "HTC task ID")
 	flags.String("group", "", "HTC job batch group")
@@ -206,7 +217,7 @@ func init() {
 		}, "|"),
 		sortDefault))
 	flags.Var(&filterStatus, "filter", fmt.Sprintf(
-		"Filter job output (%s, default %q)",
+		"Filter output by job status (%s, default %q)",
 		strings.Join(func() []string {
 			var strs []string
 			var rescaleJobStatus oapi.RescaleJobStatus
