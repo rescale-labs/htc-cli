@@ -40,6 +40,8 @@ func createProject(cmd *cobra.Command, args []string) error {
 	switch res := res.(type) {
 	case *oapi.HTCProject:
 		return runner.PrintResult(res, os.Stdout)
+	case *oapi.HTCRequestError:
+		return fmt.Errorf("%s: %s", res.ErrorType.Value, res.ErrorDescription.Value)
 	case *oapi.CreateProjectForbidden, *oapi.CreateProjectUnauthorized:
 		return fmt.Errorf("forbidden: %s", res)
 	}

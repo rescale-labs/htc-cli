@@ -327,8 +327,9 @@ func (s *EnvPair) SetValue(val string) {
 
 // Ref: #/components/schemas/ExperimentalFields
 type ExperimentalFields struct {
-	CloudFileSystems OptBool `json:"cloudFileSystems"`
-	KubernetesSwap   OptBool `json:"kubernetesSwap"`
+	CloudFileSystems     OptBool `json:"cloudFileSystems"`
+	KubernetesSwap       OptBool `json:"kubernetesSwap"`
+	RescaleFilesRDFAgent OptBool `json:"rescaleFilesRDFAgent"`
 }
 
 // GetCloudFileSystems returns the value of CloudFileSystems.
@@ -341,6 +342,11 @@ func (s *ExperimentalFields) GetKubernetesSwap() OptBool {
 	return s.KubernetesSwap
 }
 
+// GetRescaleFilesRDFAgent returns the value of RescaleFilesRDFAgent.
+func (s *ExperimentalFields) GetRescaleFilesRDFAgent() OptBool {
+	return s.RescaleFilesRDFAgent
+}
+
 // SetCloudFileSystems sets the value of CloudFileSystems.
 func (s *ExperimentalFields) SetCloudFileSystems(val OptBool) {
 	s.CloudFileSystems = val
@@ -349,6 +355,11 @@ func (s *ExperimentalFields) SetCloudFileSystems(val OptBool) {
 // SetKubernetesSwap sets the value of KubernetesSwap.
 func (s *ExperimentalFields) SetKubernetesSwap(val OptBool) {
 	s.KubernetesSwap = val
+}
+
+// SetRescaleFilesRDFAgent sets the value of RescaleFilesRDFAgent.
+func (s *ExperimentalFields) SetRescaleFilesRDFAgent(val OptBool) {
+	s.RescaleFilesRDFAgent = val
 }
 
 // Ref: #/components/schemas/FeatureFlagsResult
@@ -3053,9 +3064,9 @@ func (*HTCRepository) createRepoRes() {}
 
 // Ref: #/components/schemas/HTCRequestError
 type HTCRequestError struct {
-	ErrorDescription OptString `json:"errorDescription"`
-	ErrorType        OptString `json:"errorType"`
-	Message          OptString `json:"message"`
+	ErrorDescription OptString    `json:"errorDescription"`
+	ErrorType        OptString    `json:"errorType"`
+	Message          OptNilString `json:"message"`
 }
 
 // GetErrorDescription returns the value of ErrorDescription.
@@ -3069,7 +3080,7 @@ func (s *HTCRequestError) GetErrorType() OptString {
 }
 
 // GetMessage returns the value of Message.
-func (s *HTCRequestError) GetMessage() OptString {
+func (s *HTCRequestError) GetMessage() OptNilString {
 	return s.Message
 }
 
@@ -3084,13 +3095,15 @@ func (s *HTCRequestError) SetErrorType(val OptString) {
 }
 
 // SetMessage sets the value of Message.
-func (s *HTCRequestError) SetMessage(val OptString) {
+func (s *HTCRequestError) SetMessage(val OptNilString) {
 	s.Message = val
 }
 
-func (*HTCRequestError) getJobRes()     {}
-func (*HTCRequestError) getLogsRes()    {}
-func (*HTCRequestError) submitJobsRes() {}
+func (*HTCRequestError) createProjectRes() {}
+func (*HTCRequestError) getJobRes()        {}
+func (*HTCRequestError) getJobsRes()       {}
+func (*HTCRequestError) getLogsRes()       {}
+func (*HTCRequestError) submitJobsRes()    {}
 
 // Ref: #/components/schemas/HTCRetryStrategy
 type HTCRetryStrategy struct {

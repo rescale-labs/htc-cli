@@ -14,14 +14,12 @@ import (
 	"github.com/rescale-labs/htc-cli/v2/tabler"
 )
 
-const pageSize = 500
-
 func getProjects(ctx context.Context, c oapi.ProjectInvoker, pageIndex string) (*oapi.HTCProjectsResponse, error) {
-	log.Printf("HtcProjectsGet: pageIndex=%s pageSize=%d", pageIndex, pageSize)
+	log.Printf("HtcProjectsGet: pageIndex=%s pageSize=%d", pageIndex, common.PageSize)
 	res, err := c.GetProjects(ctx, oapi.GetProjectsParams{
 		OnlyMyProjects: oapi.NewOptBool(false),
 		PageIndex:      oapi.NewOptString(pageIndex),
-		PageSize:       oapi.NewOptInt32(pageSize),
+		PageSize:       oapi.NewOptInt32(common.PageSize),
 	})
 	if err != nil {
 		return nil, err

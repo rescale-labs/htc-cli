@@ -459,11 +459,18 @@ func (s *ExperimentalFields) encodeFields(e *jx.Encoder) {
 			s.KubernetesSwap.Encode(e)
 		}
 	}
+	{
+		if s.RescaleFilesRDFAgent.Set {
+			e.FieldStart("rescaleFilesRDFAgent")
+			s.RescaleFilesRDFAgent.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfExperimentalFields = [2]string{
+var jsonFieldsNameOfExperimentalFields = [3]string{
 	0: "cloudFileSystems",
 	1: "kubernetesSwap",
+	2: "rescaleFilesRDFAgent",
 }
 
 // Decode decodes ExperimentalFields from json.
@@ -493,6 +500,16 @@ func (s *ExperimentalFields) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"kubernetesSwap\"")
+			}
+		case "rescaleFilesRDFAgent":
+			if err := func() error {
+				s.RescaleFilesRDFAgent.Reset()
+				if err := s.RescaleFilesRDFAgent.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"rescaleFilesRDFAgent\"")
 			}
 		default:
 			return d.Skip()

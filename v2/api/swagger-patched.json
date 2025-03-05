@@ -90,7 +90,7 @@
             "properties": {
                "name": {
                   "example": "FOO",
-                  "pattern": "^(?!.*AWS_BATCH_|RESCALE_PROJECT_ID|RESCALE_TASK_ID|RESCALE_JOB_ID|PROJECT_SHARED_FOLDER|TASK_SHARED_FOLDER|AWS_SESSION_TOKEN|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY).*",
+                  "pattern": "^(?!.*AWS_BATCH_|RESCALE_PROJECT_ID|RESCALE_TASK_ID|RESCALE_JOB_ID|PROJECT_SHARED_FOLDER|TASK_SHARED_FOLDER|AWS_SESSION_TOKEN|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|RDF_).*",
                   "type": "string"
                },
                "value": {
@@ -110,6 +110,9 @@
                   "type": "boolean"
                },
                "kubernetesSwap": {
+                  "type": "boolean"
+               },
+               "rescaleFilesRDFAgent": {
                   "type": "boolean"
                }
             },
@@ -1018,6 +1021,7 @@
                   "type": "string"
                },
                "message": {
+                  "nullable": true,
                   "type": "string"
                }
             },
@@ -2296,6 +2300,15 @@
                      }
                   },
                   "description": "Ok"
+               },
+               "400": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCRequestError"
+                        }
+                     }
+                  }
                },
                "401": {
                   "description": "Not Authorized"
@@ -3916,6 +3929,15 @@
                },
                "403": {
                   "description": "Not Allowed"
+               },
+               "404": {
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/HTCRequestError"
+                        }
+                     }
+                  }
                }
             },
             "security": [

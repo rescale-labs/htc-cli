@@ -19,7 +19,7 @@ func logs(ctx context.Context, c oapi.JobInvoker, projectId, taskId, jobId, page
 		ProjectId: projectId,
 		TaskId:    taskId,
 		JobId:     jobId,
-		PageSize:  oapi.NewOptInt32(pageSize),
+		PageSize:  oapi.NewOptInt32(common.PageSize),
 		PageIndex: oapi.OptString{pageIndex, pageIndex != ""},
 	})
 	if err != nil {
