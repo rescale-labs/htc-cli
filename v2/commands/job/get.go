@@ -18,35 +18,6 @@ import (
 	"github.com/rescale-labs/htc-cli/v2/tabler"
 )
 
-const pageSize = 500
-
-type sortOrder string
-
-const (
-	sortCompleted sortOrder = "completed"
-	sortCreated   sortOrder = "created"
-	sortStatus    sortOrder = "status"
-)
-const sortDefault = sortCompleted
-
-func (s *sortOrder) String() string {
-	return string(*s)
-}
-
-func (s *sortOrder) Set(v string) error {
-	switch sortOrder(v) {
-	case sortCompleted, sortCreated, sortStatus:
-		*s = sortOrder(v)
-		return nil
-	default:
-		return fmt.Errorf("%q is not a valid sort option", v)
-	}
-}
-
-func (s *sortOrder) Type() string {
-	return "string"
-}
-
 func getJobs(ctx context.Context, c oapi.JobInvoker, params *oapi.GetJobsParams) (*oapi.HTCJobs, error) {
 	res, err := c.GetJobs(ctx, *params)
 	if err != nil {
@@ -101,6 +72,20 @@ func Get(cmd *cobra.Command, args []string) error {
 			return config.UsageErrorf("Error setting limit: %w", err)
 		}
 
+		latest, err := flags.GetInt("latest")
+		if err != nil {
+			return config.UsageErrorf("Error setting latest: %w", err)
+		}
+
+		if latest > 0 && limit > 0 {
+			return config.UsageErrorf("Cannot use limit and latest in same command")
+		}
+
+		sortOrReversedPassed := flags.Changed("sort") || flags.Changed("reverse")
+		if latest > 0 && sortOrReversedPassed {
+			return config.UsageErrorf("Latest cannot be used together with sort or reverse options.")
+		}
+
 		group, err := flags.GetString("group")
 		if err != nil {
 			return config.UsageErrorf("Error setting group: %w", err)
@@ -111,21 +96,33 @@ func Get(cmd *cobra.Command, args []string) error {
 			return config.UsageErrorf("Error setting reverse: %w", err)
 		}
 
+		// --latest N == --limit N --reverse --sort created
+		if latest > 0 {
+			limit = latest
+			reverse = true
+			sort = common.SortCreated
+		}
+
 		var items []oapi.HTCJob
 		params := oapi.GetJobsParams{
 			ProjectId: p.ProjectId,
 			TaskId:    p.TaskId,
 			Group:     oapi.OptString{group, group != ""},
-			PageSize:  oapi.NewOptInt32(pageSize),
+			PageSize:  oapi.NewOptInt32(common.PageSize),
 			ViewType:  oapi.NewOptViewType(oapi.ViewTypeFULL),
 		}
+
+		if filterStatus != "" {
+			params.Status = oapi.NewOptRescaleJobStatus(filterStatus.ToRescaleStatus())
+		}
+
 		for {
 			res, err := getJobs(ctx, runner.Client, &params)
 			if err != nil {
 				return err
 			}
 			items = append(items, res.Items...)
-			if limit > 0 && len(items) >= limit {
+			if !(sortOrReversedPassed || latest > 0) && limit > 0 && len(items) >= limit {
 				items = items[:limit]
 				break
 			}
@@ -138,20 +135,20 @@ func Get(cmd *cobra.Command, args []string) error {
 		}
 
 		var sortFunc func(a, b oapi.HTCJob) int
-		switch sortOrder(sort) {
-		case "", sortCreated:
+		switch common.SortOrder(sort) {
+		case "", common.SortCreated:
 			sortFunc = func(a, b oapi.HTCJob) int {
 				return time.Time(a.CreatedAt.Value).Compare(
 					time.Time(b.CreatedAt.Value))
 			}
 
-		case sortCompleted:
+		case common.SortCompleted:
 			sortFunc = func(a, b oapi.HTCJob) int {
 				return time.Time(a.CompletedAt.Value).Compare(
 					time.Time(b.CompletedAt.Value))
 			}
 
-		case sortStatus:
+		case common.SortStatus:
 			sortFunc = func(a, b oapi.HTCJob) int {
 				ret := cmp.Compare(a.Status.Value, b.Status.Value)
 				if ret == 0 {
@@ -173,6 +170,9 @@ func Get(cmd *cobra.Command, args []string) error {
 		}
 
 		slices.SortFunc(items, sortFunc)
+		if limit > 0 && len(items) >= limit {
+			items = items[:limit]
+		}
 		return runner.PrintResult(tabler.HTCJobs(items), os.Stdout)
 	}
 
@@ -190,22 +190,41 @@ var GetCmd = &cobra.Command{
 	Args:  cobra.RangeArgs(0, 1),
 }
 
-var sort sortOrder
+var sort common.SortOrder
+
+const sortDefault = common.SortCompleted
+
+var filterStatus common.StatusFilter
+
+const filterDefault = ""
 
 func init() {
 	flags := GetCmd.Flags()
 
-	flags.IntP("limit", "l", 0, "Limit response to N items")
+	flags.IntP("limit", "l", 0, "Limit printed response to N items")
+	flags.IntP("latest", "L", 0, "Limit printed response to latest N items. (Equivalent to & overrides --limits N --reverse --sort created).")
 	flags.String("project-id", "", "HTC project ID")
 	flags.String("task-id", "", "HTC task ID")
 	flags.String("group", "", "HTC job batch group")
 	flags.Var(&sort, "sort", fmt.Sprintf(
 		"Sort job output (%s, default %q)",
 		strings.Join([]string{
-			string(sortCompleted),
-			string(sortCreated),
-			string(sortStatus),
+			string(common.SortCompleted),
+			string(common.SortCreated),
+			string(common.SortStatus),
 		}, "|"),
 		sortDefault))
+	flags.Var(&filterStatus, "filter", fmt.Sprintf(
+		"Filter output by job status (%s, default %q)",
+		strings.Join(func() []string {
+			var strs []string
+			var rescaleJobStatus oapi.RescaleJobStatus
+			allStatuses := rescaleJobStatus.AllValues()
+			for _, s := range allStatuses {
+				strs = append(strs, string(s))
+			}
+			return strs
+		}(), "|"),
+		filterDefault))
 	flags.BoolP("reverse", "r", false, "Reverse sort order")
 }

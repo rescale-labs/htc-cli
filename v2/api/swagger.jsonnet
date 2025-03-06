@@ -64,6 +64,15 @@ local patches = {
       post+: {
         'x-ogen-operation-group': 'Project',
         operationId: 'createProject',
+        responses+: {
+            '400'+: {
+                content+: {
+                    'application/json'+: {
+                        schema: { '$ref': '#/components/schemas/HTCRequestError' },
+                    }
+                }
+            }
+        }
       },
     },
     '/htc/projects/{projectId}'+: {
@@ -160,6 +169,13 @@ local patches = {
               },
             },
           },
+          '404'+: {
+            content+: {
+              'application/json'+: {
+                schema: { '$ref': '#/components/schemas/HTCRequestError' },
+              },
+            },
+          }
         },
       },
     },
@@ -351,7 +367,10 @@ local patches = {
         properties: {
           errorType: { type: 'string' },
           errorDescription: { type: 'string' },
-          message: { type: 'string' },
+          message: {
+            type: 'string',
+            nullable: true
+          },
         },
       },
       HTCTask+: {
