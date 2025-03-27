@@ -2349,6 +2349,16 @@ func (s *HTCJobDefinition) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.SecretEnvs != nil {
+			e.FieldStart("secretEnvs")
+			e.ArrStart()
+			for _, elem := range s.SecretEnvs {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
 		if s.ExecTimeoutSeconds.Set {
 			e.FieldStart("execTimeoutSeconds")
 			s.ExecTimeoutSeconds.Encode(e)
@@ -2402,20 +2412,21 @@ func (s *HTCJobDefinition) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfHTCJobDefinition = [13]string{
+var jsonFieldsNameOfHTCJobDefinition = [14]string{
 	0:  "architecture",
 	1:  "claims",
 	2:  "commands",
 	3:  "envs",
-	4:  "execTimeoutSeconds",
-	5:  "imageName",
-	6:  "maxDiskGiB",
-	7:  "maxMemory",
-	8:  "maxSwap",
-	9:  "maxVCpus",
-	10: "priority",
-	11: "tags",
-	12: "workingDir",
+	4:  "secretEnvs",
+	5:  "execTimeoutSeconds",
+	6:  "imageName",
+	7:  "maxDiskGiB",
+	8:  "maxMemory",
+	9:  "maxSwap",
+	10: "maxVCpus",
+	11: "priority",
+	12: "tags",
+	13: "workingDir",
 }
 
 // Decode decodes HTCJobDefinition from json.
@@ -2490,6 +2501,23 @@ func (s *HTCJobDefinition) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"envs\"")
 			}
+		case "secretEnvs":
+			if err := func() error {
+				s.SecretEnvs = make([]SecretEnvPair, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem SecretEnvPair
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.SecretEnvs = append(s.SecretEnvs, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"secretEnvs\"")
+			}
 		case "execTimeoutSeconds":
 			if err := func() error {
 				s.ExecTimeoutSeconds.Reset()
@@ -2501,7 +2529,7 @@ func (s *HTCJobDefinition) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"execTimeoutSeconds\"")
 			}
 		case "imageName":
-			requiredBitSet[0] |= 1 << 5
+			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
 				v, err := d.Str()
 				s.ImageName = string(v)
@@ -2592,7 +2620,7 @@ func (s *HTCJobDefinition) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
-		0b00100000,
+		0b01000000,
 		0b00000000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
@@ -11315,6 +11343,119 @@ func (s *RescaleUser) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *RescaleUser) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *SecretEnvPair) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *SecretEnvPair) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("name")
+		e.Str(s.Name)
+	}
+	{
+		e.FieldStart("value")
+		e.Str(s.Value)
+	}
+}
+
+var jsonFieldsNameOfSecretEnvPair = [2]string{
+	0: "name",
+	1: "value",
+}
+
+// Decode decodes SecretEnvPair from json.
+func (s *SecretEnvPair) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode SecretEnvPair to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "name":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.Name = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"name\"")
+			}
+		case "value":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Str()
+				s.Value = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"value\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode SecretEnvPair")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000011,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfSecretEnvPair) {
+					name = jsonFieldsNameOfSecretEnvPair[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *SecretEnvPair) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *SecretEnvPair) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
