@@ -2738,8 +2738,7 @@
                            "$ref": "#/components/schemas/OAuth2ErrorResponse"
                         }
                      }
-                  },
-                  "description": "Not Found"
+                  }
                }
             },
             "security": [
