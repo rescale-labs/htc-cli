@@ -1542,6 +1542,10 @@ func (s *Server) handleGetLogsRequest(args [3]string, argsEscaped bool, w http.R
 					Name: "pageSize",
 					In:   "query",
 				}: params.PageSize,
+				{
+					Name: "sort",
+					In:   "query",
+				}: params.Sort,
 			},
 			Raw: r,
 		}
@@ -2275,6 +2279,16 @@ func (s *Server) handleGetTokenRequest(args [0]string, argsEscaped bool, w http.
 			return
 		}
 	}
+	params, err := decodeGetTokenParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
 
 	var response GetTokenRes
 	if m := s.cfg.Middleware; m != nil {
@@ -2284,13 +2298,18 @@ func (s *Server) handleGetTokenRequest(args [0]string, argsEscaped bool, w http.
 			OperationSummary: "Get JWT Token",
 			OperationID:      "getToken",
 			Body:             nil,
-			Params:           middleware.Parameters{},
-			Raw:              r,
+			Params: middleware.Parameters{
+				{
+					Name: "X-Rescale-Environment",
+					In:   "header",
+				}: params.XRescaleEnvironment,
+			},
+			Raw: r,
 		}
 
 		type (
 			Request  = struct{}
-			Params   = struct{}
+			Params   = GetTokenParams
 			Response = GetTokenRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -2300,14 +2319,14 @@ func (s *Server) handleGetTokenRequest(args [0]string, argsEscaped bool, w http.
 		](
 			m,
 			mreq,
-			nil,
+			unpackGetTokenParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.GetToken(ctx)
+				response, err = s.h.GetToken(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.GetToken(ctx)
+		response, err = s.h.GetToken(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)

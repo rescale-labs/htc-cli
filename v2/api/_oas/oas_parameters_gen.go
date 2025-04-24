@@ -1339,6 +1339,8 @@ type GetLogsParams struct {
 	PageIndex OptString
 	// Maximum value: 10000.
 	PageSize OptInt32
+	// Sort order.
+	Sort OptGetLogsSort
 }
 
 func unpackGetLogsParams(packed middleware.Parameters) (params GetLogsParams) {
@@ -1379,6 +1381,15 @@ func unpackGetLogsParams(packed middleware.Parameters) (params GetLogsParams) {
 		}
 		if v, ok := packed[key]; ok {
 			params.PageSize = v.(OptInt32)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "sort",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Sort = v.(OptGetLogsSort)
 		}
 	}
 	return params
@@ -1604,6 +1615,67 @@ func decodeGetLogsParams(args [3]string, argsEscaped bool, r *http.Request) (par
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "pageSize",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Set default value for query: sort.
+	{
+		val := GetLogsSort("desc")
+		params.Sort.SetTo(val)
+	}
+	// Decode query: sort.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "sort",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotSortVal GetLogsSort
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotSortVal = GetLogsSort(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Sort.SetTo(paramsDotSortVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Sort.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "sort",
 			In:   "query",
 			Err:  err,
 		}
@@ -2159,6 +2231,73 @@ func decodeGetTasksParams(args [1]string, argsEscaped bool, r *http.Request) (pa
 		return params, &ogenerrors.DecodeParamError{
 			Name: "pageSize",
 			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// GetTokenParams is parameters of getToken operation.
+type GetTokenParams struct {
+	XRescaleEnvironment OptString
+}
+
+func unpackGetTokenParams(packed middleware.Parameters) (params GetTokenParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "X-Rescale-Environment",
+			In:   "header",
+		}
+		if v, ok := packed[key]; ok {
+			params.XRescaleEnvironment = v.(OptString)
+		}
+	}
+	return params
+}
+
+func decodeGetTokenParams(args [0]string, argsEscaped bool, r *http.Request) (params GetTokenParams, _ error) {
+	h := uri.NewHeaderDecoder(r.Header)
+	// Set default value for header: X-Rescale-Environment.
+	{
+		val := string("prod")
+		params.XRescaleEnvironment.SetTo(val)
+	}
+	// Decode header: X-Rescale-Environment.
+	if err := func() error {
+		cfg := uri.HeaderParameterDecodingConfig{
+			Name:    "X-Rescale-Environment",
+			Explode: false,
+		}
+		if err := h.HasParam(cfg); err == nil {
+			if err := h.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotXRescaleEnvironmentVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotXRescaleEnvironmentVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.XRescaleEnvironment.SetTo(paramsDotXRescaleEnvironmentVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "X-Rescale-Environment",
+			In:   "header",
 			Err:  err,
 		}
 	}

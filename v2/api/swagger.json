@@ -2,11 +2,11 @@
   "openapi" : "3.0.3",
   "info" : {
     "title" : "Rescale HTC API",
-    "description" : "### Changelog\n#### 2024-12-23\n- Added an improvement to job scheduling that splits up batches for limit constrained job submit requests (ENK-2340)\n#### 2024-11-05\n- Added the project_name label to project level metrics that were previously missing it (ENK-2256)\n- Automatically delete jobs sixty days after they reach a terminal state (ENK-2137)\n#### 2024-10-15\n- Fixed an issue where non-existent images would incorrectly return a PENDING status instead of a 404 response when checking image availability across cloud providers. (ENK-1139)\n#### 2024-10-07\n- Added improvements and optimizations for GCP image validation on job submit. (ENK-2158)\n#### 2024-10-02\n- Added improvements and optimizations for processing job submit requests in limited projects and workspaces. (ENK-1844)\n#### 2024-09-10\n- Added additional validation for the HTCJobDefinition during job submission. (ENK-2155)\n#### 2024-09-09\n- Added additional metrics for vCPU scheduling. (ENK-2039)\n#### 2024-08-26\n- Added additional metrics for swap and disk usage. (ENK-2023, ENK-2044, ENK-2045, ENK-2120)\n#### 2024-08-19\n- Added support for jobs in GCP to use the experimental real swap feature for workspaces where swap infrastructure has been configured. The amount of swap provided is approximately equal to the memory requested by the job. This feature can be enabled by setting the experimental.kubernetesSwap field to true in the Job submit request (ENK-2065)\n#### 2024-08-14\n- Updated job cancellation to correctly update job status. (ENK-2069)\n#### 2024-08-09\n- Updated the response from `/htc/gcp/clusters/{workspaceId}` to include the cluster's autoscaling profile and subnetwork name. (ENK-2042)\n#### 2024-07-22\n- Fixed issue where jobs in multi-region projects were all getting routed to a single region instead of being spread out\n#### 2024-07-18\n- Added htc_job_limit_vcpus metric to response from /htc/metrics\n#### 2024-07-08\n- Allow workspace and organization admin to cancel jobs, view job logs and view job events\n#### 2024-04-23\n- Workspaces can now also be configured with a task retention policy which governs the auto-archival and auto-deletion of tasks. The project task retention policy is prioritized.\n#### 2024-03-01\n- Projects can now be configured with a task retention policy which governs the auto-archival and auto-deletion of tasks.\n- The API now supports manual archival of tasks.\n#### 2024-01-31\n- Added pagination support for GET /htc/projects/{projectId}/tasks/{taskId}/groups endpoint.\n#### 2024-01-26\n- Added workspace dimensions endpoint to enable viewing of predefined computing environment options for a workspace.\n- Added project dimensions endpoints to enable inspection of a project's current computing environment configuration as well as facilitate customization and adjustment of a project's computing environment settings.\n#### 2023-09-25\n- Introduced new `/limits` API endpoints for resource limit management at workspace and project levels.\n- If limits are set for both workspace and project, jobs within the project may be throttled based on resource consumption across either.\n#### 2023-06-20\n- Do not allow jobs submission to deleted tasks \n#### 2023-05-05\n- Fixed issue where jobs would be stuck in running despite completing successfully \n#### 2023-04-20\n- Added clearer error messages for jobs that failed because they exceeded disk space limits \n#### 2023-04-06\n- Added support for validating HTC Bearer tokens using JWKs \n#### 2023-03-07\n- Added support for adding user-defined claims to job bearer tokens during job submission\n- Limited the scope of API endpoints that job bearer tokens are allowed to access \n#### 2023-01-10\n- Added support for extending an existing project with additional regions.\n- Note: this does not currently consolidate images and objects in storage to new regions.\n#### 2022-11-30\n- Updated maxSwap minimum value to 0.\n- If maxSwap is 0 it will not be set in the job definition.\n#### 2022-11-23\n- Changed maxDiskGb field to maxDiskGiB. Fix GCP to use MiB and GiB instead of MB and GB to be consistent with AWS.  \n#### 2022-11-21\n- Updated job submit request body to allow maxDiskGb to be optionally set by the user for GCP only. \n#### 2022-11-18\n- Updated job submit request body to include only maxSwap to be optionally set by user. See HTCJobDefinition model for more details.\n- maxSwap defaults to 2000MB if no value is provided.\n- maxSwap is currently only supported on AWS.\n#### 2022-10-17\n- Added endpoint to return group names associated with a task.\n#### 2022-08-01\n - Added validation for system environment variables during job submission.\n#### 2022-07-25\n - Added support for image tags on GCP. Images pushed to ECR with a tag will be replicated with the tag attached to GCP, and can be submitted in the same way as AWS\n- Resolved bug where log lines were duplicated several times.\n#### 2022-07-08\n - Added validation for image name during job submission\n#### 2022-06-30\n - Added capability to run AARCH64 jobs (specified on the job definition endpoint) on <em>GCP_US_CENTRAL_1</em> and <em>GCP_EU_WEST_4</em> for all users.\n- Added capability to run jobs in GCP region <em>GCP_US_CENTRAL_1</em> for all users.\n#### 2022-06-23\n - Added capability to run jobs in GCP region <em>GCP_EU_WEST_4</em> for all users. This is set during project creation.",
+    "description" : "### Changelog\n#### 2025-03-10\n- Updated documentation around swap, deprecated the maxSwap parameter in HTCJobSubmitRequest (ENK-2467)\n#### 2024-12-23\n- Added an improvement to job scheduling that splits up batches for limit constrained job submit requests (ENK-2340)\n#### 2024-11-05\n- Added the project_name label to project level metrics that were previously missing it (ENK-2256)\n- Automatically delete jobs sixty days after they reach a terminal state (ENK-2137)\n#### 2024-10-15\n- Fixed an issue where non-existent images would incorrectly return a PENDING status instead of a 404 response when checking image availability across cloud providers. (ENK-1139)\n#### 2024-10-07\n- Added improvements and optimizations for GCP image validation on job submit. (ENK-2158)\n#### 2024-10-02\n- Added improvements and optimizations for processing job submit requests in limited projects and workspaces. (ENK-1844)\n#### 2024-09-10\n- Added additional validation for the HTCJobDefinition during job submission. (ENK-2155)\n#### 2024-09-09\n- Added additional metrics for vCPU scheduling. (ENK-2039)\n#### 2024-08-26\n- Added additional metrics for swap and disk usage. (ENK-2023, ENK-2044, ENK-2045, ENK-2120)\n#### 2024-08-19\n- Added support for jobs in GCP to use the experimental real swap feature for workspaces where swap infrastructure has been configured. The amount of swap provided is approximately equal to the memory requested by the job. This feature can be enabled by setting the experimental.kubernetesSwap field to true in the Job submit request (ENK-2065)\n#### 2024-08-14\n- Updated job cancellation to correctly update job status. (ENK-2069)\n#### 2024-08-09\n- Updated the response from `/htc/gcp/clusters/{workspaceId}` to include the cluster's autoscaling profile and subnetwork name. (ENK-2042)\n#### 2024-07-22\n- Fixed issue where jobs in multi-region projects were all getting routed to a single region instead of being spread out\n#### 2024-07-18\n- Added htc_job_limit_vcpus metric to response from /htc/metrics\n#### 2024-07-08\n- Allow workspace and organization admin to cancel jobs, view job logs and view job events\n#### 2024-04-23\n- Workspaces can now also be configured with a task retention policy which governs the auto-archival and auto-deletion of tasks. The project task retention policy is prioritized.\n#### 2024-03-01\n- Projects can now be configured with a task retention policy which governs the auto-archival and auto-deletion of tasks.\n- The API now supports manual archival of tasks.\n#### 2024-01-31\n- Added pagination support for GET /htc/projects/{projectId}/tasks/{taskId}/groups endpoint.\n#### 2024-01-26\n- Added workspace dimensions endpoint to enable viewing of predefined computing environment options for a workspace.\n- Added project dimensions endpoints to enable inspection of a project's current computing environment configuration as well as facilitate customization and adjustment of a project's computing environment settings.\n#### 2023-09-25\n- Introduced new `/limits` API endpoints for resource limit management at workspace and project levels.\n- If limits are set for both workspace and project, jobs within the project may be throttled based on resource consumption across either.\n#### 2023-06-20\n- Do not allow jobs submission to deleted tasks \n#### 2023-05-05\n- Fixed issue where jobs would be stuck in running despite completing successfully \n#### 2023-04-20\n- Added clearer error messages for jobs that failed because they exceeded disk space limits \n#### 2023-04-06\n- Added support for validating HTC Bearer tokens using JWKs \n#### 2023-03-07\n- Added support for adding user-defined claims to job bearer tokens during job submission\n- Limited the scope of API endpoints that job bearer tokens are allowed to access \n#### 2023-01-10\n- Added support for extending an existing project with additional regions.\n- Note: this does not currently consolidate images and objects in storage to new regions.\n#### 2022-11-30\n- Updated maxSwap minimum value to 0.\n- If maxSwap is 0 it will not be set in the job definition.\n#### 2022-11-23\n- Changed maxDiskGb field to maxDiskGiB. Fix GCP to use MiB and GiB instead of MB and GB to be consistent with AWS.  \n#### 2022-11-21\n- Updated job submit request body to allow maxDiskGb to be optionally set by the user for GCP only. \n#### 2022-11-18\n- Updated job submit request body to include only maxSwap to be optionally set by user. See HTCJobDefinition model for more details.\n- maxSwap defaults to 2000MB if no value is provided.\n- maxSwap is currently only supported on AWS.\n#### 2022-10-17\n- Added endpoint to return group names associated with a task.\n#### 2022-08-01\n - Added validation for system environment variables during job submission.\n#### 2022-07-25\n - Added support for image tags on GCP. Images pushed to ECR with a tag will be replicated with the tag attached to GCP, and can be submitted in the same way as AWS\n- Resolved bug where log lines were duplicated several times.\n#### 2022-07-08\n - Added validation for image name during job submission\n#### 2022-06-30\n - Added capability to run AARCH64 jobs (specified on the job definition endpoint) on <em>GCP_US_CENTRAL_1</em> and <em>GCP_EU_WEST_4</em> for all users.\n- Added capability to run jobs in GCP region <em>GCP_US_CENTRAL_1</em> for all users.\n#### 2022-06-23\n - Added capability to run jobs in GCP region <em>GCP_EU_WEST_4</em> for all users. This is set during project creation.",
     "version" : "Beta V1"
   },
   "servers" : [ {
-    "url" : "https://htc.rescale.com/api/v1"
+    "url" : "http://localhost:8080/api/v1"
   } ],
   "paths" : {
     "/.well-known/jwks.json" : {
@@ -21,6 +21,21 @@
               "application/json" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/JsonWebKeySet"
+                },
+                "examples" : {
+                  "jwks" : {
+                    "summary" : "Sample JWK Set",
+                    "value" : {
+                      "keys" : [ {
+                        "kty" : "RSA",
+                        "kid" : "c0dc8eda-e0db-4882-901e-1862c3860550",
+                        "use" : "sig",
+                        "alg" : "RS256",
+                        "n" : "rsa-public-modulus",
+                        "e" : "AQAB"
+                      } ]
+                    }
+                  }
                 }
               }
             }
@@ -115,14 +130,6 @@
         "tags" : [ "Token Resource" ],
         "summary" : "Get Rescale User",
         "description" : "This endpoint will get Rescale user information given a Rescale API key.",
-        "parameters" : [ {
-          "name" : "X-Rescale-Environment",
-          "in" : "header",
-          "schema" : {
-            "default" : "prod",
-            "type" : "string"
-          }
-        } ],
         "responses" : {
           "200" : {
             "description" : "Ok",
@@ -191,11 +198,11 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
-          },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -230,11 +237,11 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
-          },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -291,11 +298,11 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
-          },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -326,11 +333,11 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
-          },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -362,11 +369,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -405,11 +422,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -441,11 +468,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -506,11 +543,11 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
-          },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -551,11 +588,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -588,11 +635,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -627,11 +684,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -676,11 +743,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -715,11 +792,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -758,11 +845,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -785,11 +882,21 @@
           "204" : {
             "description" : "No Content"
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -829,11 +936,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -864,11 +981,21 @@
           "204" : {
             "description" : "No Content"
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -915,11 +1042,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -959,11 +1096,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -995,11 +1142,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -1038,11 +1195,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -1074,11 +1241,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -1110,11 +1287,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -1153,11 +1340,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -1180,11 +1377,21 @@
           "204" : {
             "description" : "No Content"
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -1242,11 +1449,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -1285,11 +1502,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -1328,11 +1555,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -1370,12 +1607,12 @@
                     "projectId" : {
                       "type" : "string",
                       "readOnly" : true,
-                      "example" : "project-12345"
+                      "example" : "123e4567-e89b-12d3-a456-426614174000"
                     },
                     "taskId" : {
                       "type" : "string",
                       "readOnly" : true,
-                      "example" : "task-12345"
+                      "example" : "123e4567-e89b-12d3-a456-426614174000"
                     },
                     "taskName" : {
                       "type" : "string",
@@ -1442,11 +1679,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -1492,11 +1739,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -1570,11 +1827,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -1631,11 +1898,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -1730,11 +2007,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -1797,11 +2084,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -1840,11 +2137,15 @@
           "200" : {
             "description" : "Ok"
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : { }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -1890,11 +2191,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -1966,11 +2277,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -2019,6 +2340,15 @@
             "default" : 100,
             "type" : "integer"
           }
+        }, {
+          "name" : "sort",
+          "in" : "query",
+          "description" : "Sort order",
+          "schema" : {
+            "default" : "desc",
+            "enum" : [ "asc", "desc" ],
+            "type" : "string"
+          }
         } ],
         "responses" : {
           "200" : {
@@ -2043,11 +2373,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -2094,11 +2434,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -2137,11 +2487,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -2180,11 +2540,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -2230,11 +2600,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -2273,11 +2653,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -2316,11 +2706,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -2367,11 +2767,11 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
-          },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -2413,11 +2813,11 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
-          },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -2444,11 +2844,11 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
-          },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -2480,11 +2880,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -2519,11 +2929,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -2555,11 +2975,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -2591,11 +3021,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -2634,11 +3074,21 @@
               }
             }
           },
-          "401" : {
-            "description" : "Not Authorized"
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OAuth2ErrorResponse"
+                }
+              }
+            }
           },
           "403" : {
             "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
         },
         "security" : [ {
@@ -2678,6 +3128,9 @@
   },
   "components" : {
     "schemas" : {
+      "AlgorithmParameterSpec" : {
+        "type" : "object"
+      },
       "Architecture" : {
         "enum" : [ "AARCH64", "X86", "A100" ],
         "type" : "string"
@@ -2703,7 +3156,7 @@
         "type" : "string"
       },
       "CloudProvider" : {
-        "enum" : [ "AWS", "GCP", "NGC", "AZURE", "RC", "UNASSIGNED" ],
+        "enum" : [ "AWS", "GCP", "NGC", "AZURE", "RC", "COREWEAVE", "UNASSIGNED" ],
         "type" : "string"
       },
       "ContainerDetails" : {
@@ -2750,7 +3203,7 @@
         "type" : "object",
         "properties" : {
           "name" : {
-            "pattern": "^(?!.*AWS_BATCH_|RESCALE_PROJECT_ID|RESCALE_TASK_ID|RESCALE_JOB_ID|PROJECT_SHARED_FOLDER|TASK_SHARED_FOLDER|AWS_SESSION_TOKEN|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|RDF_).*",
+            "pattern" : "^(?!.*AWS_BATCH_|RESCALE_PROJECT_ID|RESCALE_TASK_ID|RESCALE_JOB_ID|PROJECT_SHARED_FOLDER|TASK_SHARED_FOLDER|AWS_SESSION_TOKEN|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|RDF_).*",
             "type" : "string",
             "example" : "FOO"
           },
@@ -2764,12 +3217,16 @@
         "type" : "object",
         "properties" : {
           "kubernetesSwap" : {
+            "description" : "Allows the job to use swap space equal to the amount of memory assigned. For example, a job with 128 MB of memory would also be allowed to use 128 MB of swap memory (disk)",
             "type" : "boolean"
           },
           "cloudFileSystems" : {
             "type" : "boolean"
           },
           "rescaleFilesRDFAgent" : {
+            "type" : "boolean"
+          },
+          "privilegedMode" : {
             "type" : "boolean"
           }
         }
@@ -2920,7 +3377,7 @@
         "properties" : {
           "jobUUID" : {
             "type" : "string",
-            "example" : "155f18d4"
+            "example" : "123e4567-e89b-12d3-a456-426614174000"
           },
           "providerJobId" : {
             "type" : "string",
@@ -2931,11 +3388,11 @@
           },
           "taskId" : {
             "type" : "string",
-            "example" : "task-12345"
+            "example" : "123e4567-e89b-12d3-a456-426614174000"
           },
           "projectId" : {
             "type" : "string",
-            "example" : "project-12345"
+            "example" : "123e4567-e89b-12d3-a456-426614174000"
           },
           "status" : {
             "$ref" : "#/components/schemas/RescaleJobStatus"
@@ -3010,6 +3467,10 @@
             "format" : "int32",
             "type" : "integer"
           },
+          "maxGpus" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
           "imageName" : {
             "type" : "string"
           },
@@ -3072,7 +3533,7 @@
           },
           "maxSwap" : {
             "format" : "int32",
-            "description" : "On AWS, maxSwap allows swap memory to be used, up to the limit. On other providers, swap is not available, but maxSwap is added to the maxMemory to provide the same amount of available space. The default value is 2000 MB",
+            "description" : "Deprecated. This field has no effect and may be removed at any time.",
             "minimum" : 0,
             "type" : "integer"
           },
@@ -3093,9 +3554,22 @@
             "example" : [ "python", "script.py" ]
           },
           "envs" : {
+            "description" : "Must not be reserved environment variable:AWS_BATCH_CE_NAME |AWS_BATCH_JOB_ARRAY_INDEX |AWS_BATCH_JOB_ATTEMPT |AWS_BATCH_JOB_ID |AWS_BATCH_JOB_MAIN_NODE_INDEX |AWS_BATCH_JOB_MAIN_NODE_PRIVATE_IPV4_ADDRESS |AWS_BATCH_JOB_NODE_INDEX |AWS_BATCH_JOB_NUM_NODES |AWS_BATCH_JQ_NAME |RESCALE_PROJECT_ID |RESCALE_TASK_ID |RESCALE_JOB_ID |RESCALE_HTC_REGION |RESCALE_HTC_TASK_ID |RESCALE_HTC_PROJECT_ID |RESCALE_HTC_BEARER_TOKEN |PROJECT_SHARED_FOLDER |TASK_SHARED_FOLDER |AWS_SESSION_TOKEN |AWS_ACCESS_KEY_ID |AWS_SECRET_ACCESS_KEY",
             "type" : "array",
             "items" : {
-              "$ref" : "#/components/schemas/EnvPair"
+              "required" : [ "name", "value" ],
+              "type" : "object",
+              "properties" : {
+                "name" : {
+                  "pattern" : "^(?!.*AWS_BATCH_|RESCALE_PROJECT_ID|RESCALE_TASK_ID|RESCALE_JOB_ID|PROJECT_SHARED_FOLDER|TASK_SHARED_FOLDER|AWS_SESSION_TOKEN|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|RDF_).*",
+                  "type" : "string",
+                  "example" : "FOO"
+                },
+                "value" : {
+                  "type" : "string",
+                  "example" : "bar"
+                }
+              }
             }
           },
           "claims" : {
@@ -3115,7 +3589,11 @@
             "$ref" : "#/components/schemas/Architecture"
           },
           "priority" : {
-            "$ref" : "#/components/schemas/JobPriority"
+            "description" : "ON_DEMAND_ECONOMY uses spot instances and may be preempted.",
+            "type" : "string",
+            "allOf" : [ {
+              "$ref" : "#/components/schemas/JobPriority"
+            } ]
           },
           "workingDir" : {
             "description" : "",
@@ -3138,17 +3616,17 @@
           "taskId" : {
             "type" : "string",
             "readOnly" : true,
-            "example" : "task-12345"
+            "example" : "123e4567-e89b-12d3-a456-426614174000"
           },
           "projectId" : {
             "type" : "string",
             "readOnly" : true,
-            "example" : "project-12345"
+            "example" : "123e4567-e89b-12d3-a456-426614174000"
           },
           "parentJobId" : {
             "type" : "string",
             "readOnly" : true,
-            "example" : "job-12345"
+            "example" : "123e4567-e89b-12d3-a456-426614174000"
           },
           "createdBy" : {
             "type" : "string",
@@ -3277,7 +3755,7 @@
           "projectId" : {
             "type" : "string",
             "readOnly" : true,
-            "example" : "project-12345"
+            "example" : "123e4567-e89b-12d3-a456-426614174000"
           },
           "projectName" : {
             "type" : "string",
@@ -3392,7 +3870,7 @@
           "projectId" : {
             "type" : "string",
             "readOnly" : true,
-            "example" : "project-12345"
+            "example" : "123e4567-e89b-12d3-a456-426614174000"
           },
           "modifierRole" : {
             "description" : "The highest role that can modify this limit",
@@ -3500,7 +3978,7 @@
           "projectId" : {
             "type" : "string",
             "readOnly" : true,
-            "example" : "project-12345"
+            "example" : "123e4567-e89b-12d3-a456-426614174000"
           },
           "createdBy" : {
             "type" : "string",
@@ -3537,12 +4015,12 @@
           "projectId" : {
             "type" : "string",
             "readOnly" : true,
-            "example" : "project-12345"
+            "example" : "123e4567-e89b-12d3-a456-426614174000"
           },
           "taskId" : {
             "type" : "string",
             "readOnly" : true,
-            "example" : "task-12345"
+            "example" : "123e4567-e89b-12d3-a456-426614174000"
           },
           "taskName" : {
             "type" : "string",
@@ -3948,6 +4426,9 @@
       "PublicKey" : {
         "type" : "object",
         "properties" : {
+          "params" : {
+            "$ref" : "#/components/schemas/AlgorithmParameterSpec"
+          },
           "algorithm" : {
             "type" : "string"
           },
@@ -4032,11 +4513,11 @@
         "properties" : {
           "eventId" : {
             "type" : "string",
-            "example" : "event-13"
+            "example" : "123e4567-e89b-12d3-a456-426614174000"
           },
           "jobId" : {
             "type" : "string",
-            "example" : "job-12345"
+            "example" : "123e4567-e89b-12d3-a456-426614174000"
           },
           "dateTime" : {
             "$ref" : "#/components/schemas/Instant"
@@ -4063,7 +4544,7 @@
         }
       },
       "RescaleRegion" : {
-        "enum" : [ "AWS_AP_SOUTHEAST_1", "AWS_CA_CENTRAL_1", "AWS_EU_NORTH_1", "AWS_EU_CENTRAL_1", "AWS_EU_WEST_1", "AWS_EU_WEST_2", "AWS_EU_WEST_3", "AWS_SA_EAST_1", "AWS_US_EAST_2", "AWS_US_WEST_2", "AWS_US_EAST_1", "GCP_ASIA_SOUTHEAST_1", "GCP_US_CENTRAL_1", "GCP_US_EAST_1", "GCP_US_EAST_2", "GCP_US_EAST_4", "GCP_US_WEST_1", "GCP_US_WEST_4", "GCP_EU_WEST_1", "GCP_EU_WEST_2", "GCP_EU_WEST_3", "GCP_EU_WEST_4", "GCP_CA_CENTRAL_1", "NGC_ENOCH_1", "AZURE_US_WEST_2", "AZURE_US_EAST_2", "AZURE_US_SOUTHCENTRAL", "AZURE_EU_NORTH", "RC_ICELAND_1", "UNASSIGNED" ],
+        "enum" : [ "AWS_AP_SOUTHEAST_1", "AWS_CA_CENTRAL_1", "AWS_EU_NORTH_1", "AWS_EU_CENTRAL_1", "AWS_EU_WEST_1", "AWS_EU_WEST_2", "AWS_EU_WEST_3", "AWS_SA_EAST_1", "AWS_US_EAST_2", "AWS_US_WEST_2", "AWS_US_EAST_1", "GCP_ASIA_SOUTHEAST_1", "GCP_US_CENTRAL_1", "GCP_US_EAST_1", "GCP_US_EAST_2", "GCP_US_EAST_4", "GCP_US_WEST_1", "GCP_US_WEST_4", "GCP_EU_WEST_1", "GCP_EU_WEST_2", "GCP_EU_WEST_3", "GCP_EU_WEST_4", "GCP_CA_CENTRAL_1", "NGC_ENOCH_1", "AZURE_US_WEST_2", "AZURE_US_EAST_2", "AZURE_US_SOUTHCENTRAL", "AZURE_EU_NORTH", "RC_ICELAND_1", "COREWEAVE_US_EAST_4", "UNASSIGNED" ],
         "type" : "string"
       },
       "RescaleUser" : {

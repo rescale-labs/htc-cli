@@ -50,6 +50,8 @@ func (s CloudProvider) Validate() error {
 		return nil
 	case "RC":
 		return nil
+	case "COREWEAVE":
+		return nil
 	case "UNASSIGNED":
 		return nil
 	default:
@@ -116,6 +118,17 @@ func (s *EnvPair) Validate() error {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
+}
+
+func (s GetLogsSort) Validate() error {
+	switch s {
+	case "asc":
+		return nil
+	case "desc":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
 }
 
 func (s *HTCCluster) Validate() error {
@@ -433,6 +446,8 @@ func (s HTCComputeEnvironmentRegion) Validate() error {
 	case "AZURE_EU_NORTH":
 		return nil
 	case "RC_ICELAND_1":
+		return nil
+	case "COREWEAVE_US_EAST_4":
 		return nil
 	case "UNASSIGNED":
 		return nil
@@ -879,6 +894,48 @@ func (s *HTCJobDefinition) Validate() error {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
+}
+
+func (s *HTCJobDefinitionEnvsItem) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := (validate.String{
+			MinLength:    0,
+			MinLengthSet: false,
+			MaxLength:    0,
+			MaxLengthSet: false,
+			Email:        false,
+			Hostname:     false,
+			Regex:        regexMap["^(?!.*AWS_BATCH_|RESCALE_PROJECT_ID|RESCALE_TASK_ID|RESCALE_JOB_ID|PROJECT_SHARED_FOLDER|TASK_SHARED_FOLDER|AWS_SESSION_TOKEN|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|RDF_).*"],
+		}).Validate(string(s.Name)); err != nil {
+			return errors.Wrap(err, "string")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "name",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s HTCJobDefinitionPriority) Validate() error {
+	switch s {
+	case "ON_DEMAND_PRIORITY":
+		return nil
+	case "ON_DEMAND_ECONOMY":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
 }
 
 func (s HTCJobFailureCode) Validate() error {
@@ -1524,6 +1581,8 @@ func (s HTCRegionAdminSettingsRegion) Validate() error {
 		return nil
 	case "RC_ICELAND_1":
 		return nil
+	case "COREWEAVE_US_EAST_4":
+		return nil
 	case "UNASSIGNED":
 		return nil
 	default:
@@ -1968,17 +2027,6 @@ func (s *JobExecutionEnvironment) Validate() error {
 	return nil
 }
 
-func (s JobPriority) Validate() error {
-	switch s {
-	case "ON_DEMAND_PRIORITY":
-		return nil
-	case "ON_DEMAND_ECONOMY":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
-}
-
 func (s ModifierRole) Validate() error {
 	switch s {
 	case "WORKSPACE_ADMIN":
@@ -2255,6 +2303,8 @@ func (s RescaleRegion) Validate() error {
 	case "AZURE_EU_NORTH":
 		return nil
 	case "RC_ICELAND_1":
+		return nil
+	case "COREWEAVE_US_EAST_4":
 		return nil
 	case "UNASSIGNED":
 		return nil

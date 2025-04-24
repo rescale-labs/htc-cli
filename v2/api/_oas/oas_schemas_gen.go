@@ -11,6 +11,9 @@ import (
 	"github.com/go-faster/jx"
 )
 
+// Ref: #/components/schemas/AlgorithmParameterSpec
+type AlgorithmParameterSpec struct{}
+
 // Ref: #/components/schemas/Architecture
 type Architecture string
 
@@ -163,6 +166,11 @@ type CancelJobsForbidden struct{}
 
 func (*CancelJobsForbidden) cancelJobsRes() {}
 
+// CancelJobsNotFound is response for CancelJobs operation.
+type CancelJobsNotFound struct{}
+
+func (*CancelJobsNotFound) cancelJobsRes() {}
+
 // CancelJobsOK is response for CancelJobs operation.
 type CancelJobsOK struct{}
 
@@ -182,6 +190,7 @@ const (
 	CloudProviderNGC        CloudProvider = "NGC"
 	CloudProviderAZURE      CloudProvider = "AZURE"
 	CloudProviderRC         CloudProvider = "RC"
+	CloudProviderCOREWEAVE  CloudProvider = "COREWEAVE"
 	CloudProviderUNASSIGNED CloudProvider = "UNASSIGNED"
 )
 
@@ -193,6 +202,7 @@ func (CloudProvider) AllValues() []CloudProvider {
 		CloudProviderNGC,
 		CloudProviderAZURE,
 		CloudProviderRC,
+		CloudProviderCOREWEAVE,
 		CloudProviderUNASSIGNED,
 	}
 }
@@ -209,6 +219,8 @@ func (s CloudProvider) MarshalText() ([]byte, error) {
 	case CloudProviderAZURE:
 		return []byte(s), nil
 	case CloudProviderRC:
+		return []byte(s), nil
+	case CloudProviderCOREWEAVE:
 		return []byte(s), nil
 	case CloudProviderUNASSIGNED:
 		return []byte(s), nil
@@ -234,6 +246,9 @@ func (s *CloudProvider) UnmarshalText(data []byte) error {
 		return nil
 	case CloudProviderRC:
 		*s = CloudProviderRC
+		return nil
+	case CloudProviderCOREWEAVE:
+		*s = CloudProviderCOREWEAVE
 		return nil
 	case CloudProviderUNASSIGNED:
 		*s = CloudProviderUNASSIGNED
@@ -327,8 +342,11 @@ func (s *EnvPair) SetValue(val string) {
 
 // Ref: #/components/schemas/ExperimentalFields
 type ExperimentalFields struct {
-	CloudFileSystems     OptBool `json:"cloudFileSystems"`
+	CloudFileSystems OptBool `json:"cloudFileSystems"`
+	// Allows the job to use swap space equal to the amount of memory assigned. For example, a job with
+	// 128 MB of memory would also be allowed to use 128 MB of swap memory (disk).
 	KubernetesSwap       OptBool `json:"kubernetesSwap"`
+	PrivilegedMode       OptBool `json:"privilegedMode"`
 	RescaleFilesRDFAgent OptBool `json:"rescaleFilesRDFAgent"`
 }
 
@@ -340,6 +358,11 @@ func (s *ExperimentalFields) GetCloudFileSystems() OptBool {
 // GetKubernetesSwap returns the value of KubernetesSwap.
 func (s *ExperimentalFields) GetKubernetesSwap() OptBool {
 	return s.KubernetesSwap
+}
+
+// GetPrivilegedMode returns the value of PrivilegedMode.
+func (s *ExperimentalFields) GetPrivilegedMode() OptBool {
+	return s.PrivilegedMode
 }
 
 // GetRescaleFilesRDFAgent returns the value of RescaleFilesRDFAgent.
@@ -355,6 +378,11 @@ func (s *ExperimentalFields) SetCloudFileSystems(val OptBool) {
 // SetKubernetesSwap sets the value of KubernetesSwap.
 func (s *ExperimentalFields) SetKubernetesSwap(val OptBool) {
 	s.KubernetesSwap = val
+}
+
+// SetPrivilegedMode sets the value of PrivilegedMode.
+func (s *ExperimentalFields) SetPrivilegedMode(val OptBool) {
+	s.PrivilegedMode = val
 }
 
 // SetRescaleFilesRDFAgent sets the value of RescaleFilesRDFAgent.
@@ -479,6 +507,47 @@ func (*GetLimitsUnauthorized) getLimitsRes() {}
 type GetLogsForbidden struct{}
 
 func (*GetLogsForbidden) getLogsRes() {}
+
+type GetLogsSort string
+
+const (
+	GetLogsSortAsc  GetLogsSort = "asc"
+	GetLogsSortDesc GetLogsSort = "desc"
+)
+
+// AllValues returns all GetLogsSort values.
+func (GetLogsSort) AllValues() []GetLogsSort {
+	return []GetLogsSort{
+		GetLogsSortAsc,
+		GetLogsSortDesc,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GetLogsSort) MarshalText() ([]byte, error) {
+	switch s {
+	case GetLogsSortAsc:
+		return []byte(s), nil
+	case GetLogsSortDesc:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GetLogsSort) UnmarshalText(data []byte) error {
+	switch GetLogsSort(data) {
+	case GetLogsSortAsc:
+		*s = GetLogsSortAsc
+		return nil
+	case GetLogsSortDesc:
+		*s = GetLogsSortDesc
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
 
 // GetLogsUnauthorized is response for GetLogs operation.
 type GetLogsUnauthorized struct{}
@@ -1013,6 +1082,7 @@ const (
 	HTCComputeEnvironmentRegionAZUREUSSOUTHCENTRAL HTCComputeEnvironmentRegion = "AZURE_US_SOUTHCENTRAL"
 	HTCComputeEnvironmentRegionAZUREEUNORTH        HTCComputeEnvironmentRegion = "AZURE_EU_NORTH"
 	HTCComputeEnvironmentRegionRCICELAND1          HTCComputeEnvironmentRegion = "RC_ICELAND_1"
+	HTCComputeEnvironmentRegionCOREWEAVEUSEAST4    HTCComputeEnvironmentRegion = "COREWEAVE_US_EAST_4"
 	HTCComputeEnvironmentRegionUNASSIGNED          HTCComputeEnvironmentRegion = "UNASSIGNED"
 )
 
@@ -1048,6 +1118,7 @@ func (HTCComputeEnvironmentRegion) AllValues() []HTCComputeEnvironmentRegion {
 		HTCComputeEnvironmentRegionAZUREUSSOUTHCENTRAL,
 		HTCComputeEnvironmentRegionAZUREEUNORTH,
 		HTCComputeEnvironmentRegionRCICELAND1,
+		HTCComputeEnvironmentRegionCOREWEAVEUSEAST4,
 		HTCComputeEnvironmentRegionUNASSIGNED,
 	}
 }
@@ -1112,6 +1183,8 @@ func (s HTCComputeEnvironmentRegion) MarshalText() ([]byte, error) {
 	case HTCComputeEnvironmentRegionAZUREEUNORTH:
 		return []byte(s), nil
 	case HTCComputeEnvironmentRegionRCICELAND1:
+		return []byte(s), nil
+	case HTCComputeEnvironmentRegionCOREWEAVEUSEAST4:
 		return []byte(s), nil
 	case HTCComputeEnvironmentRegionUNASSIGNED:
 		return []byte(s), nil
@@ -1209,6 +1282,9 @@ func (s *HTCComputeEnvironmentRegion) UnmarshalText(data []byte) error {
 		return nil
 	case HTCComputeEnvironmentRegionRCICELAND1:
 		*s = HTCComputeEnvironmentRegionRCICELAND1
+		return nil
+	case HTCComputeEnvironmentRegionCOREWEAVEUSEAST4:
+		*s = HTCComputeEnvironmentRegionCOREWEAVEUSEAST4
 		return nil
 	case HTCComputeEnvironmentRegionUNASSIGNED:
 		*s = HTCComputeEnvironmentRegionUNASSIGNED
@@ -1320,6 +1396,7 @@ type HTCJob struct {
 	JobExecutionEnvironment OptJobExecutionEnvironment `json:"jobExecutionEnvironment"`
 	JobUUID                 OptString                  `json:"jobUUID"`
 	MaxDiskGiB              OptInt32                   `json:"maxDiskGiB"`
+	MaxGpus                 OptInt32                   `json:"maxGpus"`
 	MaxMemory               OptInt32                   `json:"maxMemory"`
 	MaxSwap                 OptInt32                   `json:"maxSwap"`
 	MaxVCpus                OptInt32                   `json:"maxVCpus"`
@@ -1414,6 +1491,11 @@ func (s *HTCJob) GetJobUUID() OptString {
 // GetMaxDiskGiB returns the value of MaxDiskGiB.
 func (s *HTCJob) GetMaxDiskGiB() OptInt32 {
 	return s.MaxDiskGiB
+}
+
+// GetMaxGpus returns the value of MaxGpus.
+func (s *HTCJob) GetMaxGpus() OptInt32 {
+	return s.MaxGpus
 }
 
 // GetMaxMemory returns the value of MaxMemory.
@@ -1566,6 +1648,11 @@ func (s *HTCJob) SetMaxDiskGiB(val OptInt32) {
 	s.MaxDiskGiB = val
 }
 
+// SetMaxGpus sets the value of MaxGpus.
+func (s *HTCJob) SetMaxGpus(val OptInt32) {
+	s.MaxGpus = val
+}
+
 // SetMaxMemory sets the value of MaxMemory.
 func (s *HTCJob) SetMaxMemory(val OptInt32) {
 	s.MaxMemory = val
@@ -1640,24 +1727,28 @@ func (*HTCJob) getJobRes() {}
 
 // Ref: #/components/schemas/HTCJobDefinition
 type HTCJobDefinition struct {
-	Architecture       OptArchitecture `json:"architecture"`
-	Claims             []NameValuePair `json:"claims"`
-	Commands           []string        `json:"commands"`
-	Envs               []EnvPair       `json:"envs"`
-	SecretEnvs         []SecretEnvPair `json:"secretEnvs"`
-	ExecTimeoutSeconds OptInt32        `json:"execTimeoutSeconds"`
-	ImageName          string          `json:"imageName"`
+	Architecture OptArchitecture `json:"architecture"`
+	Claims       []NameValuePair `json:"claims"`
+	Commands     []string        `json:"commands"`
+	// Must not be reserved environment variable:AWS_BATCH_CE_NAME |AWS_BATCH_JOB_ARRAY_INDEX
+	// |AWS_BATCH_JOB_ATTEMPT |AWS_BATCH_JOB_ID |AWS_BATCH_JOB_MAIN_NODE_INDEX
+	// |AWS_BATCH_JOB_MAIN_NODE_PRIVATE_IPV4_ADDRESS |AWS_BATCH_JOB_NODE_INDEX |AWS_BATCH_JOB_NUM_NODES
+	// |AWS_BATCH_JQ_NAME |RESCALE_PROJECT_ID |RESCALE_TASK_ID |RESCALE_JOB_ID |RESCALE_HTC_REGION
+	// |RESCALE_HTC_TASK_ID |RESCALE_HTC_PROJECT_ID |RESCALE_HTC_BEARER_TOKEN |PROJECT_SHARED_FOLDER
+	// |TASK_SHARED_FOLDER |AWS_SESSION_TOKEN |AWS_ACCESS_KEY_ID |AWS_SECRET_ACCESS_KEY.
+	Envs               []HTCJobDefinitionEnvsItem `json:"envs"`
+	ExecTimeoutSeconds OptInt32                   `json:"execTimeoutSeconds"`
+	ImageName          string                     `json:"imageName"`
 	// MaxDiskGiB is supported on GCP only.
 	MaxDiskGiB OptInt32 `json:"maxDiskGiB"`
 	MaxMemory  OptInt32 `json:"maxMemory"`
-	// On AWS, maxSwap allows swap memory to be used, up to the limit. On other providers, swap is not
-	// available, but maxSwap is added to the maxMemory to provide the same amount of available space.
-	// The default value is 2000 MB.
-	MaxSwap    OptInt32                `json:"maxSwap"`
-	MaxVCpus   OptInt32                `json:"maxVCpus"`
-	Priority   OptJobPriority          `json:"priority"`
-	Tags       OptHTCJobDefinitionTags `json:"tags"`
-	WorkingDir OptNilString            `json:"workingDir"`
+	// Deprecated. This field has no effect and may be removed at any time.
+	MaxSwap  OptInt32 `json:"maxSwap"`
+	MaxVCpus OptInt32 `json:"maxVCpus"`
+	// ON_DEMAND_ECONOMY uses spot instances and may be preempted.
+	Priority   OptHTCJobDefinitionPriority `json:"priority"`
+	Tags       OptHTCJobDefinitionTags     `json:"tags"`
+	WorkingDir OptNilString                `json:"workingDir"`
 }
 
 // GetArchitecture returns the value of Architecture.
@@ -1676,13 +1767,8 @@ func (s *HTCJobDefinition) GetCommands() []string {
 }
 
 // GetEnvs returns the value of Envs.
-func (s *HTCJobDefinition) GetEnvs() []EnvPair {
+func (s *HTCJobDefinition) GetEnvs() []HTCJobDefinitionEnvsItem {
 	return s.Envs
-}
-
-// GetSecretEnvs returns the value of SecretEnvs.
-func (s *HTCJobDefinition) GetSecretEnvs() []SecretEnvPair {
-	return s.SecretEnvs
 }
 
 // GetExecTimeoutSeconds returns the value of ExecTimeoutSeconds.
@@ -1716,7 +1802,7 @@ func (s *HTCJobDefinition) GetMaxVCpus() OptInt32 {
 }
 
 // GetPriority returns the value of Priority.
-func (s *HTCJobDefinition) GetPriority() OptJobPriority {
+func (s *HTCJobDefinition) GetPriority() OptHTCJobDefinitionPriority {
 	return s.Priority
 }
 
@@ -1746,13 +1832,8 @@ func (s *HTCJobDefinition) SetCommands(val []string) {
 }
 
 // SetEnvs sets the value of Envs.
-func (s *HTCJobDefinition) SetEnvs(val []EnvPair) {
+func (s *HTCJobDefinition) SetEnvs(val []HTCJobDefinitionEnvsItem) {
 	s.Envs = val
-}
-
-// SetSecretEnvs sets the value of SecretEnvs.
-func (s *HTCJobDefinition) SetSecretEnvs(val []SecretEnvPair) {
-	s.SecretEnvs = val
 }
 
 // SetExecTimeoutSeconds sets the value of ExecTimeoutSeconds.
@@ -1786,7 +1867,7 @@ func (s *HTCJobDefinition) SetMaxVCpus(val OptInt32) {
 }
 
 // SetPriority sets the value of Priority.
-func (s *HTCJobDefinition) SetPriority(val OptJobPriority) {
+func (s *HTCJobDefinition) SetPriority(val OptHTCJobDefinitionPriority) {
 	s.Priority = val
 }
 
@@ -1798,6 +1879,72 @@ func (s *HTCJobDefinition) SetTags(val OptHTCJobDefinitionTags) {
 // SetWorkingDir sets the value of WorkingDir.
 func (s *HTCJobDefinition) SetWorkingDir(val OptNilString) {
 	s.WorkingDir = val
+}
+
+type HTCJobDefinitionEnvsItem struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+// GetName returns the value of Name.
+func (s *HTCJobDefinitionEnvsItem) GetName() string {
+	return s.Name
+}
+
+// GetValue returns the value of Value.
+func (s *HTCJobDefinitionEnvsItem) GetValue() string {
+	return s.Value
+}
+
+// SetName sets the value of Name.
+func (s *HTCJobDefinitionEnvsItem) SetName(val string) {
+	s.Name = val
+}
+
+// SetValue sets the value of Value.
+func (s *HTCJobDefinitionEnvsItem) SetValue(val string) {
+	s.Value = val
+}
+
+type HTCJobDefinitionPriority string
+
+const (
+	HTCJobDefinitionPriorityONDEMANDPRIORITY HTCJobDefinitionPriority = "ON_DEMAND_PRIORITY"
+	HTCJobDefinitionPriorityONDEMANDECONOMY  HTCJobDefinitionPriority = "ON_DEMAND_ECONOMY"
+)
+
+// AllValues returns all HTCJobDefinitionPriority values.
+func (HTCJobDefinitionPriority) AllValues() []HTCJobDefinitionPriority {
+	return []HTCJobDefinitionPriority{
+		HTCJobDefinitionPriorityONDEMANDPRIORITY,
+		HTCJobDefinitionPriorityONDEMANDECONOMY,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s HTCJobDefinitionPriority) MarshalText() ([]byte, error) {
+	switch s {
+	case HTCJobDefinitionPriorityONDEMANDPRIORITY:
+		return []byte(s), nil
+	case HTCJobDefinitionPriorityONDEMANDECONOMY:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *HTCJobDefinitionPriority) UnmarshalText(data []byte) error {
+	switch HTCJobDefinitionPriority(data) {
+	case HTCJobDefinitionPriorityONDEMANDPRIORITY:
+		*s = HTCJobDefinitionPriorityONDEMANDPRIORITY
+		return nil
+	case HTCJobDefinitionPriorityONDEMANDECONOMY:
+		*s = HTCJobDefinitionPriorityONDEMANDECONOMY
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 type HTCJobDefinitionTags map[string]string
@@ -2740,6 +2887,7 @@ const (
 	HTCRegionAdminSettingsRegionAZUREUSSOUTHCENTRAL HTCRegionAdminSettingsRegion = "AZURE_US_SOUTHCENTRAL"
 	HTCRegionAdminSettingsRegionAZUREEUNORTH        HTCRegionAdminSettingsRegion = "AZURE_EU_NORTH"
 	HTCRegionAdminSettingsRegionRCICELAND1          HTCRegionAdminSettingsRegion = "RC_ICELAND_1"
+	HTCRegionAdminSettingsRegionCOREWEAVEUSEAST4    HTCRegionAdminSettingsRegion = "COREWEAVE_US_EAST_4"
 	HTCRegionAdminSettingsRegionUNASSIGNED          HTCRegionAdminSettingsRegion = "UNASSIGNED"
 )
 
@@ -2775,6 +2923,7 @@ func (HTCRegionAdminSettingsRegion) AllValues() []HTCRegionAdminSettingsRegion {
 		HTCRegionAdminSettingsRegionAZUREUSSOUTHCENTRAL,
 		HTCRegionAdminSettingsRegionAZUREEUNORTH,
 		HTCRegionAdminSettingsRegionRCICELAND1,
+		HTCRegionAdminSettingsRegionCOREWEAVEUSEAST4,
 		HTCRegionAdminSettingsRegionUNASSIGNED,
 	}
 }
@@ -2839,6 +2988,8 @@ func (s HTCRegionAdminSettingsRegion) MarshalText() ([]byte, error) {
 	case HTCRegionAdminSettingsRegionAZUREEUNORTH:
 		return []byte(s), nil
 	case HTCRegionAdminSettingsRegionRCICELAND1:
+		return []byte(s), nil
+	case HTCRegionAdminSettingsRegionCOREWEAVEUSEAST4:
 		return []byte(s), nil
 	case HTCRegionAdminSettingsRegionUNASSIGNED:
 		return []byte(s), nil
@@ -2936,6 +3087,9 @@ func (s *HTCRegionAdminSettingsRegion) UnmarshalText(data []byte) error {
 		return nil
 	case HTCRegionAdminSettingsRegionRCICELAND1:
 		*s = HTCRegionAdminSettingsRegionRCICELAND1
+		return nil
+	case HTCRegionAdminSettingsRegionCOREWEAVEUSEAST4:
+		*s = HTCRegionAdminSettingsRegionCOREWEAVEUSEAST4
 		return nil
 	case HTCRegionAdminSettingsRegionUNASSIGNED:
 		*s = HTCRegionAdminSettingsRegionUNASSIGNED
@@ -4227,48 +4381,6 @@ func (s *JobExecutionEnvironment) SetInstanceType(val OptString) {
 	s.InstanceType = val
 }
 
-// Ref: #/components/schemas/JobPriority
-type JobPriority string
-
-const (
-	JobPriorityONDEMANDPRIORITY JobPriority = "ON_DEMAND_PRIORITY"
-	JobPriorityONDEMANDECONOMY  JobPriority = "ON_DEMAND_ECONOMY"
-)
-
-// AllValues returns all JobPriority values.
-func (JobPriority) AllValues() []JobPriority {
-	return []JobPriority{
-		JobPriorityONDEMANDPRIORITY,
-		JobPriorityONDEMANDECONOMY,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s JobPriority) MarshalText() ([]byte, error) {
-	switch s {
-	case JobPriorityONDEMANDPRIORITY:
-		return []byte(s), nil
-	case JobPriorityONDEMANDECONOMY:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *JobPriority) UnmarshalText(data []byte) error {
-	switch JobPriority(data) {
-	case JobPriorityONDEMANDPRIORITY:
-		*s = JobPriorityONDEMANDPRIORITY
-		return nil
-	case JobPriorityONDEMANDECONOMY:
-		*s = JobPriorityONDEMANDECONOMY
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
 // Ref: #/components/schemas/JsonWebKey
 type JsonWebKey struct {
 	Algorithm       OptString                    `json:"algorithm"`
@@ -4578,14 +4690,53 @@ func (s *OAuth2ErrorResponse) SetErrorDescription(val OptString) {
 	s.ErrorDescription = val
 }
 
-func (*OAuth2ErrorResponse) authTokenWhoamiGetRes()           {}
-func (*OAuth2ErrorResponse) getTokenRes()                     {}
-func (*OAuth2ErrorResponse) htcGcpClustersWorkspaceIdGetRes() {}
-func (*OAuth2ErrorResponse) htcRegionsGetRes()                {}
-func (*OAuth2ErrorResponse) htcRegionsRegionGetRes()          {}
-func (*OAuth2ErrorResponse) oAuth2TokenPostRes()              {}
-func (*OAuth2ErrorResponse) wellKnownJwksJSONGetRes()         {}
-func (*OAuth2ErrorResponse) whoAmIRes()                       {}
+func (*OAuth2ErrorResponse) authTokenWhoamiGetRes()                                       {}
+func (*OAuth2ErrorResponse) createRepoRes()                                               {}
+func (*OAuth2ErrorResponse) createTaskRes()                                               {}
+func (*OAuth2ErrorResponse) getDimensionsRes()                                            {}
+func (*OAuth2ErrorResponse) getImagesRes()                                                {}
+func (*OAuth2ErrorResponse) getLimitsRes()                                                {}
+func (*OAuth2ErrorResponse) getProjectRes()                                               {}
+func (*OAuth2ErrorResponse) getRegistryTokenRes()                                         {}
+func (*OAuth2ErrorResponse) getTasksRes()                                                 {}
+func (*OAuth2ErrorResponse) getTokenRes()                                                 {}
+func (*OAuth2ErrorResponse) htcGcpClustersWorkspaceIdGetRes()                             {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdDimensionsPutRes()                        {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdLimitsDeleteRes()                         {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdLimitsIDDeleteRes()                       {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdLimitsIDGetRes()                          {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdLimitsIDPatchRes()                        {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdLimitsPostRes()                           {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdPatchRes()                                {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdStoragePresignedURLGetRes()               {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdStorageTokenGetRes()                      {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdStorageTokenRegionGetRes()                {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdStorageTokensGetRes()                     {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdTaskRetentionPolicyDeleteRes()            {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdTaskRetentionPolicyGetRes()               {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdTaskRetentionPolicyPutRes()               {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdDeleteRes()                    {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdGetRes()                       {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGetRes() {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdGroupsGetRes()                 {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes()        {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdPatchRes()                     {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdStoragePresignedURLGetRes()    {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdStorageRegionalStorageGetRes() {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdStorageTokenGetRes()           {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdStorageTokenRegionGetRes()     {}
+func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdStorageTokensGetRes()          {}
+func (*OAuth2ErrorResponse) htcRegionsGetRes()                                            {}
+func (*OAuth2ErrorResponse) htcRegionsRegionGetRes()                                      {}
+func (*OAuth2ErrorResponse) htcStorageRegionRegionGetRes()                                {}
+func (*OAuth2ErrorResponse) htcWorkspacesWorkspaceIdDimensionsGetRes()                    {}
+func (*OAuth2ErrorResponse) htcWorkspacesWorkspaceIdLimitsGetRes()                        {}
+func (*OAuth2ErrorResponse) htcWorkspacesWorkspaceIdTaskRetentionPolicyGetRes()           {}
+func (*OAuth2ErrorResponse) htcWorkspacesWorkspaceIdTaskRetentionPolicyPutRes()           {}
+func (*OAuth2ErrorResponse) oAuth2TokenPostRes()                                          {}
+func (*OAuth2ErrorResponse) submitJobsRes()                                               {}
+func (*OAuth2ErrorResponse) wellKnownJwksJSONGetRes()                                     {}
+func (*OAuth2ErrorResponse) whoAmIRes()                                                   {}
 
 // Ref: #/components/schemas/OAuth2Token
 type OAuth2Token struct {
@@ -5086,6 +5237,52 @@ func (o OptFloat64) Or(d float64) float64 {
 	return d
 }
 
+// NewOptGetLogsSort returns new OptGetLogsSort with value set to v.
+func NewOptGetLogsSort(v GetLogsSort) OptGetLogsSort {
+	return OptGetLogsSort{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptGetLogsSort is optional GetLogsSort.
+type OptGetLogsSort struct {
+	Value GetLogsSort
+	Set   bool
+}
+
+// IsSet returns true if OptGetLogsSort was set.
+func (o OptGetLogsSort) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptGetLogsSort) Reset() {
+	var v GetLogsSort
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptGetLogsSort) SetTo(v GetLogsSort) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptGetLogsSort) Get() (v GetLogsSort, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptGetLogsSort) Or(d GetLogsSort) GetLogsSort {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptHTCComputeEnvironmentComputeScalingPolicy returns new OptHTCComputeEnvironmentComputeScalingPolicy with value set to v.
 func NewOptHTCComputeEnvironmentComputeScalingPolicy(v HTCComputeEnvironmentComputeScalingPolicy) OptHTCComputeEnvironmentComputeScalingPolicy {
 	return OptHTCComputeEnvironmentComputeScalingPolicy{
@@ -5310,6 +5507,52 @@ func (o OptHTCComputeEnvironmentRegion) Get() (v HTCComputeEnvironmentRegion, ok
 
 // Or returns value if set, or given parameter if does not.
 func (o OptHTCComputeEnvironmentRegion) Or(d HTCComputeEnvironmentRegion) HTCComputeEnvironmentRegion {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptHTCJobDefinitionPriority returns new OptHTCJobDefinitionPriority with value set to v.
+func NewOptHTCJobDefinitionPriority(v HTCJobDefinitionPriority) OptHTCJobDefinitionPriority {
+	return OptHTCJobDefinitionPriority{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptHTCJobDefinitionPriority is optional HTCJobDefinitionPriority.
+type OptHTCJobDefinitionPriority struct {
+	Value HTCJobDefinitionPriority
+	Set   bool
+}
+
+// IsSet returns true if OptHTCJobDefinitionPriority was set.
+func (o OptHTCJobDefinitionPriority) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptHTCJobDefinitionPriority) Reset() {
+	var v HTCJobDefinitionPriority
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptHTCJobDefinitionPriority) SetTo(v HTCJobDefinitionPriority) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptHTCJobDefinitionPriority) Get() (v HTCJobDefinitionPriority, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptHTCJobDefinitionPriority) Or(d HTCJobDefinitionPriority) HTCJobDefinitionPriority {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -6092,52 +6335,6 @@ func (o OptJobExecutionEnvironment) Get() (v JobExecutionEnvironment, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptJobExecutionEnvironment) Or(d JobExecutionEnvironment) JobExecutionEnvironment {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptJobPriority returns new OptJobPriority with value set to v.
-func NewOptJobPriority(v JobPriority) OptJobPriority {
-	return OptJobPriority{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptJobPriority is optional JobPriority.
-type OptJobPriority struct {
-	Value JobPriority
-	Set   bool
-}
-
-// IsSet returns true if OptJobPriority was set.
-func (o OptJobPriority) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptJobPriority) Reset() {
-	var v JobPriority
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptJobPriority) SetTo(v JobPriority) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptJobPriority) Get() (v JobPriority, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptJobPriority) Or(d JobPriority) JobPriority {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -7353,9 +7550,10 @@ func (s *PresignedPutUrlResponseURL) SetSerializedHashCode(val OptInt32) {
 
 // Ref: #/components/schemas/PublicKey
 type PublicKey struct {
-	Algorithm OptString `json:"algorithm"`
-	Encoded   OptString `json:"encoded"`
-	Format    OptString `json:"format"`
+	Algorithm OptString               `json:"algorithm"`
+	Encoded   OptString               `json:"encoded"`
+	Format    OptString               `json:"format"`
+	Params    *AlgorithmParameterSpec `json:"params"`
 }
 
 // GetAlgorithm returns the value of Algorithm.
@@ -7373,6 +7571,11 @@ func (s *PublicKey) GetFormat() OptString {
 	return s.Format
 }
 
+// GetParams returns the value of Params.
+func (s *PublicKey) GetParams() *AlgorithmParameterSpec {
+	return s.Params
+}
+
 // SetAlgorithm sets the value of Algorithm.
 func (s *PublicKey) SetAlgorithm(val OptString) {
 	s.Algorithm = val
@@ -7386,6 +7589,11 @@ func (s *PublicKey) SetEncoded(val OptString) {
 // SetFormat sets the value of Format.
 func (s *PublicKey) SetFormat(val OptString) {
 	s.Format = val
+}
+
+// SetParams sets the value of Params.
+func (s *PublicKey) SetParams(val *AlgorithmParameterSpec) {
+	s.Params = val
 }
 
 // Ref: #/components/schemas/RegionStorageOption
@@ -7675,6 +7883,7 @@ const (
 	RescaleRegionAZUREUSSOUTHCENTRAL RescaleRegion = "AZURE_US_SOUTHCENTRAL"
 	RescaleRegionAZUREEUNORTH        RescaleRegion = "AZURE_EU_NORTH"
 	RescaleRegionRCICELAND1          RescaleRegion = "RC_ICELAND_1"
+	RescaleRegionCOREWEAVEUSEAST4    RescaleRegion = "COREWEAVE_US_EAST_4"
 	RescaleRegionUNASSIGNED          RescaleRegion = "UNASSIGNED"
 )
 
@@ -7710,6 +7919,7 @@ func (RescaleRegion) AllValues() []RescaleRegion {
 		RescaleRegionAZUREUSSOUTHCENTRAL,
 		RescaleRegionAZUREEUNORTH,
 		RescaleRegionRCICELAND1,
+		RescaleRegionCOREWEAVEUSEAST4,
 		RescaleRegionUNASSIGNED,
 	}
 }
@@ -7774,6 +7984,8 @@ func (s RescaleRegion) MarshalText() ([]byte, error) {
 	case RescaleRegionAZUREEUNORTH:
 		return []byte(s), nil
 	case RescaleRegionRCICELAND1:
+		return []byte(s), nil
+	case RescaleRegionCOREWEAVEUSEAST4:
 		return []byte(s), nil
 	case RescaleRegionUNASSIGNED:
 		return []byte(s), nil
@@ -7871,6 +8083,9 @@ func (s *RescaleRegion) UnmarshalText(data []byte) error {
 		return nil
 	case RescaleRegionRCICELAND1:
 		*s = RescaleRegionRCICELAND1
+		return nil
+	case RescaleRegionCOREWEAVEUSEAST4:
+		*s = RescaleRegionCOREWEAVEUSEAST4
 		return nil
 	case RescaleRegionUNASSIGNED:
 		*s = RescaleRegionUNASSIGNED
@@ -8025,32 +8240,6 @@ func (s *RescaleUser) SetWorkspace(val OptWorkspace) {
 // SetWorkspaceAdmin sets the value of WorkspaceAdmin.
 func (s *RescaleUser) SetWorkspaceAdmin(val OptBool) {
 	s.WorkspaceAdmin = val
-}
-
-// Ref: #/components/schemas/SecretEnvPair
-type SecretEnvPair struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
-}
-
-// GetName returns the value of Name.
-func (s *SecretEnvPair) GetName() string {
-	return s.Name
-}
-
-// GetValue returns the value of Value.
-func (s *SecretEnvPair) GetValue() string {
-	return s.Value
-}
-
-// SetName sets the value of Name.
-func (s *SecretEnvPair) SetName(val string) {
-	s.Name = val
-}
-
-// SetValue sets the value of Value.
-func (s *SecretEnvPair) SetValue(val string) {
-	s.Value = val
 }
 
 type SecurityScheme struct {
