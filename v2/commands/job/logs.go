@@ -21,6 +21,7 @@ func logs(ctx context.Context, c oapi.JobInvoker, projectId, taskId, jobId, page
 		JobId:     jobId,
 		PageSize:  oapi.NewOptInt32(common.PageSize),
 		PageIndex: oapi.OptString{pageIndex, pageIndex != ""},
+		Sort:   oapi.OptGetLogsSort{"asc", true},
 	})
 	if err != nil {
 		return nil, err
@@ -106,7 +107,12 @@ func Logs(cmd *cobra.Command, args []string) error {
 			printedLogTime := time.Time(res.Items[currentPage-1].Timestamp.Value)
 			if printedLogTime.After(latestLogTime) {
 				latestLogTime = printedLogTime
+				sleepRetries = 1
 			} else {
+				if sleepRetries > 1 {
+					 // move cursor up and clear previous line after first retry
+					fmt.Print("\033[F\033[K")
+				}
 				fmt.Printf("no new logs from query, sleeping 5s... (x%d)\n", sleepRetries)
 				time.Sleep(common.LogsQueryInterval)
 				sleepRetries++
