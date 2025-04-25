@@ -70,7 +70,6 @@ func (e *HTCJobStatusEvent) Fields() []Field {
 func (e *HTCJobStatusEvent) WriteRows(rowFmt string, w io.Writer) error {
 	_, err := fmt.Fprintf(
 		w, rowFmt,
-		// e.EventId.Value,
 		formatDateTime(e.DateTime),
 		e.Status.Value,
 	)
