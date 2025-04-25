@@ -281,6 +281,47 @@ func encodeGetEventsResponse(response GetEventsRes, w http.ResponseWriter) error
 	}
 }
 
+func encodeGetGCPClustersResponse(response GetGCPClustersRes, w http.ResponseWriter) error {
+	switch response := response.(type) {
+	case *HTCClusterStatusResponse:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetGCPClustersUnauthorized:
+		w.WriteHeader(401)
+
+		return nil
+
+	case *GetGCPClustersForbidden:
+		w.WriteHeader(403)
+
+		return nil
+
+	case *OAuth2ErrorResponse:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeGetImageResponse(response GetImageRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCImageStatus:
@@ -779,47 +820,6 @@ func encodeGetTokenResponse(response GetTokenRes, w http.ResponseWriter) error {
 	case *OAuth2ErrorResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeHtcGcpClustersWorkspaceIdGetResponse(response HtcGcpClustersWorkspaceIdGetRes, w http.ResponseWriter) error {
-	switch response := response.(type) {
-	case *HTCClusterStatusResponse:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *HtcGcpClustersWorkspaceIdGetUnauthorized:
-		w.WriteHeader(401)
-
-		return nil
-
-	case *HtcGcpClustersWorkspaceIdGetForbidden:
-		w.WriteHeader(403)
-
-		return nil
-
-	case *OAuth2ErrorResponse:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(404)
 
 		e := new(jx.Encoder)
 		response.Encode(e)

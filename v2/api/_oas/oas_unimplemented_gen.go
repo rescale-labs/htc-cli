@@ -94,6 +94,16 @@ func (UnimplementedHandler) GetEvents(ctx context.Context, params GetEventsParam
 	return r, ht.ErrNotImplemented
 }
 
+// GetGCPClusters implements getGCPClusters operation.
+//
+// This endpoint returns details about all GCP clusters that can run jobs for the specified HTC
+// workspace.
+//
+// GET /htc/gcp/clusters/{workspaceId}
+func (UnimplementedHandler) GetGCPClusters(ctx context.Context, params GetGCPClustersParams) (r GetGCPClustersRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetImage implements getImage operation.
 //
 // Retrieves the current status of an image across cloud providers. The status indicates whether the
@@ -216,16 +226,6 @@ func (UnimplementedHandler) GetTasks(ctx context.Context, params GetTasksParams)
 //
 // GET /auth/token
 func (UnimplementedHandler) GetToken(ctx context.Context, params GetTokenParams) (r GetTokenRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcGcpClustersWorkspaceIdGet implements GET /htc/gcp/clusters/{workspaceId} operation.
-//
-// This endpoint returns details about all GCP clusters that can run jobs for the specified HTC
-// workspace.
-//
-// GET /htc/gcp/clusters/{workspaceId}
-func (UnimplementedHandler) HtcGcpClustersWorkspaceIdGet(ctx context.Context, params HtcGcpClustersWorkspaceIdGetParams) (r HtcGcpClustersWorkspaceIdGetRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

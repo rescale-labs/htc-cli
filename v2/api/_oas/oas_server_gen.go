@@ -14,19 +14,13 @@ type Handler interface {
 	MetricsHandler
 	ProjectHandler
 	TaskHandler
+	WorkspaceHandler
 	// AuthTokenWhoamiGet implements GET /auth/token/whoami operation.
 	//
 	// This endpoint will get a JWT token payload given a bearer token.
 	//
 	// GET /auth/token/whoami
 	AuthTokenWhoamiGet(ctx context.Context) (AuthTokenWhoamiGetRes, error)
-	// HtcGcpClustersWorkspaceIdGet implements GET /htc/gcp/clusters/{workspaceId} operation.
-	//
-	// This endpoint returns details about all GCP clusters that can run jobs for the specified HTC
-	// workspace.
-	//
-	// GET /htc/gcp/clusters/{workspaceId}
-	HtcGcpClustersWorkspaceIdGet(ctx context.Context, params HtcGcpClustersWorkspaceIdGetParams) (HtcGcpClustersWorkspaceIdGetRes, error)
 	// HtcProjectsProjectIdDimensionsPut implements PUT /htc/projects/{projectId}/dimensions operation.
 	//
 	// This endpoint allows _workspace_, _organization_, and _Rescale administrators_ to _create_,
@@ -514,6 +508,19 @@ type TaskHandler interface {
 	//
 	// GET /htc/projects/{projectId}/tasks
 	GetTasks(ctx context.Context, params GetTasksParams) (GetTasksRes, error)
+}
+
+// WorkspaceHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Workspace
+type WorkspaceHandler interface {
+	// GetGCPClusters implements getGCPClusters operation.
+	//
+	// This endpoint returns details about all GCP clusters that can run jobs for the specified HTC
+	// workspace.
+	//
+	// GET /htc/gcp/clusters/{workspaceId}
+	GetGCPClusters(ctx context.Context, params GetGCPClustersParams) (GetGCPClustersRes, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

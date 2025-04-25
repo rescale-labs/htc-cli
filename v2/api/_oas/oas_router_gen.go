@@ -190,7 +190,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "GET":
-							s.handleHtcGcpClustersWorkspaceIdGetRequest([1]string{
+							s.handleGetGCPClustersRequest([1]string{
 								args[0],
 							}, elemIsEscaped, w, r)
 						default:
@@ -1661,9 +1661,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						// Leaf node.
 						switch method {
 						case "GET":
-							r.name = "HtcGcpClustersWorkspaceIdGet"
+							r.name = "GetGCPClusters"
 							r.summary = "Get Status of GCP Cluster"
-							r.operationID = ""
+							r.operationID = "getGCPClusters"
 							r.pathPattern = "/htc/gcp/clusters/{workspaceId}"
 							r.args = args
 							r.count = 1

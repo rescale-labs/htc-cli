@@ -23,19 +23,13 @@ type Invoker interface {
 	MetricsInvoker
 	ProjectInvoker
 	TaskInvoker
+	WorkspaceInvoker
 	// AuthTokenWhoamiGet invokes GET /auth/token/whoami operation.
 	//
 	// This endpoint will get a JWT token payload given a bearer token.
 	//
 	// GET /auth/token/whoami
 	AuthTokenWhoamiGet(ctx context.Context) (AuthTokenWhoamiGetRes, error)
-	// HtcGcpClustersWorkspaceIdGet invokes GET /htc/gcp/clusters/{workspaceId} operation.
-	//
-	// This endpoint returns details about all GCP clusters that can run jobs for the specified HTC
-	// workspace.
-	//
-	// GET /htc/gcp/clusters/{workspaceId}
-	HtcGcpClustersWorkspaceIdGet(ctx context.Context, params HtcGcpClustersWorkspaceIdGetParams) (HtcGcpClustersWorkspaceIdGetRes, error)
 	// HtcProjectsProjectIdDimensionsPut invokes PUT /htc/projects/{projectId}/dimensions operation.
 	//
 	// This endpoint allows _workspace_, _organization_, and _Rescale administrators_ to _create_,
@@ -523,6 +517,19 @@ type TaskInvoker interface {
 	//
 	// GET /htc/projects/{projectId}/tasks
 	GetTasks(ctx context.Context, params GetTasksParams) (GetTasksRes, error)
+}
+
+// WorkspaceInvoker invokes operations described by OpenAPI v3 specification.
+//
+// x-gen-operation-group: Workspace
+type WorkspaceInvoker interface {
+	// GetGCPClusters invokes getGCPClusters operation.
+	//
+	// This endpoint returns details about all GCP clusters that can run jobs for the specified HTC
+	// workspace.
+	//
+	// GET /htc/gcp/clusters/{workspaceId}
+	GetGCPClusters(ctx context.Context, params GetGCPClustersParams) (GetGCPClustersRes, error)
 }
 
 // Client implements OAS client.
@@ -1302,6 +1309,94 @@ func (c *Client) sendGetEvents(ctx context.Context, params GetEventsParams) (res
 	defer resp.Body.Close()
 
 	result, err := decodeGetEventsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetGCPClusters invokes getGCPClusters operation.
+//
+// This endpoint returns details about all GCP clusters that can run jobs for the specified HTC
+// workspace.
+//
+// GET /htc/gcp/clusters/{workspaceId}
+func (c *Client) GetGCPClusters(ctx context.Context, params GetGCPClustersParams) (GetGCPClustersRes, error) {
+	res, err := c.sendGetGCPClusters(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetGCPClusters(ctx context.Context, params GetGCPClustersParams) (res GetGCPClustersRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/htc/gcp/clusters/"
+	{
+		// Encode "workspaceId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "workspaceId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.WorkspaceId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetGCPClusters", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetGCPClustersResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -2827,94 +2922,6 @@ func (c *Client) sendGetToken(ctx context.Context, params GetTokenParams) (res G
 	defer resp.Body.Close()
 
 	result, err := decodeGetTokenResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcGcpClustersWorkspaceIdGet invokes GET /htc/gcp/clusters/{workspaceId} operation.
-//
-// This endpoint returns details about all GCP clusters that can run jobs for the specified HTC
-// workspace.
-//
-// GET /htc/gcp/clusters/{workspaceId}
-func (c *Client) HtcGcpClustersWorkspaceIdGet(ctx context.Context, params HtcGcpClustersWorkspaceIdGetParams) (HtcGcpClustersWorkspaceIdGetRes, error) {
-	res, err := c.sendHtcGcpClustersWorkspaceIdGet(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendHtcGcpClustersWorkspaceIdGet(ctx context.Context, params HtcGcpClustersWorkspaceIdGetParams) (res HtcGcpClustersWorkspaceIdGetRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [2]string
-	pathParts[0] = "/htc/gcp/clusters/"
-	{
-		// Encode "workspaceId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "workspaceId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.WorkspaceId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcGcpClustersWorkspaceIdGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcGcpClustersWorkspaceIdGetResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

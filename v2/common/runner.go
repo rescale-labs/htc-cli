@@ -208,6 +208,14 @@ func (r *Runner) GetIds(p *IDParams) error {
 	return nil
 }
 
+func (r *Runner) GetWorkspaceId() (string, error) {
+	if r.Config.Credentials.Identity.WorkspaceId == "" {
+		return "", config.UsageErrorf("Error: missing workspace ID.")
+	} else {
+		return r.Config.Credentials.Identity.WorkspaceId, nil
+	}
+}
+
 func (r *Runner) PrintResult(res any, w io.Writer) error {
 	// Text output is the default and happy path. Use it when we can.
 	if r.Config.OutputFormat == "text" {

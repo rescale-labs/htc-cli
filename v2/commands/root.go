@@ -12,6 +12,7 @@ import (
 	"github.com/rescale-labs/htc-cli/v2/commands/region"
 	"github.com/rescale-labs/htc-cli/v2/commands/task"
 	"github.com/rescale-labs/htc-cli/v2/commands/version"
+	"github.com/rescale-labs/htc-cli/v2/commands/workspace"
 )
 
 var RootCmd = &cobra.Command{
@@ -52,4 +53,7 @@ func init() {
 
 	// version
 	RootCmd.AddCommand(version.Cmd)
+
+	// workspace
+	RootCmd.AddCommand(workspace.WorkspaceCmd)
 }

@@ -433,6 +433,16 @@ type GetEventsUnauthorized struct{}
 
 func (*GetEventsUnauthorized) getEventsRes() {}
 
+// GetGCPClustersForbidden is response for GetGCPClusters operation.
+type GetGCPClustersForbidden struct{}
+
+func (*GetGCPClustersForbidden) getGCPClustersRes() {}
+
+// GetGCPClustersUnauthorized is response for GetGCPClusters operation.
+type GetGCPClustersUnauthorized struct{}
+
+func (*GetGCPClustersUnauthorized) getGCPClustersRes() {}
+
 // GetImageForbidden is response for GetImage operation.
 type GetImageForbidden struct{}
 
@@ -786,7 +796,7 @@ func (s *HTCClusterStatusResponse) SetGcpProjectId(val OptString) {
 	s.GcpProjectId = val
 }
 
-func (*HTCClusterStatusResponse) htcGcpClustersWorkspaceIdGetRes() {}
+func (*HTCClusterStatusResponse) getGCPClustersRes() {}
 
 // Ref: #/components/schemas/HTCComputeEnvironment
 type HTCComputeEnvironment struct {
@@ -3716,16 +3726,6 @@ func (s *HTCWorkspaceLimit) SetWorkspaceId(val OptString) {
 
 func (*HTCWorkspaceLimit) htcWorkspacesWorkspaceIdLimitsGetRes() {}
 
-// HtcGcpClustersWorkspaceIdGetForbidden is response for HtcGcpClustersWorkspaceIdGet operation.
-type HtcGcpClustersWorkspaceIdGetForbidden struct{}
-
-func (*HtcGcpClustersWorkspaceIdGetForbidden) htcGcpClustersWorkspaceIdGetRes() {}
-
-// HtcGcpClustersWorkspaceIdGetUnauthorized is response for HtcGcpClustersWorkspaceIdGet operation.
-type HtcGcpClustersWorkspaceIdGetUnauthorized struct{}
-
-func (*HtcGcpClustersWorkspaceIdGetUnauthorized) htcGcpClustersWorkspaceIdGetRes() {}
-
 type HtcProjectsProjectIdDimensionsPutCreatedApplicationJSON []HTCComputeEnvironment
 
 func (*HtcProjectsProjectIdDimensionsPutCreatedApplicationJSON) htcProjectsProjectIdDimensionsPutRes() {
@@ -4762,6 +4762,7 @@ func (*OAuth2ErrorResponse) authTokenWhoamiGetRes()                             
 func (*OAuth2ErrorResponse) createRepoRes()                                               {}
 func (*OAuth2ErrorResponse) createTaskRes()                                               {}
 func (*OAuth2ErrorResponse) getDimensionsRes()                                            {}
+func (*OAuth2ErrorResponse) getGCPClustersRes()                                           {}
 func (*OAuth2ErrorResponse) getImagesRes()                                                {}
 func (*OAuth2ErrorResponse) getLimitsRes()                                                {}
 func (*OAuth2ErrorResponse) getProjectRes()                                               {}
@@ -4769,7 +4770,6 @@ func (*OAuth2ErrorResponse) getRegistryTokenRes()                               
 func (*OAuth2ErrorResponse) getTaskStatsRes()                                             {}
 func (*OAuth2ErrorResponse) getTasksRes()                                                 {}
 func (*OAuth2ErrorResponse) getTokenRes()                                                 {}
-func (*OAuth2ErrorResponse) htcGcpClustersWorkspaceIdGetRes()                             {}
 func (*OAuth2ErrorResponse) htcProjectsProjectIdDimensionsPutRes()                        {}
 func (*OAuth2ErrorResponse) htcProjectsProjectIdLimitsDeleteRes()                         {}
 func (*OAuth2ErrorResponse) htcProjectsProjectIdLimitsIDDeleteRes()                       {}
