@@ -14,4 +14,5 @@ func init() {
 	JobCmd.AddCommand(GetCmd)
 	JobCmd.AddCommand(CancelCmd)
 	JobCmd.AddCommand(LogsCmd)
+	JobCmd.AddCommand(EventsCmd)
 }
