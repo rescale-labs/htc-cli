@@ -423,6 +423,16 @@ type GetDimensionsUnauthorized struct{}
 
 func (*GetDimensionsUnauthorized) getDimensionsRes() {}
 
+// GetEventsForbidden is response for GetEvents operation.
+type GetEventsForbidden struct{}
+
+func (*GetEventsForbidden) getEventsRes() {}
+
+// GetEventsUnauthorized is response for GetEvents operation.
+type GetEventsUnauthorized struct{}
+
+func (*GetEventsUnauthorized) getEventsRes() {}
+
 // GetImageForbidden is response for GetImage operation.
 type GetImageForbidden struct{}
 
@@ -1380,7 +1390,7 @@ type HTCJob struct {
 	Architecture            OptArchitecture            `json:"architecture"`
 	Commands                []string                   `json:"commands"`
 	CompletedAt             OptNilNullableInstant      `json:"completedAt"`
-	Container               OptContainerDetails        `json:"container"`
+	Container               OptNilContainerDetails     `json:"container"`
 	CreatedAt               OptInstant                 `json:"createdAt"`
 	CreatedBy               OptString                  `json:"createdBy"`
 	Envs                    []EnvPair                  `json:"envs"`
@@ -1389,7 +1399,7 @@ type HTCJob struct {
 	Group                   OptString                  `json:"group"`
 	ImageName               OptString                  `json:"imageName"`
 	InstanceId              OptString                  `json:"instanceId"`
-	InstanceLabels          OptInstanceLabels          `json:"instanceLabels"`
+	InstanceLabels          OptNilInstanceLabels       `json:"instanceLabels"`
 	JobExecutionEnvironment OptJobExecutionEnvironment `json:"jobExecutionEnvironment"`
 	JobUUID                 OptString                  `json:"jobUUID"`
 	MaxDiskGiB              OptInt32                   `json:"maxDiskGiB"`
@@ -1426,7 +1436,7 @@ func (s *HTCJob) GetCompletedAt() OptNilNullableInstant {
 }
 
 // GetContainer returns the value of Container.
-func (s *HTCJob) GetContainer() OptContainerDetails {
+func (s *HTCJob) GetContainer() OptNilContainerDetails {
 	return s.Container
 }
 
@@ -1471,7 +1481,7 @@ func (s *HTCJob) GetInstanceId() OptString {
 }
 
 // GetInstanceLabels returns the value of InstanceLabels.
-func (s *HTCJob) GetInstanceLabels() OptInstanceLabels {
+func (s *HTCJob) GetInstanceLabels() OptNilInstanceLabels {
 	return s.InstanceLabels
 }
 
@@ -1581,7 +1591,7 @@ func (s *HTCJob) SetCompletedAt(val OptNilNullableInstant) {
 }
 
 // SetContainer sets the value of Container.
-func (s *HTCJob) SetContainer(val OptContainerDetails) {
+func (s *HTCJob) SetContainer(val OptNilContainerDetails) {
 	s.Container = val
 }
 
@@ -1626,7 +1636,7 @@ func (s *HTCJob) SetInstanceId(val OptString) {
 }
 
 // SetInstanceLabels sets the value of InstanceLabels.
-func (s *HTCJob) SetInstanceLabels(val OptInstanceLabels) {
+func (s *HTCJob) SetInstanceLabels(val OptNilInstanceLabels) {
 	s.InstanceLabels = val
 }
 
@@ -2079,6 +2089,34 @@ func (s *HTCJobLogs) SetNext(val OptURI) {
 }
 
 func (*HTCJobLogs) getLogsRes() {}
+
+// Ref: #/components/schemas/HTCJobStatusEvents
+type HTCJobStatusEvents struct {
+	Items []RescaleJobStatusEvent `json:"items"`
+	Next  OptURI                  `json:"next"`
+}
+
+// GetItems returns the value of Items.
+func (s *HTCJobStatusEvents) GetItems() []RescaleJobStatusEvent {
+	return s.Items
+}
+
+// GetNext returns the value of Next.
+func (s *HTCJobStatusEvents) GetNext() OptURI {
+	return s.Next
+}
+
+// SetItems sets the value of Items.
+func (s *HTCJobStatusEvents) SetItems(val []RescaleJobStatusEvent) {
+	s.Items = val
+}
+
+// SetNext sets the value of Next.
+func (s *HTCJobStatusEvents) SetNext(val OptURI) {
+	s.Next = val
+}
+
+func (*HTCJobStatusEvents) getEventsRes() {}
 
 // Ref: #/components/schemas/HTCJobSubmitRequest
 type HTCJobSubmitRequest struct {
@@ -3262,6 +3300,7 @@ func (s *HTCRequestError) SetMessage(val OptNilString) {
 }
 
 func (*HTCRequestError) createProjectRes() {}
+func (*HTCRequestError) getEventsRes()     {}
 func (*HTCRequestError) getJobRes()        {}
 func (*HTCRequestError) getJobsRes()       {}
 func (*HTCRequestError) getLogsRes()       {}
@@ -4088,23 +4127,6 @@ type HtcProjectsProjectIdTasksTaskIdGroupsGetUnauthorized struct{}
 func (*HtcProjectsProjectIdTasksTaskIdGroupsGetUnauthorized) htcProjectsProjectIdTasksTaskIdGroupsGetRes() {
 }
 
-// HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetForbidden is response for HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet operation.
-type HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetForbidden struct{}
-
-func (*HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetForbidden) htcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes() {
-}
-
-type HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetOKApplicationJSON jx.Raw
-
-func (*HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetOKApplicationJSON) htcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes() {
-}
-
-// HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetUnauthorized is response for HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet operation.
-type HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetUnauthorized struct{}
-
-func (*HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetUnauthorized) htcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes() {
-}
-
 // HtcProjectsProjectIdTasksTaskIdPatchForbidden is response for HtcProjectsProjectIdTasksTaskIdPatch operation.
 type HtcProjectsProjectIdTasksTaskIdPatchForbidden struct{}
 
@@ -4716,7 +4738,6 @@ func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdDeleteRes()          
 func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdGetRes()                       {}
 func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGetRes() {}
 func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdGroupsGetRes()                 {}
-func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes()        {}
 func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdPatchRes()                     {}
 func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdStoragePresignedURLGetRes()    {}
 func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdStorageRegionalStorageGetRes() {}
@@ -4998,52 +5019,6 @@ func (o OptCloudProvider) Get() (v CloudProvider, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptCloudProvider) Or(d CloudProvider) CloudProvider {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptContainerDetails returns new OptContainerDetails with value set to v.
-func NewOptContainerDetails(v ContainerDetails) OptContainerDetails {
-	return OptContainerDetails{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptContainerDetails is optional ContainerDetails.
-type OptContainerDetails struct {
-	Value ContainerDetails
-	Set   bool
-}
-
-// IsSet returns true if OptContainerDetails was set.
-func (o OptContainerDetails) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptContainerDetails) Reset() {
-	var v ContainerDetails
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptContainerDetails) SetTo(v ContainerDetails) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptContainerDetails) Get() (v ContainerDetails, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptContainerDetails) Or(d ContainerDetails) ContainerDetails {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -6108,52 +6083,6 @@ func (o OptHtcProjectsProjectIdTasksTaskIdDeleteOKLifecycleStatus) Or(d HtcProje
 	return d
 }
 
-// NewOptInstanceLabels returns new OptInstanceLabels with value set to v.
-func NewOptInstanceLabels(v InstanceLabels) OptInstanceLabels {
-	return OptInstanceLabels{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptInstanceLabels is optional InstanceLabels.
-type OptInstanceLabels struct {
-	Value InstanceLabels
-	Set   bool
-}
-
-// IsSet returns true if OptInstanceLabels was set.
-func (o OptInstanceLabels) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptInstanceLabels) Reset() {
-	var v InstanceLabels
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptInstanceLabels) SetTo(v InstanceLabels) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptInstanceLabels) Get() (v InstanceLabels, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptInstanceLabels) Or(d InstanceLabels) InstanceLabels {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptInstant returns new OptInstant with value set to v.
 func NewOptInstant(v Instant) OptInstant {
 	return OptInstant{
@@ -6430,6 +6359,69 @@ func (o OptKey) Or(d Key) Key {
 	return d
 }
 
+// NewOptNilContainerDetails returns new OptNilContainerDetails with value set to v.
+func NewOptNilContainerDetails(v ContainerDetails) OptNilContainerDetails {
+	return OptNilContainerDetails{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilContainerDetails is optional nullable ContainerDetails.
+type OptNilContainerDetails struct {
+	Value ContainerDetails
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilContainerDetails was set.
+func (o OptNilContainerDetails) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilContainerDetails) Reset() {
+	var v ContainerDetails
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilContainerDetails) SetTo(v ContainerDetails) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilContainerDetails) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilContainerDetails) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v ContainerDetails
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilContainerDetails) Get() (v ContainerDetails, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilContainerDetails) Or(d ContainerDetails) ContainerDetails {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilDateTime returns new OptNilDateTime with value set to v.
 func NewOptNilDateTime(v time.Time) OptNilDateTime {
 	return OptNilDateTime{
@@ -6487,6 +6479,69 @@ func (o OptNilDateTime) Get() (v time.Time, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilDateTime) Or(d time.Time) time.Time {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilInstanceLabels returns new OptNilInstanceLabels with value set to v.
+func NewOptNilInstanceLabels(v InstanceLabels) OptNilInstanceLabels {
+	return OptNilInstanceLabels{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilInstanceLabels is optional nullable InstanceLabels.
+type OptNilInstanceLabels struct {
+	Value InstanceLabels
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilInstanceLabels was set.
+func (o OptNilInstanceLabels) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilInstanceLabels) Reset() {
+	var v InstanceLabels
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilInstanceLabels) SetTo(v InstanceLabels) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilInstanceLabels) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilInstanceLabels) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v InstanceLabels
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilInstanceLabels) Get() (v InstanceLabels, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilInstanceLabels) Or(d InstanceLabels) InstanceLabels {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -7834,6 +7889,109 @@ func (s *RescaleJobStatus) UnmarshalText(data []byte) error {
 	default:
 		return errors.Errorf("invalid value: %q", data)
 	}
+}
+
+// Ref: #/components/schemas/RescaleJobStatusEvent
+type RescaleJobStatusEvent struct {
+	Container          OptNilContainerDetails `json:"container"`
+	DateTime           OptInstant             `json:"dateTime"`
+	EventId            OptString              `json:"eventId"`
+	InstanceId         OptNilString           `json:"instanceId"`
+	InstanceLabels     OptNilInstanceLabels   `json:"instanceLabels"`
+	JobId              OptString              `json:"jobId"`
+	Status             OptRescaleJobStatus    `json:"status"`
+	StatusReason       OptNilString           `json:"statusReason"`
+	UserCancelledEvent OptBool                `json:"userCancelledEvent"`
+}
+
+// GetContainer returns the value of Container.
+func (s *RescaleJobStatusEvent) GetContainer() OptNilContainerDetails {
+	return s.Container
+}
+
+// GetDateTime returns the value of DateTime.
+func (s *RescaleJobStatusEvent) GetDateTime() OptInstant {
+	return s.DateTime
+}
+
+// GetEventId returns the value of EventId.
+func (s *RescaleJobStatusEvent) GetEventId() OptString {
+	return s.EventId
+}
+
+// GetInstanceId returns the value of InstanceId.
+func (s *RescaleJobStatusEvent) GetInstanceId() OptNilString {
+	return s.InstanceId
+}
+
+// GetInstanceLabels returns the value of InstanceLabels.
+func (s *RescaleJobStatusEvent) GetInstanceLabels() OptNilInstanceLabels {
+	return s.InstanceLabels
+}
+
+// GetJobId returns the value of JobId.
+func (s *RescaleJobStatusEvent) GetJobId() OptString {
+	return s.JobId
+}
+
+// GetStatus returns the value of Status.
+func (s *RescaleJobStatusEvent) GetStatus() OptRescaleJobStatus {
+	return s.Status
+}
+
+// GetStatusReason returns the value of StatusReason.
+func (s *RescaleJobStatusEvent) GetStatusReason() OptNilString {
+	return s.StatusReason
+}
+
+// GetUserCancelledEvent returns the value of UserCancelledEvent.
+func (s *RescaleJobStatusEvent) GetUserCancelledEvent() OptBool {
+	return s.UserCancelledEvent
+}
+
+// SetContainer sets the value of Container.
+func (s *RescaleJobStatusEvent) SetContainer(val OptNilContainerDetails) {
+	s.Container = val
+}
+
+// SetDateTime sets the value of DateTime.
+func (s *RescaleJobStatusEvent) SetDateTime(val OptInstant) {
+	s.DateTime = val
+}
+
+// SetEventId sets the value of EventId.
+func (s *RescaleJobStatusEvent) SetEventId(val OptString) {
+	s.EventId = val
+}
+
+// SetInstanceId sets the value of InstanceId.
+func (s *RescaleJobStatusEvent) SetInstanceId(val OptNilString) {
+	s.InstanceId = val
+}
+
+// SetInstanceLabels sets the value of InstanceLabels.
+func (s *RescaleJobStatusEvent) SetInstanceLabels(val OptNilInstanceLabels) {
+	s.InstanceLabels = val
+}
+
+// SetJobId sets the value of JobId.
+func (s *RescaleJobStatusEvent) SetJobId(val OptString) {
+	s.JobId = val
+}
+
+// SetStatus sets the value of Status.
+func (s *RescaleJobStatusEvent) SetStatus(val OptRescaleJobStatus) {
+	s.Status = val
+}
+
+// SetStatusReason sets the value of StatusReason.
+func (s *RescaleJobStatusEvent) SetStatusReason(val OptNilString) {
+	s.StatusReason = val
+}
+
+// SetUserCancelledEvent sets the value of UserCancelledEvent.
+func (s *RescaleJobStatusEvent) SetUserCancelledEvent(val OptBool) {
+	s.UserCancelledEvent = val
 }
 
 // Ref: #/components/schemas/RescaleRegion

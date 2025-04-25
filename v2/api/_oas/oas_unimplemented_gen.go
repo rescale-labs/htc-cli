@@ -85,6 +85,15 @@ func (UnimplementedHandler) GetDimensions(ctx context.Context, params GetDimensi
 	return r, ht.ErrNotImplemented
 }
 
+// GetEvents implements getEvents operation.
+//
+// This endpoint will get events for a job.
+//
+// GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events
+func (UnimplementedHandler) GetEvents(ctx context.Context, params GetEventsParams) (r GetEventsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetImage implements getImage operation.
 //
 // Retrieves the current status of an image across cloud providers. The status indicates whether the
@@ -423,15 +432,6 @@ func (UnimplementedHandler) HtcProjectsProjectIdTasksTaskIdGroupSummaryStatistic
 //
 // GET /htc/projects/{projectId}/tasks/{taskId}/groups
 func (UnimplementedHandler) HtcProjectsProjectIdTasksTaskIdGroupsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdGroupsGetParams) (r HtcProjectsProjectIdTasksTaskIdGroupsGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet implements GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events operation.
-//
-// This endpoint will get events for a job.
-//
-// GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events
-func (UnimplementedHandler) HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetParams) (r HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

@@ -240,6 +240,47 @@ func encodeGetDimensionsResponse(response GetDimensionsRes, w http.ResponseWrite
 	}
 }
 
+func encodeGetEventsResponse(response GetEventsRes, w http.ResponseWriter) error {
+	switch response := response.(type) {
+	case *HTCJobStatusEvents:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetEventsUnauthorized:
+		w.WriteHeader(401)
+
+		return nil
+
+	case *GetEventsForbidden:
+		w.WriteHeader(403)
+
+		return nil
+
+	case *HTCRequestError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeGetImageResponse(response GetImageRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCImageStatus:
@@ -1448,47 +1489,6 @@ func encodeHtcProjectsProjectIdTasksTaskIdGroupsGetResponse(response HtcProjects
 		return nil
 
 	case *HtcProjectsProjectIdTasksTaskIdGroupsGetForbidden:
-		w.WriteHeader(403)
-
-		return nil
-
-	case *OAuth2ErrorResponse:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(404)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeHtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetResponse(response HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes, w http.ResponseWriter) error {
-	switch response := response.(type) {
-	case *HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetOKApplicationJSON:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetUnauthorized:
-		w.WriteHeader(401)
-
-		return nil
-
-	case *HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetForbidden:
 		w.WriteHeader(403)
 
 		return nil

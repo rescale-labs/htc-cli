@@ -3034,6 +3034,97 @@ func (s *HTCJobLogs) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *HTCJobStatusEvents) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *HTCJobStatusEvents) encodeFields(e *jx.Encoder) {
+	{
+		if s.Items != nil {
+			e.FieldStart("items")
+			e.ArrStart()
+			for _, elem := range s.Items {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.Next.Set {
+			e.FieldStart("next")
+			s.Next.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfHTCJobStatusEvents = [2]string{
+	0: "items",
+	1: "next",
+}
+
+// Decode decodes HTCJobStatusEvents from json.
+func (s *HTCJobStatusEvents) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode HTCJobStatusEvents to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "items":
+			if err := func() error {
+				s.Items = make([]RescaleJobStatusEvent, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem RescaleJobStatusEvent
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Items = append(s.Items, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"items\"")
+			}
+		case "next":
+			if err := func() error {
+				s.Next.Reset()
+				if err := s.Next.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"next\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode HTCJobStatusEvents")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *HTCJobStatusEvents) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *HTCJobStatusEvents) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *HTCJobSubmitRequest) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -6980,48 +7071,6 @@ func (s *HtcProjectsProjectIdTasksTaskIdGroupsGetOKApplicationJSON) UnmarshalJSO
 	return s.Decode(d)
 }
 
-// Encode encodes HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetOKApplicationJSON as json.
-func (s HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetOKApplicationJSON) Encode(e *jx.Encoder) {
-	unwrapped := jx.Raw(s)
-
-	if len(unwrapped) != 0 {
-		e.Raw(unwrapped)
-	}
-}
-
-// Decode decodes HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetOKApplicationJSON from json.
-func (s *HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetOKApplicationJSON) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetOKApplicationJSON to nil")
-	}
-	var unwrapped jx.Raw
-	if err := func() error {
-		v, err := d.RawAppend(nil)
-		unwrapped = jx.Raw(v)
-		if err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetOKApplicationJSON(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetOKApplicationJSON) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetOKApplicationJSON) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes HtcStorageGetOKApplicationJSON as json.
 func (s HtcStorageGetOKApplicationJSON) Encode(e *jx.Encoder) {
 	unwrapped := []RegionStorageOption(s)
@@ -8440,39 +8489,6 @@ func (s *OptCloudProvider) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes ContainerDetails as json.
-func (o OptContainerDetails) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes ContainerDetails from json.
-func (o *OptContainerDetails) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptContainerDetails to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptContainerDetails) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptContainerDetails) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes time.Time as json.
 func (o OptDateTime) Encode(e *jx.Encoder, format func(*jx.Encoder, time.Time)) {
 	if !o.Set {
@@ -9204,39 +9220,6 @@ func (s *OptHtcProjectsProjectIdTasksTaskIdDeleteOKLifecycleStatus) UnmarshalJSO
 	return s.Decode(d)
 }
 
-// Encode encodes InstanceLabels as json.
-func (o OptInstanceLabels) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes InstanceLabels from json.
-func (o *OptInstanceLabels) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptInstanceLabels to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptInstanceLabels) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptInstanceLabels) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes Instant as json.
 func (o OptInstant) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -9440,6 +9423,55 @@ func (s *OptKey) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes ContainerDetails as json.
+func (o OptNilContainerDetails) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes ContainerDetails from json.
+func (o *OptNilContainerDetails) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilContainerDetails to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v ContainerDetails
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilContainerDetails) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilContainerDetails) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes time.Time as json.
 func (o OptNilDateTime) Encode(e *jx.Encoder, format func(*jx.Encoder, time.Time)) {
 	if !o.Set {
@@ -9489,6 +9521,55 @@ func (s OptNilDateTime) MarshalJSON() ([]byte, error) {
 func (s *OptNilDateTime) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d, json.DecodeDateTime)
+}
+
+// Encode encodes InstanceLabels as json.
+func (o OptNilInstanceLabels) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes InstanceLabels from json.
+func (o *OptNilInstanceLabels) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilInstanceLabels to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v InstanceLabels
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilInstanceLabels) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilInstanceLabels) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
 }
 
 // Encode encodes NullableInstant as json.
@@ -11105,6 +11186,205 @@ func (s RescaleJobStatus) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *RescaleJobStatus) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *RescaleJobStatusEvent) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *RescaleJobStatusEvent) encodeFields(e *jx.Encoder) {
+	{
+		if s.Container.Set {
+			e.FieldStart("container")
+			s.Container.Encode(e)
+		}
+	}
+	{
+		if s.DateTime.Set {
+			e.FieldStart("dateTime")
+			s.DateTime.Encode(e)
+		}
+	}
+	{
+		if s.EventId.Set {
+			e.FieldStart("eventId")
+			s.EventId.Encode(e)
+		}
+	}
+	{
+		if s.InstanceId.Set {
+			e.FieldStart("instanceId")
+			s.InstanceId.Encode(e)
+		}
+	}
+	{
+		if s.InstanceLabels.Set {
+			e.FieldStart("instanceLabels")
+			s.InstanceLabels.Encode(e)
+		}
+	}
+	{
+		if s.JobId.Set {
+			e.FieldStart("jobId")
+			s.JobId.Encode(e)
+		}
+	}
+	{
+		if s.Status.Set {
+			e.FieldStart("status")
+			s.Status.Encode(e)
+		}
+	}
+	{
+		if s.StatusReason.Set {
+			e.FieldStart("statusReason")
+			s.StatusReason.Encode(e)
+		}
+	}
+	{
+		if s.UserCancelledEvent.Set {
+			e.FieldStart("userCancelledEvent")
+			s.UserCancelledEvent.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfRescaleJobStatusEvent = [9]string{
+	0: "container",
+	1: "dateTime",
+	2: "eventId",
+	3: "instanceId",
+	4: "instanceLabels",
+	5: "jobId",
+	6: "status",
+	7: "statusReason",
+	8: "userCancelledEvent",
+}
+
+// Decode decodes RescaleJobStatusEvent from json.
+func (s *RescaleJobStatusEvent) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode RescaleJobStatusEvent to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "container":
+			if err := func() error {
+				s.Container.Reset()
+				if err := s.Container.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"container\"")
+			}
+		case "dateTime":
+			if err := func() error {
+				s.DateTime.Reset()
+				if err := s.DateTime.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"dateTime\"")
+			}
+		case "eventId":
+			if err := func() error {
+				s.EventId.Reset()
+				if err := s.EventId.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"eventId\"")
+			}
+		case "instanceId":
+			if err := func() error {
+				s.InstanceId.Reset()
+				if err := s.InstanceId.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"instanceId\"")
+			}
+		case "instanceLabels":
+			if err := func() error {
+				s.InstanceLabels.Reset()
+				if err := s.InstanceLabels.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"instanceLabels\"")
+			}
+		case "jobId":
+			if err := func() error {
+				s.JobId.Reset()
+				if err := s.JobId.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"jobId\"")
+			}
+		case "status":
+			if err := func() error {
+				s.Status.Reset()
+				if err := s.Status.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"status\"")
+			}
+		case "statusReason":
+			if err := func() error {
+				s.StatusReason.Reset()
+				if err := s.StatusReason.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"statusReason\"")
+			}
+		case "userCancelledEvent":
+			if err := func() error {
+				s.UserCancelledEvent.Reset()
+				if err := s.UserCancelledEvent.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"userCancelledEvent\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode RescaleJobStatusEvent")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *RescaleJobStatusEvent) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *RescaleJobStatusEvent) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

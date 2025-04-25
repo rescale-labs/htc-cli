@@ -47,6 +47,7 @@
             "type": "string"
          },
          "ContainerDetails": {
+            "nullable": true,
             "properties": {
                "exitCode": {
                   "example": 3,
@@ -560,6 +561,22 @@
                   "nullable": true
                }
             }
+         },
+         "HTCJobStatusEvents": {
+            "properties": {
+               "items": {
+                  "items": {
+                     "$ref": "#/components/schemas/RescaleJobStatusEvent"
+                  },
+                  "type": "array"
+               },
+               "next": {
+                  "example": "https://page2.com",
+                  "format": "uri",
+                  "type": "string"
+               }
+            },
+            "type": "object"
          },
          "HTCJobSubmitRequest": {
             "properties": {
@@ -1260,6 +1277,7 @@
             "type": "object"
          },
          "InstanceLabels": {
+            "nullable": true,
             "properties": {
                "accountId": {
                   "type": "string"
@@ -1662,6 +1680,7 @@
                   "type": "string"
                },
                "instanceId": {
+                  "nullable": true,
                   "type": "string"
                },
                "instanceLabels": {
@@ -1676,6 +1695,7 @@
                },
                "statusReason": {
                   "example": "Completed",
+                  "nullable": true,
                   "type": "string"
                },
                "userCancelledEvent": {
@@ -4503,6 +4523,7 @@
       "/htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events": {
          "get": {
             "description": "This endpoint will get events for a job",
+            "operationId": "getEvents",
             "parameters": [
                {
                   "in": "path",
@@ -4550,19 +4571,7 @@
                   "content": {
                      "application/json": {
                         "schema": {
-                           "properties": {
-                              "items": {
-                                 "items": {
-                                    "$ref": "#/components/schemas/RescaleJobStatusEvent"
-                                 },
-                                 "type": "array"
-                              },
-                              "next": {
-                                 "example": "https://page2.com",
-                                 "format": "uri",
-                                 "type": "string"
-                              }
-                           }
+                           "$ref": "#/components/schemas/HTCJobStatusEvents"
                         }
                      }
                   },
@@ -4578,11 +4587,10 @@
                   "content": {
                      "application/json": {
                         "schema": {
-                           "$ref": "#/components/schemas/OAuth2ErrorResponse"
+                           "$ref": "#/components/schemas/HTCRequestError"
                         }
                      }
-                  },
-                  "description": "Not Found"
+                  }
                }
             },
             "security": [
@@ -4593,7 +4601,8 @@
             "summary": "Get Job Events",
             "tags": [
                "Job Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Job"
          }
       },
       "/htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/logs": {
