@@ -54,3 +54,41 @@ func (s HTCJobs) WriteRows(rowFmt string, w io.Writer) error {
 	}
 	return nil
 }
+
+
+var htcJobStatusEventFields = []Field {
+	Field{"Time", "%19s", "%19s"},
+	Field{"Status", "%21s", "%21s"},
+}
+
+type HTCJobStatusEvent oapi.RescaleJobStatusEvent
+
+func (e *HTCJobStatusEvent) Fields() []Field {
+	return htcJobStatusEventFields
+}
+
+func (e *HTCJobStatusEvent) WriteRows(rowFmt string, w io.Writer) error {
+	_, err := fmt.Fprintf(
+		w, rowFmt,
+		// e.EventId.Value,
+		formatDateTime(e.DateTime),
+		e.Status.Value,
+	)
+	return err
+}
+
+
+type HTCJobStatusEvents []oapi.RescaleJobStatusEvent
+
+func (s HTCJobStatusEvents) Fields() []Field {
+	return htcJobStatusEventFields
+}
+
+func (s HTCJobStatusEvents) WriteRows(rowFmt string, w io.Writer) error {
+	for _, j := range s {
+		if err := (*HTCJobStatusEvent)(&j).WriteRows(rowFmt, w); err != nil {
+			return err
+		}
+	}
+	return nil
+}

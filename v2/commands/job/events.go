@@ -3,6 +3,7 @@ package job
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -10,6 +11,7 @@ import (
 	oapi "github.com/rescale-labs/htc-cli/v2/api/_oas"
 	"github.com/rescale-labs/htc-cli/v2/common"
 	"github.com/rescale-labs/htc-cli/v2/config"
+	"github.com/rescale-labs/htc-cli/v2/tabler"
 )
 
 func events(ctx context.Context, c oapi.JobInvoker, projectId, taskId, jobId, pageIndex string) (*oapi.HTCJobStatusEvents, error) {
@@ -53,25 +55,22 @@ func Events(cmd *cobra.Command, args[]string) error{
 
 	ctx := context.Background()
 
-	// var items []oapi.RescaleJobStatusEvent
 	pageIndex := ""
 	for {
-		res, err := events(ctx, runner.Client, p.ProjectId, p.TaskId, jobId, "")
+		res, err := events(ctx, runner.Client, p.ProjectId, p.TaskId, jobId, pageIndex)
 		if err != nil {
 			return err
 		}
-		// items = append(items, res.Items...)
-		fmt.Println(res.Items)
 		if len(res.Items) == 0 {
 			break
 		}
+		runner.PrintResult(tabler.HTCJobStatusEvents(res.Items), os.Stdout)
 
 		pageIndex = res.Next.Value.Query().Get("pageIndex")
 		if pageIndex == "" {
 			break
 		}
 	}
-	// return runner.PrintResult(items, os.Stdout)
 	return nil
 }
 
