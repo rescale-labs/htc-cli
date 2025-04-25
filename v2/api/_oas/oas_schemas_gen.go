@@ -11,9 +11,6 @@ import (
 	"github.com/go-faster/jx"
 )
 
-// Ref: #/components/schemas/AlgorithmParameterSpec
-type AlgorithmParameterSpec struct{}
-
 // Ref: #/components/schemas/Architecture
 type Architecture string
 
@@ -7550,10 +7547,9 @@ func (s *PresignedPutUrlResponseURL) SetSerializedHashCode(val OptInt32) {
 
 // Ref: #/components/schemas/PublicKey
 type PublicKey struct {
-	Algorithm OptString               `json:"algorithm"`
-	Encoded   OptString               `json:"encoded"`
-	Format    OptString               `json:"format"`
-	Params    *AlgorithmParameterSpec `json:"params"`
+	Algorithm OptString `json:"algorithm"`
+	Encoded   OptString `json:"encoded"`
+	Format    OptString `json:"format"`
 }
 
 // GetAlgorithm returns the value of Algorithm.
@@ -7571,11 +7567,6 @@ func (s *PublicKey) GetFormat() OptString {
 	return s.Format
 }
 
-// GetParams returns the value of Params.
-func (s *PublicKey) GetParams() *AlgorithmParameterSpec {
-	return s.Params
-}
-
 // SetAlgorithm sets the value of Algorithm.
 func (s *PublicKey) SetAlgorithm(val OptString) {
 	s.Algorithm = val
@@ -7589,11 +7580,6 @@ func (s *PublicKey) SetEncoded(val OptString) {
 // SetFormat sets the value of Format.
 func (s *PublicKey) SetFormat(val OptString) {
 	s.Format = val
-}
-
-// SetParams sets the value of Params.
-func (s *PublicKey) SetParams(val *AlgorithmParameterSpec) {
-	s.Params = val
 }
 
 // Ref: #/components/schemas/RegionStorageOption

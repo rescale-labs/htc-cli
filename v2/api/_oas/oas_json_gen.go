@@ -14,50 +14,6 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-// Encode implements json.Marshaler.
-func (s *AlgorithmParameterSpec) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *AlgorithmParameterSpec) encodeFields(e *jx.Encoder) {
-}
-
-var jsonFieldsNameOfAlgorithmParameterSpec = [0]string{}
-
-// Decode decodes AlgorithmParameterSpec from json.
-func (s *AlgorithmParameterSpec) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode AlgorithmParameterSpec to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		default:
-			return d.Skip()
-		}
-	}); err != nil {
-		return errors.Wrap(err, "decode AlgorithmParameterSpec")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *AlgorithmParameterSpec) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *AlgorithmParameterSpec) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes Architecture as json.
 func (s Architecture) Encode(e *jx.Encoder) {
 	e.Str(string(s))
@@ -10574,19 +10530,12 @@ func (s *PublicKey) encodeFields(e *jx.Encoder) {
 			s.Format.Encode(e)
 		}
 	}
-	{
-		if s.Params != nil {
-			e.FieldStart("params")
-			s.Params.Encode(e)
-		}
-	}
 }
 
-var jsonFieldsNameOfPublicKey = [4]string{
+var jsonFieldsNameOfPublicKey = [3]string{
 	0: "algorithm",
 	1: "encoded",
 	2: "format",
-	3: "params",
 }
 
 // Decode decodes PublicKey from json.
@@ -10626,18 +10575,6 @@ func (s *PublicKey) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"format\"")
-			}
-		case "params":
-			if err := func() error {
-				s.Params = nil
-				var elem AlgorithmParameterSpec
-				if err := elem.Decode(d); err != nil {
-					return err
-				}
-				s.Params = &elem
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"params\"")
 			}
 		default:
 			return d.Skip()

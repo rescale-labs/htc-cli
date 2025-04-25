@@ -1,9 +1,6 @@
 {
    "components": {
       "schemas": {
-         "AlgorithmParameterSpec": {
-            "type": "object"
-         },
          "Architecture": {
             "enum": [
                "AARCH64",
@@ -1571,9 +1568,6 @@
                },
                "format": {
                   "type": "string"
-               },
-               "params": {
-                  "$ref": "#/components/schemas/AlgorithmParameterSpec"
                }
             },
             "type": "object"
@@ -5527,7 +5521,7 @@
    },
    "servers": [
       {
-         "url": "http://localhost:8080/api/v1"
+         "url": "https://htc.rescale.com/api/v1"
       }
    ]
 }

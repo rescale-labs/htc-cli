@@ -6,7 +6,7 @@
     "version" : "Beta V1"
   },
   "servers" : [ {
-    "url" : "http://localhost:8080/api/v1"
+    "url" : "https://htc.rescale.com/api/v1"
   } ],
   "paths" : {
     "/.well-known/jwks.json" : {
@@ -3128,9 +3128,6 @@
   },
   "components" : {
     "schemas" : {
-      "AlgorithmParameterSpec" : {
-        "type" : "object"
-      },
       "Architecture" : {
         "enum" : [ "AARCH64", "X86", "A100" ],
         "type" : "string"
@@ -4426,9 +4423,6 @@
       "PublicKey" : {
         "type" : "object",
         "properties" : {
-          "params" : {
-            "$ref" : "#/components/schemas/AlgorithmParameterSpec"
-          },
           "algorithm" : {
             "type" : "string"
           },
