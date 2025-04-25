@@ -502,6 +502,12 @@ type TaskHandler interface {
 	//
 	// POST /htc/projects/{projectId}/tasks
 	CreateTask(ctx context.Context, req OptHTCTask, params CreateTaskParams) (CreateTaskRes, error)
+	// GetTaskStats implements GetTaskStats operation.
+	//
+	// This endpoint will get task summary statistics.
+	//
+	// GET /htc/projects/{projectId}/tasks/{taskId}/summary-statistics
+	GetTaskStats(ctx context.Context, params GetTaskStatsParams) (GetTaskStatsRes, error)
 	// GetTasks implements getTasks operation.
 	//
 	// This endpoint will get all tasks in a project.

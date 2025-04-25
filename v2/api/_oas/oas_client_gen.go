@@ -511,6 +511,12 @@ type TaskInvoker interface {
 	//
 	// POST /htc/projects/{projectId}/tasks
 	CreateTask(ctx context.Context, request OptHTCTask, params CreateTaskParams) (CreateTaskRes, error)
+	// GetTaskStats invokes GetTaskStats operation.
+	//
+	// This endpoint will get task summary statistics.
+	//
+	// GET /htc/projects/{projectId}/tasks/{taskId}/summary-statistics
+	GetTaskStats(ctx context.Context, params GetTaskStatsParams) (GetTaskStatsRes, error)
 	// GetTasks invokes getTasks operation.
 	//
 	// This endpoint will get all tasks in a project.
@@ -2504,6 +2510,113 @@ func (c *Client) sendGetRegistryToken(ctx context.Context, params GetRegistryTok
 	defer resp.Body.Close()
 
 	result, err := decodeGetRegistryTokenResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetTaskStats invokes GetTaskStats operation.
+//
+// This endpoint will get task summary statistics.
+//
+// GET /htc/projects/{projectId}/tasks/{taskId}/summary-statistics
+func (c *Client) GetTaskStats(ctx context.Context, params GetTaskStatsParams) (GetTaskStatsRes, error) {
+	res, err := c.sendGetTaskStats(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetTaskStats(ctx context.Context, params GetTaskStatsParams) (res GetTaskStatsRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [5]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/tasks/"
+	{
+		// Encode "taskId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "taskId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.TaskId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[3] = encoded
+	}
+	pathParts[4] = "/summary-statistics"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetTaskStats", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetTaskStatsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

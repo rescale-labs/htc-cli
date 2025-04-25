@@ -659,6 +659,16 @@ type GetRegistryTokenUnauthorized struct{}
 
 func (*GetRegistryTokenUnauthorized) getRegistryTokenRes() {}
 
+// GetTaskStatsForbidden is response for GetTaskStats operation.
+type GetTaskStatsForbidden struct{}
+
+func (*GetTaskStatsForbidden) getTaskStatsRes() {}
+
+// GetTaskStatsUnauthorized is response for GetTaskStats operation.
+type GetTaskStatsUnauthorized struct{}
+
+func (*GetTaskStatsUnauthorized) getTaskStatsRes() {}
+
 // GetTasksForbidden is response for GetTasks operation.
 type GetTasksForbidden struct{}
 
@@ -4400,6 +4410,114 @@ func (s *JobExecutionEnvironment) SetInstanceType(val OptString) {
 	s.InstanceType = val
 }
 
+// Ref: #/components/schemas/JobStatusSummary
+type JobStatusSummary struct {
+	Group       OptString                      `json:"group"`
+	JobStatuses OptJobStatusSummaryJobStatuses `json:"jobStatuses"`
+}
+
+// GetGroup returns the value of Group.
+func (s *JobStatusSummary) GetGroup() OptString {
+	return s.Group
+}
+
+// GetJobStatuses returns the value of JobStatuses.
+func (s *JobStatusSummary) GetJobStatuses() OptJobStatusSummaryJobStatuses {
+	return s.JobStatuses
+}
+
+// SetGroup sets the value of Group.
+func (s *JobStatusSummary) SetGroup(val OptString) {
+	s.Group = val
+}
+
+// SetJobStatuses sets the value of JobStatuses.
+func (s *JobStatusSummary) SetJobStatuses(val OptJobStatusSummaryJobStatuses) {
+	s.JobStatuses = val
+}
+
+func (*JobStatusSummary) getTaskStatsRes() {}
+
+type JobStatusSummaryJobStatuses struct {
+	FAILED              OptInt `json:"FAILED"`
+	RUNNABLE            OptInt `json:"RUNNABLE"`
+	RUNNING             OptInt `json:"RUNNING"`
+	STARTING            OptInt `json:"STARTING"`
+	SUBMITTEDTOPROVIDER OptInt `json:"SUBMITTED_TO_PROVIDER"`
+	SUBMITTEDTORESCALE  OptInt `json:"SUBMITTED_TO_RESCALE"`
+	SUCCEEDED           OptInt `json:"SUCCEEDED"`
+}
+
+// GetFAILED returns the value of FAILED.
+func (s *JobStatusSummaryJobStatuses) GetFAILED() OptInt {
+	return s.FAILED
+}
+
+// GetRUNNABLE returns the value of RUNNABLE.
+func (s *JobStatusSummaryJobStatuses) GetRUNNABLE() OptInt {
+	return s.RUNNABLE
+}
+
+// GetRUNNING returns the value of RUNNING.
+func (s *JobStatusSummaryJobStatuses) GetRUNNING() OptInt {
+	return s.RUNNING
+}
+
+// GetSTARTING returns the value of STARTING.
+func (s *JobStatusSummaryJobStatuses) GetSTARTING() OptInt {
+	return s.STARTING
+}
+
+// GetSUBMITTEDTOPROVIDER returns the value of SUBMITTEDTOPROVIDER.
+func (s *JobStatusSummaryJobStatuses) GetSUBMITTEDTOPROVIDER() OptInt {
+	return s.SUBMITTEDTOPROVIDER
+}
+
+// GetSUBMITTEDTORESCALE returns the value of SUBMITTEDTORESCALE.
+func (s *JobStatusSummaryJobStatuses) GetSUBMITTEDTORESCALE() OptInt {
+	return s.SUBMITTEDTORESCALE
+}
+
+// GetSUCCEEDED returns the value of SUCCEEDED.
+func (s *JobStatusSummaryJobStatuses) GetSUCCEEDED() OptInt {
+	return s.SUCCEEDED
+}
+
+// SetFAILED sets the value of FAILED.
+func (s *JobStatusSummaryJobStatuses) SetFAILED(val OptInt) {
+	s.FAILED = val
+}
+
+// SetRUNNABLE sets the value of RUNNABLE.
+func (s *JobStatusSummaryJobStatuses) SetRUNNABLE(val OptInt) {
+	s.RUNNABLE = val
+}
+
+// SetRUNNING sets the value of RUNNING.
+func (s *JobStatusSummaryJobStatuses) SetRUNNING(val OptInt) {
+	s.RUNNING = val
+}
+
+// SetSTARTING sets the value of STARTING.
+func (s *JobStatusSummaryJobStatuses) SetSTARTING(val OptInt) {
+	s.STARTING = val
+}
+
+// SetSUBMITTEDTOPROVIDER sets the value of SUBMITTEDTOPROVIDER.
+func (s *JobStatusSummaryJobStatuses) SetSUBMITTEDTOPROVIDER(val OptInt) {
+	s.SUBMITTEDTOPROVIDER = val
+}
+
+// SetSUBMITTEDTORESCALE sets the value of SUBMITTEDTORESCALE.
+func (s *JobStatusSummaryJobStatuses) SetSUBMITTEDTORESCALE(val OptInt) {
+	s.SUBMITTEDTORESCALE = val
+}
+
+// SetSUCCEEDED sets the value of SUCCEEDED.
+func (s *JobStatusSummaryJobStatuses) SetSUCCEEDED(val OptInt) {
+	s.SUCCEEDED = val
+}
+
 // Ref: #/components/schemas/JsonWebKey
 type JsonWebKey struct {
 	Algorithm       OptString                    `json:"algorithm"`
@@ -4717,6 +4835,7 @@ func (*OAuth2ErrorResponse) getImagesRes()                                      
 func (*OAuth2ErrorResponse) getLimitsRes()                                                {}
 func (*OAuth2ErrorResponse) getProjectRes()                                               {}
 func (*OAuth2ErrorResponse) getRegistryTokenRes()                                         {}
+func (*OAuth2ErrorResponse) getTaskStatsRes()                                             {}
 func (*OAuth2ErrorResponse) getTasksRes()                                                 {}
 func (*OAuth2ErrorResponse) getTokenRes()                                                 {}
 func (*OAuth2ErrorResponse) htcGcpClustersWorkspaceIdGetRes()                             {}
@@ -6129,6 +6248,52 @@ func (o OptInstant) Or(d Instant) Instant {
 	return d
 }
 
+// NewOptInt returns new OptInt with value set to v.
+func NewOptInt(v int) OptInt {
+	return OptInt{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptInt is optional int.
+type OptInt struct {
+	Value int
+	Set   bool
+}
+
+// IsSet returns true if OptInt was set.
+func (o OptInt) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptInt) Reset() {
+	var v int
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptInt) SetTo(v int) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptInt) Get() (v int, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptInt32 returns new OptInt32 with value set to v.
 func NewOptInt32(v int32) OptInt32 {
 	return OptInt32{
@@ -6261,6 +6426,52 @@ func (o OptJobExecutionEnvironment) Get() (v JobExecutionEnvironment, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptJobExecutionEnvironment) Or(d JobExecutionEnvironment) JobExecutionEnvironment {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptJobStatusSummaryJobStatuses returns new OptJobStatusSummaryJobStatuses with value set to v.
+func NewOptJobStatusSummaryJobStatuses(v JobStatusSummaryJobStatuses) OptJobStatusSummaryJobStatuses {
+	return OptJobStatusSummaryJobStatuses{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptJobStatusSummaryJobStatuses is optional JobStatusSummaryJobStatuses.
+type OptJobStatusSummaryJobStatuses struct {
+	Value JobStatusSummaryJobStatuses
+	Set   bool
+}
+
+// IsSet returns true if OptJobStatusSummaryJobStatuses was set.
+func (o OptJobStatusSummaryJobStatuses) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptJobStatusSummaryJobStatuses) Reset() {
+	var v JobStatusSummaryJobStatuses
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptJobStatusSummaryJobStatuses) SetTo(v JobStatusSummaryJobStatuses) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptJobStatusSummaryJobStatuses) Get() (v JobStatusSummaryJobStatuses, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptJobStatusSummaryJobStatuses) Or(d JobStatusSummaryJobStatuses) JobStatusSummaryJobStatuses {
 	if v, ok := o.Get(); ok {
 		return v
 	}

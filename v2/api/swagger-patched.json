@@ -1336,17 +1336,6 @@
                   "type": "string"
                },
                "jobStatuses": {
-                  "enum": [
-                     "SUBMITTED_TO_RESCALE",
-                     "SUBMITTED_TO_PROVIDER",
-                     "RUNNABLE",
-                     "STARTING",
-                     "RUNNING",
-                     "SUCCEEDED",
-                     "FAILED",
-                     "POD_SUCCEEDED",
-                     "POD_FAILED"
-                  ],
                   "properties": {
                      "FAILED": {
                         "example": 5,
@@ -5024,6 +5013,7 @@
       "/htc/projects/{projectId}/tasks/{taskId}/summary-statistics": {
          "get": {
             "description": "This endpoint will get task summary statistics",
+            "operationId": "GetTaskStats",
             "parameters": [
                {
                   "in": "path",
@@ -5078,7 +5068,8 @@
             "summary": "Get Task Summary Statistics",
             "tags": [
                "Task Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Task"
          }
       },
       "/htc/regions": {

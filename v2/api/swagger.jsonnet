@@ -165,6 +165,12 @@ local patches = {
         operationId: 'createTask',
       },
     },
+  '/htc/projects/{projectId}/tasks/{taskId}/summary-statistics'+: {
+    get+: {
+      'x-ogen-operation-group': 'Task',
+      operationId: 'GetTaskStats',
+    }
+  },
     '/htc/projects/{projectId}/tasks/{taskId}/jobs'+: {
       get+: {
         'x-ogen-operation-group': 'Job',
@@ -283,6 +289,45 @@ local patches = {
     schemas+: {
       ContainerDetails+: {
         nullable: true,
+      },
+      // Need to remove the enum to avoid `non-primitive enum not implemented`
+      // In this schema the status enum string is used as a key
+      JobStatusSummary+: {
+        properties+: {
+          jobStatuses: {
+            type: 'object',
+            properties: {
+              FAILED: {
+                example: 5,
+                type: 'integer'
+              },
+              RUNNABLE: {
+                example: 5,
+                type: 'integer'
+              },
+              RUNNING: {
+                example: 5,
+                type: 'integer'
+              },
+              STARTING: {
+                example: 5,
+                type: 'integer'
+              },
+              SUBMITTED_TO_PROVIDER: {
+                example: 5,
+                type: 'integer'
+              },
+              SUBMITTED_TO_RESCALE: {
+                example: 5,
+                type: 'integer'
+              },
+              SUCCEEDED: {
+                example: 5,
+                type: 'integer'
+              }
+            }
+          }
+        }
       },
       HTCJob+: {
         properties+: {
