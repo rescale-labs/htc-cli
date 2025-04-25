@@ -12,4 +12,5 @@ var TaskCmd = &cobra.Command{
 func init() {
 	TaskCmd.AddCommand(CreateCmd)
 	TaskCmd.AddCommand(GetCmd)
+	TaskCmd.AddCommand(StatsCmd)
 }

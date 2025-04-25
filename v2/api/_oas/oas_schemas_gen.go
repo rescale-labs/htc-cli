@@ -4412,12 +4412,12 @@ func (s *JobExecutionEnvironment) SetInstanceType(val OptString) {
 
 // Ref: #/components/schemas/JobStatusSummary
 type JobStatusSummary struct {
-	Group       OptString                      `json:"group"`
+	Group       OptNilString                   `json:"group"`
 	JobStatuses OptJobStatusSummaryJobStatuses `json:"jobStatuses"`
 }
 
 // GetGroup returns the value of Group.
-func (s *JobStatusSummary) GetGroup() OptString {
+func (s *JobStatusSummary) GetGroup() OptNilString {
 	return s.Group
 }
 
@@ -4427,7 +4427,7 @@ func (s *JobStatusSummary) GetJobStatuses() OptJobStatusSummaryJobStatuses {
 }
 
 // SetGroup sets the value of Group.
-func (s *JobStatusSummary) SetGroup(val OptString) {
+func (s *JobStatusSummary) SetGroup(val OptNilString) {
 	s.Group = val
 }
 

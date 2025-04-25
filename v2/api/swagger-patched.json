@@ -1333,6 +1333,7 @@
             "properties": {
                "group": {
                   "example": "my-job-group",
+                  "nullable": true,
                   "type": "string"
                },
                "jobStatuses": {

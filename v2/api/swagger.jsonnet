@@ -294,6 +294,9 @@ local patches = {
       // In this schema the status enum string is used as a key
       JobStatusSummary+: {
         properties+: {
+          group+:{
+            nullable: true,
+          },
           jobStatuses: {
             type: 'object',
             properties: {
