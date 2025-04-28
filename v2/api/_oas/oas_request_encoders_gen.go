@@ -171,7 +171,7 @@ func encodeHtcProjectsProjectIdTasksTaskIdPatchRequest(
 	return nil
 }
 
-func encodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyPutRequest(
+func encodePutTaskRetentionPolicyRequest(
 	req OptWorkspaceTaskRetentionPolicy,
 	r *http.Request,
 ) error {

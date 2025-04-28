@@ -2897,7 +2897,7 @@
          },
          "get": {
             "description": "This endpoint will list all resource limitations associated with this project.\n\nA job running in this project will be subject to all resulting limits as well as any associated with the workspace (see `/htc/workspaces/{workspaceId}/limits`)",
-            "operationId": "getLimits",
+            "operationId": "getProjectLimits",
             "parameters": [
                {
                   "in": "path",
@@ -5303,6 +5303,7 @@
       "/htc/workspaces/{workspaceId}/limits": {
          "get": {
             "description": "This endpoint will get the resource limit applied to this workspace",
+            "operationId": "getWorkspaceLimits",
             "parameters": [
                {
                   "in": "path",
@@ -5349,12 +5350,14 @@
             "summary": "Get Workspace Limit",
             "tags": [
                "Workspace Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Workspace"
          }
       },
       "/htc/workspaces/{workspaceId}/task-retention-policy": {
          "get": {
             "description": "This endpoint is used to retrieve the current task retention policy of a specific Workspace. The task retention policy is necessary in managing the lifecycle of tasks within a Workspace. The task retention policy includes two key aspects:\n\n* **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after which an archived task is automatically deleted. Archived tasks can be unarchived during this period, protecting users from prematurely deleting task resources.\n\n* **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours) of inactivity after which an active task is automatically archived. This feature helps in keeping the project organized by archiving active tasks, ensuring that storage resources are freed optimistically.\n\nSetting either value to `0` will result in disabling of that feature. For example, a project's task retention policy with `deleteAfter` set to `0` will result in tasks within that project never auto-deleting.",
+            "operationId": "getTaskRetentionPolicy",
             "parameters": [
                {
                   "in": "path",
@@ -5401,10 +5404,12 @@
             "summary": "Get Workspace Task Retention Policy",
             "tags": [
                "Workspace Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Workspace"
          },
          "put": {
             "description": "This endpoint enables Workspace administrators to define or update the task retention policy for a specific workspace. The task retention policy includes two key aspects:\n\n* **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in hours) after which an archived task is automatically deleted. This control allows for flexibility in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before being permanently deleted. Archived tasks can be unarchived during this period, protecting users from prematurely deleting task resources\n\n* **Auto-Archive After Inactivity**: The `archiveAfter` field allows administrators to specify the duration (in hours) of inactivity after which an active task is automatically archived. This feature helps in keeping the project organized by archiving active tasks, ensuring that storage resources are freed optimistically.\n\nSetting either value to `0` will result in disabling of that feature. For example, a workspace's task retention policy with `deleteAfter` set to `0` will result in tasks within that project never auto-deleting. The policy applies to all projects within the workspace that do not have their own project-level policy defined. If a project within the workspace has its own retention policy defined, the project-level policy takes precedence over the workspace-level policy.",
+            "operationId": "putTaskRetentionPolicy",
             "parameters": [
                {
                   "in": "path",
@@ -5450,6 +5455,9 @@
                      }
                   },
                   "description": "Not Found"
+               },
+               "405": {
+                  "description": "Not Allowed"
                }
             },
             "security": [
@@ -5460,7 +5468,8 @@
             "summary": "Modify Workspace Task Retention Policy",
             "tags": [
                "Workspace Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Workspace"
          }
       },
       "/oauth2/token": {

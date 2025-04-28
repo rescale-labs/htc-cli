@@ -143,17 +143,6 @@ func (UnimplementedHandler) GetJobs(ctx context.Context, params GetJobsParams) (
 	return r, ht.ErrNotImplemented
 }
 
-// GetLimits implements getLimits operation.
-//
-// This endpoint will list all resource limitations associated with this project.
-// A job running in this project will be subject to all resulting limits as well as any associated
-// with the workspace (see `/htc/workspaces/{workspaceId}/limits`).
-//
-// GET /htc/projects/{projectId}/limits
-func (UnimplementedHandler) GetLimits(ctx context.Context, params GetLimitsParams) (r GetLimitsRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // GetLogs implements getLogs operation.
 //
 // This endpoint will get job logs.
@@ -181,6 +170,17 @@ func (UnimplementedHandler) GetProject(ctx context.Context, params GetProjectPar
 	return r, ht.ErrNotImplemented
 }
 
+// GetProjectLimits implements getProjectLimits operation.
+//
+// This endpoint will list all resource limitations associated with this project.
+// A job running in this project will be subject to all resulting limits as well as any associated
+// with the workspace (see `/htc/workspaces/{workspaceId}/limits`).
+//
+// GET /htc/projects/{projectId}/limits
+func (UnimplementedHandler) GetProjectLimits(ctx context.Context, params GetProjectLimitsParams) (r GetProjectLimitsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetProjects implements getProjects operation.
 //
 // This endpoint will get all projects.
@@ -199,6 +199,27 @@ func (UnimplementedHandler) GetProjects(ctx context.Context, params GetProjectsP
 //
 // GET /htc/projects/{projectId}/container-registry/token
 func (UnimplementedHandler) GetRegistryToken(ctx context.Context, params GetRegistryTokenParams) (r GetRegistryTokenRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetTaskRetentionPolicy implements getTaskRetentionPolicy operation.
+//
+// This endpoint is used to retrieve the current task retention policy of a specific Workspace. The
+// task retention policy is necessary in managing the lifecycle of tasks within a Workspace. The task
+// retention policy includes two key aspects:
+// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
+// which an archived task is automatically deleted. Archived tasks can be unarchived during this
+// period, protecting users from prematurely deleting task resources.
+// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
+// of inactivity after which an active task is automatically archived. This feature helps in keeping
+// the project organized by archiving active tasks, ensuring that storage resources are freed
+// optimistically.
+// Setting either value to `0` will result in disabling of that feature. For example, a project's
+// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
+// auto-deleting.
+//
+// GET /htc/workspaces/{workspaceId}/task-retention-policy
+func (UnimplementedHandler) GetTaskRetentionPolicy(ctx context.Context, params GetTaskRetentionPolicyParams) (r GetTaskRetentionPolicyRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -226,6 +247,15 @@ func (UnimplementedHandler) GetTasks(ctx context.Context, params GetTasksParams)
 //
 // GET /auth/token
 func (UnimplementedHandler) GetToken(ctx context.Context, params GetTokenParams) (r GetTokenRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetWorkspaceLimits implements getWorkspaceLimits operation.
+//
+// This endpoint will get the resource limit applied to this workspace.
+//
+// GET /htc/workspaces/{workspaceId}/limits
+func (UnimplementedHandler) GetWorkspaceLimits(ctx context.Context, params GetWorkspaceLimitsParams) (r GetWorkspaceLimitsRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -565,37 +595,16 @@ func (UnimplementedHandler) HtcWorkspacesWorkspaceIdDimensionsGet(ctx context.Co
 	return r, ht.ErrNotImplemented
 }
 
-// HtcWorkspacesWorkspaceIdLimitsGet implements GET /htc/workspaces/{workspaceId}/limits operation.
+// OAuth2TokenPost implements POST /oauth2/token operation.
 //
-// This endpoint will get the resource limit applied to this workspace.
+// This endpoint will get an OAuth access token.
 //
-// GET /htc/workspaces/{workspaceId}/limits
-func (UnimplementedHandler) HtcWorkspacesWorkspaceIdLimitsGet(ctx context.Context, params HtcWorkspacesWorkspaceIdLimitsGetParams) (r HtcWorkspacesWorkspaceIdLimitsGetRes, _ error) {
+// POST /oauth2/token
+func (UnimplementedHandler) OAuth2TokenPost(ctx context.Context) (r OAuth2TokenPostRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// HtcWorkspacesWorkspaceIdTaskRetentionPolicyGet implements GET /htc/workspaces/{workspaceId}/task-retention-policy operation.
-//
-// This endpoint is used to retrieve the current task retention policy of a specific Workspace. The
-// task retention policy is necessary in managing the lifecycle of tasks within a Workspace. The task
-// retention policy includes two key aspects:
-// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
-// which an archived task is automatically deleted. Archived tasks can be unarchived during this
-// period, protecting users from prematurely deleting task resources.
-// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
-// of inactivity after which an active task is automatically archived. This feature helps in keeping
-// the project organized by archiving active tasks, ensuring that storage resources are freed
-// optimistically.
-// Setting either value to `0` will result in disabling of that feature. For example, a project's
-// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
-// auto-deleting.
-//
-// GET /htc/workspaces/{workspaceId}/task-retention-policy
-func (UnimplementedHandler) HtcWorkspacesWorkspaceIdTaskRetentionPolicyGet(ctx context.Context, params HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetParams) (r HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcWorkspacesWorkspaceIdTaskRetentionPolicyPut implements PUT /htc/workspaces/{workspaceId}/task-retention-policy operation.
+// PutTaskRetentionPolicy implements putTaskRetentionPolicy operation.
 //
 // This endpoint enables Workspace administrators to define or update the task retention policy for a
 // specific workspace. The task retention policy includes two key aspects:
@@ -615,16 +624,7 @@ func (UnimplementedHandler) HtcWorkspacesWorkspaceIdTaskRetentionPolicyGet(ctx c
 // defined, the project-level policy takes precedence over the workspace-level policy.
 //
 // PUT /htc/workspaces/{workspaceId}/task-retention-policy
-func (UnimplementedHandler) HtcWorkspacesWorkspaceIdTaskRetentionPolicyPut(ctx context.Context, req OptWorkspaceTaskRetentionPolicy, params HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutParams) (r HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// OAuth2TokenPost implements POST /oauth2/token operation.
-//
-// This endpoint will get an OAuth access token.
-//
-// POST /oauth2/token
-func (UnimplementedHandler) OAuth2TokenPost(ctx context.Context) (r OAuth2TokenPostRes, _ error) {
+func (UnimplementedHandler) PutTaskRetentionPolicy(ctx context.Context, req OptWorkspaceTaskRetentionPolicy, params PutTaskRetentionPolicyParams) (r PutTaskRetentionPolicyRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
