@@ -263,19 +263,6 @@ type Invoker interface {
 	//
 	// GET /htc/storage/region/{region}
 	HtcStorageRegionRegionGet(ctx context.Context, params HtcStorageRegionRegionGetParams) (HtcStorageRegionRegionGetRes, error)
-	// HtcWorkspacesWorkspaceIdDimensionsGet invokes GET /htc/workspaces/{workspaceId}/dimensions operation.
-	//
-	// This endpoint provides a comprehensive view of the various hardware configurations and
-	// environments available within a specific workspace. This read-only API is primarily designed for
-	// users who need to understand the different "dimensions" or attributes that describe the hardware
-	// and other aspects of job runs within their workspace. By offering insights into available
-	// environments, it aids users in selecting the most suitable configuration for their jobs,
-	// especially when performance testing across different hardware setups.
-	// Normal users can access this endpoint for the workspace they belong to
-	// Rescale personnel are required in order to modify any of these dimensions.
-	//
-	// GET /htc/workspaces/{workspaceId}/dimensions
-	HtcWorkspacesWorkspaceIdDimensionsGet(ctx context.Context, params HtcWorkspacesWorkspaceIdDimensionsGetParams) (HtcWorkspacesWorkspaceIdDimensionsGetRes, error)
 	// OAuth2TokenPost invokes POST /oauth2/token operation.
 	//
 	// This endpoint will get an OAuth access token.
@@ -414,7 +401,13 @@ type ProjectInvoker interface {
 	//
 	// POST /htc/projects
 	CreateProject(ctx context.Context, request OptHTCProject) (CreateProjectRes, error)
-	// GetDimensions invokes getDimensions operation.
+	// GetProject invokes getProject operation.
+	//
+	// This endpoint will get a project by id.
+	//
+	// GET /htc/projects/{projectId}
+	GetProject(ctx context.Context, params GetProjectParams) (GetProjectRes, error)
+	// GetProjectDimensions invokes getProjectDimensions operation.
 	//
 	// This endpoint is designed to retrieve the current set of dimension combinations configured for a
 	// specific project so that users can understand the existing computing environment constraints of a
@@ -427,13 +420,7 @@ type ProjectInvoker interface {
 	// currently configured `machineType`.
 	//
 	// GET /htc/projects/{projectId}/dimensions
-	GetDimensions(ctx context.Context, params GetDimensionsParams) (GetDimensionsRes, error)
-	// GetProject invokes getProject operation.
-	//
-	// This endpoint will get a project by id.
-	//
-	// GET /htc/projects/{projectId}
-	GetProject(ctx context.Context, params GetProjectParams) (GetProjectRes, error)
+	GetProjectDimensions(ctx context.Context, params GetProjectDimensionsParams) (GetProjectDimensionsRes, error)
 	// GetProjectLimits invokes getProjectLimits operation.
 	//
 	// This endpoint will list all resource limitations associated with this project.
@@ -503,6 +490,19 @@ type WorkspaceInvoker interface {
 	//
 	// GET /htc/workspaces/{workspaceId}/task-retention-policy
 	GetTaskRetentionPolicy(ctx context.Context, params GetTaskRetentionPolicyParams) (GetTaskRetentionPolicyRes, error)
+	// GetWorkspaceDimensions invokes getWorkspaceDimensions operation.
+	//
+	// This endpoint provides a comprehensive view of the various hardware configurations and
+	// environments available within a specific workspace. This read-only API is primarily designed for
+	// users who need to understand the different "dimensions" or attributes that describe the hardware
+	// and other aspects of job runs within their workspace. By offering insights into available
+	// environments, it aids users in selecting the most suitable configuration for their jobs,
+	// especially when performance testing across different hardware setups.
+	// Normal users can access this endpoint for the workspace they belong to
+	// Rescale personnel are required in order to modify any of these dimensions.
+	//
+	// GET /htc/workspaces/{workspaceId}/dimensions
+	GetWorkspaceDimensions(ctx context.Context, params GetWorkspaceDimensionsParams) (GetWorkspaceDimensionsRes, error)
 	// GetWorkspaceLimits invokes getWorkspaceLimits operation.
 	//
 	// This endpoint will get the resource limit applied to this workspace.
@@ -1048,104 +1048,6 @@ func (c *Client) sendCreateTask(ctx context.Context, request OptHTCTask, params 
 	defer resp.Body.Close()
 
 	result, err := decodeCreateTaskResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// GetDimensions invokes getDimensions operation.
-//
-// This endpoint is designed to retrieve the current set of dimension combinations configured for a
-// specific project so that users can understand the existing computing environment constraints of a
-// project. It returns a list of dimension combinations such as pricing priority, geographical region,
-//
-//	compute scaling policy, and hyperthreading options.
-//
-// Any user who _belongs to the workspace this project belongs to_ can use this endpoint to verify or
-// audit the current configuration of a project. This can be helpful in ensuring that the project's
-// settings align with expectations.
-// The payload also includes a read-only set of `derived` dimensions which help describe the
-// currently configured `machineType`.
-//
-// GET /htc/projects/{projectId}/dimensions
-func (c *Client) GetDimensions(ctx context.Context, params GetDimensionsParams) (GetDimensionsRes, error) {
-	res, err := c.sendGetDimensions(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendGetDimensions(ctx context.Context, params GetDimensionsParams) (res GetDimensionsRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/dimensions"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "GetDimensions", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeGetDimensionsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -2308,6 +2210,104 @@ func (c *Client) sendGetProject(ctx context.Context, params GetProjectParams) (r
 	return result, nil
 }
 
+// GetProjectDimensions invokes getProjectDimensions operation.
+//
+// This endpoint is designed to retrieve the current set of dimension combinations configured for a
+// specific project so that users can understand the existing computing environment constraints of a
+// project. It returns a list of dimension combinations such as pricing priority, geographical region,
+//
+//	compute scaling policy, and hyperthreading options.
+//
+// Any user who _belongs to the workspace this project belongs to_ can use this endpoint to verify or
+// audit the current configuration of a project. This can be helpful in ensuring that the project's
+// settings align with expectations.
+// The payload also includes a read-only set of `derived` dimensions which help describe the
+// currently configured `machineType`.
+//
+// GET /htc/projects/{projectId}/dimensions
+func (c *Client) GetProjectDimensions(ctx context.Context, params GetProjectDimensionsParams) (GetProjectDimensionsRes, error) {
+	res, err := c.sendGetProjectDimensions(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetProjectDimensions(ctx context.Context, params GetProjectDimensionsParams) (res GetProjectDimensionsRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/dimensions"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetProjectDimensions", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetProjectDimensionsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // GetProjectLimits invokes getProjectLimits operation.
 //
 // This endpoint will list all resource limitations associated with this project.
@@ -3022,6 +3022,101 @@ func (c *Client) sendGetToken(ctx context.Context, params GetTokenParams) (res G
 	defer resp.Body.Close()
 
 	result, err := decodeGetTokenResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetWorkspaceDimensions invokes getWorkspaceDimensions operation.
+//
+// This endpoint provides a comprehensive view of the various hardware configurations and
+// environments available within a specific workspace. This read-only API is primarily designed for
+// users who need to understand the different "dimensions" or attributes that describe the hardware
+// and other aspects of job runs within their workspace. By offering insights into available
+// environments, it aids users in selecting the most suitable configuration for their jobs,
+// especially when performance testing across different hardware setups.
+// Normal users can access this endpoint for the workspace they belong to
+// Rescale personnel are required in order to modify any of these dimensions.
+//
+// GET /htc/workspaces/{workspaceId}/dimensions
+func (c *Client) GetWorkspaceDimensions(ctx context.Context, params GetWorkspaceDimensionsParams) (GetWorkspaceDimensionsRes, error) {
+	res, err := c.sendGetWorkspaceDimensions(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetWorkspaceDimensions(ctx context.Context, params GetWorkspaceDimensionsParams) (res GetWorkspaceDimensionsRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/htc/workspaces/"
+	{
+		// Encode "workspaceId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "workspaceId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.WorkspaceId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/dimensions"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetWorkspaceDimensions", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetWorkspaceDimensionsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -6067,101 +6162,6 @@ func (c *Client) sendHtcStorageRegionRegionGet(ctx context.Context, params HtcSt
 	defer resp.Body.Close()
 
 	result, err := decodeHtcStorageRegionRegionGetResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcWorkspacesWorkspaceIdDimensionsGet invokes GET /htc/workspaces/{workspaceId}/dimensions operation.
-//
-// This endpoint provides a comprehensive view of the various hardware configurations and
-// environments available within a specific workspace. This read-only API is primarily designed for
-// users who need to understand the different "dimensions" or attributes that describe the hardware
-// and other aspects of job runs within their workspace. By offering insights into available
-// environments, it aids users in selecting the most suitable configuration for their jobs,
-// especially when performance testing across different hardware setups.
-// Normal users can access this endpoint for the workspace they belong to
-// Rescale personnel are required in order to modify any of these dimensions.
-//
-// GET /htc/workspaces/{workspaceId}/dimensions
-func (c *Client) HtcWorkspacesWorkspaceIdDimensionsGet(ctx context.Context, params HtcWorkspacesWorkspaceIdDimensionsGetParams) (HtcWorkspacesWorkspaceIdDimensionsGetRes, error) {
-	res, err := c.sendHtcWorkspacesWorkspaceIdDimensionsGet(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendHtcWorkspacesWorkspaceIdDimensionsGet(ctx context.Context, params HtcWorkspacesWorkspaceIdDimensionsGetParams) (res HtcWorkspacesWorkspaceIdDimensionsGetRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/htc/workspaces/"
-	{
-		// Encode "workspaceId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "workspaceId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.WorkspaceId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/dimensions"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcWorkspacesWorkspaceIdDimensionsGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcWorkspacesWorkspaceIdDimensionsGetResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

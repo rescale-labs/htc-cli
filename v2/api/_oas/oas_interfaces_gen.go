@@ -21,10 +21,6 @@ type CreateTaskRes interface {
 	createTaskRes()
 }
 
-type GetDimensionsRes interface {
-	getDimensionsRes()
-}
-
 type GetEventsRes interface {
 	getEventsRes()
 }
@@ -57,6 +53,10 @@ type GetMetricsRes interface {
 	getMetricsRes()
 }
 
+type GetProjectDimensionsRes interface {
+	getProjectDimensionsRes()
+}
+
 type GetProjectLimitsRes interface {
 	getProjectLimitsRes()
 }
@@ -87,6 +87,10 @@ type GetTasksRes interface {
 
 type GetTokenRes interface {
 	getTokenRes()
+}
+
+type GetWorkspaceDimensionsRes interface {
+	getWorkspaceDimensionsRes()
 }
 
 type GetWorkspaceLimitsRes interface {
@@ -203,10 +207,6 @@ type HtcStorageGetRes interface {
 
 type HtcStorageRegionRegionGetRes interface {
 	htcStorageRegionRegionGetRes()
-}
-
-type HtcWorkspacesWorkspaceIdDimensionsGetRes interface {
-	htcWorkspacesWorkspaceIdDimensionsGetRes()
 }
 
 type OAuth2TokenPostRes interface {

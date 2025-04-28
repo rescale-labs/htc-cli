@@ -109,7 +109,6 @@ var RetentionPolicyApplyCmd = &cobra.Command{
 
 func init() {
 	// example retention policy JSON payload
-
 	policy := oapi.WorkspaceTaskRetentionPolicy{
 		ArchiveAfter: 24, // hours
 		DeleteAfter: 168, // hours

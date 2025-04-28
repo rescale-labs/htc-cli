@@ -66,25 +66,6 @@ func (UnimplementedHandler) CreateTask(ctx context.Context, req OptHTCTask, para
 	return r, ht.ErrNotImplemented
 }
 
-// GetDimensions implements getDimensions operation.
-//
-// This endpoint is designed to retrieve the current set of dimension combinations configured for a
-// specific project so that users can understand the existing computing environment constraints of a
-// project. It returns a list of dimension combinations such as pricing priority, geographical region,
-//
-//	compute scaling policy, and hyperthreading options.
-//
-// Any user who _belongs to the workspace this project belongs to_ can use this endpoint to verify or
-// audit the current configuration of a project. This can be helpful in ensuring that the project's
-// settings align with expectations.
-// The payload also includes a read-only set of `derived` dimensions which help describe the
-// currently configured `machineType`.
-//
-// GET /htc/projects/{projectId}/dimensions
-func (UnimplementedHandler) GetDimensions(ctx context.Context, params GetDimensionsParams) (r GetDimensionsRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // GetEvents implements getEvents operation.
 //
 // This endpoint will get events for a job.
@@ -170,6 +151,25 @@ func (UnimplementedHandler) GetProject(ctx context.Context, params GetProjectPar
 	return r, ht.ErrNotImplemented
 }
 
+// GetProjectDimensions implements getProjectDimensions operation.
+//
+// This endpoint is designed to retrieve the current set of dimension combinations configured for a
+// specific project so that users can understand the existing computing environment constraints of a
+// project. It returns a list of dimension combinations such as pricing priority, geographical region,
+//
+//	compute scaling policy, and hyperthreading options.
+//
+// Any user who _belongs to the workspace this project belongs to_ can use this endpoint to verify or
+// audit the current configuration of a project. This can be helpful in ensuring that the project's
+// settings align with expectations.
+// The payload also includes a read-only set of `derived` dimensions which help describe the
+// currently configured `machineType`.
+//
+// GET /htc/projects/{projectId}/dimensions
+func (UnimplementedHandler) GetProjectDimensions(ctx context.Context, params GetProjectDimensionsParams) (r GetProjectDimensionsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetProjectLimits implements getProjectLimits operation.
 //
 // This endpoint will list all resource limitations associated with this project.
@@ -247,6 +247,22 @@ func (UnimplementedHandler) GetTasks(ctx context.Context, params GetTasksParams)
 //
 // GET /auth/token
 func (UnimplementedHandler) GetToken(ctx context.Context, params GetTokenParams) (r GetTokenRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetWorkspaceDimensions implements getWorkspaceDimensions operation.
+//
+// This endpoint provides a comprehensive view of the various hardware configurations and
+// environments available within a specific workspace. This read-only API is primarily designed for
+// users who need to understand the different "dimensions" or attributes that describe the hardware
+// and other aspects of job runs within their workspace. By offering insights into available
+// environments, it aids users in selecting the most suitable configuration for their jobs,
+// especially when performance testing across different hardware setups.
+// Normal users can access this endpoint for the workspace they belong to
+// Rescale personnel are required in order to modify any of these dimensions.
+//
+// GET /htc/workspaces/{workspaceId}/dimensions
+func (UnimplementedHandler) GetWorkspaceDimensions(ctx context.Context, params GetWorkspaceDimensionsParams) (r GetWorkspaceDimensionsRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -576,22 +592,6 @@ func (UnimplementedHandler) HtcStorageGet(ctx context.Context) (r HtcStorageGetR
 //
 // GET /htc/storage/region/{region}
 func (UnimplementedHandler) HtcStorageRegionRegionGet(ctx context.Context, params HtcStorageRegionRegionGetParams) (r HtcStorageRegionRegionGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcWorkspacesWorkspaceIdDimensionsGet implements GET /htc/workspaces/{workspaceId}/dimensions operation.
-//
-// This endpoint provides a comprehensive view of the various hardware configurations and
-// environments available within a specific workspace. This read-only API is primarily designed for
-// users who need to understand the different "dimensions" or attributes that describe the hardware
-// and other aspects of job runs within their workspace. By offering insights into available
-// environments, it aids users in selecting the most suitable configuration for their jobs,
-// especially when performance testing across different hardware setups.
-// Normal users can access this endpoint for the workspace they belong to
-// Rescale personnel are required in order to modify any of these dimensions.
-//
-// GET /htc/workspaces/{workspaceId}/dimensions
-func (UnimplementedHandler) HtcWorkspacesWorkspaceIdDimensionsGet(ctx context.Context, params HtcWorkspacesWorkspaceIdDimensionsGetParams) (r HtcWorkspacesWorkspaceIdDimensionsGetRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

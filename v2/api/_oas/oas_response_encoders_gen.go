@@ -199,47 +199,6 @@ func encodeCreateTaskResponse(response CreateTaskRes, w http.ResponseWriter) err
 	}
 }
 
-func encodeGetDimensionsResponse(response GetDimensionsRes, w http.ResponseWriter) error {
-	switch response := response.(type) {
-	case *HTCProjectDimensions:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *GetDimensionsUnauthorized:
-		w.WriteHeader(401)
-
-		return nil
-
-	case *GetDimensionsForbidden:
-		w.WriteHeader(403)
-
-		return nil
-
-	case *OAuth2ErrorResponse:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(404)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
 func encodeGetEventsResponse(response GetEventsRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCJobStatusEvents:
@@ -596,6 +555,47 @@ func encodeGetProjectResponse(response GetProjectRes, w http.ResponseWriter) err
 	}
 }
 
+func encodeGetProjectDimensionsResponse(response GetProjectDimensionsRes, w http.ResponseWriter) error {
+	switch response := response.(type) {
+	case *HTCProjectDimensions:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetProjectDimensionsUnauthorized:
+		w.WriteHeader(401)
+
+		return nil
+
+	case *GetProjectDimensionsForbidden:
+		w.WriteHeader(403)
+
+		return nil
+
+	case *OAuth2ErrorResponse:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeGetProjectLimitsResponse(response GetProjectLimitsRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCProjectLimits:
@@ -861,6 +861,47 @@ func encodeGetTokenResponse(response GetTokenRes, w http.ResponseWriter) error {
 	case *OAuth2ErrorResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodeGetWorkspaceDimensionsResponse(response GetWorkspaceDimensionsRes, w http.ResponseWriter) error {
+	switch response := response.(type) {
+	case *HTCWorkspaceDimensions:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetWorkspaceDimensionsUnauthorized:
+		w.WriteHeader(401)
+
+		return nil
+
+	case *GetWorkspaceDimensionsForbidden:
+		w.WriteHeader(403)
+
+		return nil
+
+	case *OAuth2ErrorResponse:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2010,47 +2051,6 @@ func encodeHtcStorageRegionRegionGetResponse(response HtcStorageRegionRegionGetR
 		return nil
 
 	case *HtcStorageRegionRegionGetForbidden:
-		w.WriteHeader(403)
-
-		return nil
-
-	case *OAuth2ErrorResponse:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(404)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeHtcWorkspacesWorkspaceIdDimensionsGetResponse(response HtcWorkspacesWorkspaceIdDimensionsGetRes, w http.ResponseWriter) error {
-	switch response := response.(type) {
-	case *HtcWorkspacesWorkspaceIdDimensionsGetOKApplicationJSON:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *HtcWorkspacesWorkspaceIdDimensionsGetUnauthorized:
-		w.WriteHeader(401)
-
-		return nil
-
-	case *HtcWorkspacesWorkspaceIdDimensionsGetForbidden:
 		w.WriteHeader(403)
 
 		return nil

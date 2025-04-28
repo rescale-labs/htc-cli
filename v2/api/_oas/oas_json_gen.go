@@ -6420,6 +6420,56 @@ func (s *HTCTokenPayload) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes HTCWorkspaceDimensions as json.
+func (s HTCWorkspaceDimensions) Encode(e *jx.Encoder) {
+	unwrapped := []HTCComputeEnvironment(s)
+
+	e.ArrStart()
+	for _, elem := range unwrapped {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes HTCWorkspaceDimensions from json.
+func (s *HTCWorkspaceDimensions) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode HTCWorkspaceDimensions to nil")
+	}
+	var unwrapped []HTCComputeEnvironment
+	if err := func() error {
+		unwrapped = make([]HTCComputeEnvironment, 0)
+		if err := d.Arr(func(d *jx.Decoder) error {
+			var elem HTCComputeEnvironment
+			if err := elem.Decode(d); err != nil {
+				return err
+			}
+			unwrapped = append(unwrapped, elem)
+			return nil
+		}); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = HTCWorkspaceDimensions(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s HTCWorkspaceDimensions) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *HTCWorkspaceDimensions) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode implements json.Marshaler.
 func (s *HTCWorkspaceLimit) Encode(e *jx.Encoder) {
 	e.ObjStart()
@@ -7117,56 +7167,6 @@ func (s HtcStorageGetOKApplicationJSON) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *HtcStorageGetOKApplicationJSON) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes HtcWorkspacesWorkspaceIdDimensionsGetOKApplicationJSON as json.
-func (s HtcWorkspacesWorkspaceIdDimensionsGetOKApplicationJSON) Encode(e *jx.Encoder) {
-	unwrapped := []HTCComputeEnvironment(s)
-
-	e.ArrStart()
-	for _, elem := range unwrapped {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes HtcWorkspacesWorkspaceIdDimensionsGetOKApplicationJSON from json.
-func (s *HtcWorkspacesWorkspaceIdDimensionsGetOKApplicationJSON) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode HtcWorkspacesWorkspaceIdDimensionsGetOKApplicationJSON to nil")
-	}
-	var unwrapped []HTCComputeEnvironment
-	if err := func() error {
-		unwrapped = make([]HTCComputeEnvironment, 0)
-		if err := d.Arr(func(d *jx.Decoder) error {
-			var elem HTCComputeEnvironment
-			if err := elem.Decode(d); err != nil {
-				return err
-			}
-			unwrapped = append(unwrapped, elem)
-			return nil
-		}); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = HtcWorkspacesWorkspaceIdDimensionsGetOKApplicationJSON(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s HtcWorkspacesWorkspaceIdDimensionsGetOKApplicationJSON) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *HtcWorkspacesWorkspaceIdDimensionsGetOKApplicationJSON) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

@@ -117,7 +117,7 @@ local patches = {
     '/htc/projects/{projectId}/dimensions'+: {
       get+: {
         'x-ogen-operation-group': 'Project',
-        operationId: 'getDimensions',
+        operationId: 'getProjectDimensions',
         responses+: {
           '200'+: {
             content+: {
@@ -283,6 +283,21 @@ local patches = {
           },
         }
       }
+    },
+    '/htc/workspaces/{workspaceId}/dimensions'+: {
+      get+: {
+        'x-ogen-operation-group': 'Workspace',
+        operationId: 'getWorkspaceDimensions',
+        responses+: {
+          '200'+: {
+            content+: {
+              'application/json'+: {
+                schema: { '$ref': '#/components/schemas/HTCWorkspaceDimensions' },
+              },
+            },
+          },
+        },
+      },
     },
     '/htc/workspaces/{workspaceId}/limits'+: {
       get+: {
@@ -505,6 +520,12 @@ local patches = {
             type: 'string',
             example: 'https://page2.com',
           },
+        },
+      },
+      HTCWorkspaceDimensions: {
+        type: 'array',
+        items: {
+          '$ref': '#/components/schemas/HTCComputeEnvironment',
         },
       },
       HTCTokenPayload: { type: 'string' },

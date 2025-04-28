@@ -421,7 +421,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									// Leaf node.
 									switch r.Method {
 									case "GET":
-										s.handleGetDimensionsRequest([1]string{
+										s.handleGetProjectDimensionsRequest([1]string{
 											args[0],
 										}, elemIsEscaped, w, r)
 									case "PUT":
@@ -1330,7 +1330,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								// Leaf node.
 								switch r.Method {
 								case "GET":
-									s.handleHtcWorkspacesWorkspaceIdDimensionsGetRequest([1]string{
+									s.handleGetWorkspaceDimensionsRequest([1]string{
 										args[0],
 									}, elemIsEscaped, w, r)
 								default:
@@ -1920,9 +1920,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									// Leaf node.
 									switch method {
 									case "GET":
-										r.name = "GetDimensions"
+										r.name = "GetProjectDimensions"
 										r.summary = "Get Project Dimensions"
-										r.operationID = "getDimensions"
+										r.operationID = "getProjectDimensions"
 										r.pathPattern = "/htc/projects/{projectId}/dimensions"
 										r.args = args
 										r.count = 1
@@ -2904,9 +2904,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								// Leaf node.
 								switch method {
 								case "GET":
-									r.name = "HtcWorkspacesWorkspaceIdDimensionsGet"
+									r.name = "GetWorkspaceDimensions"
 									r.summary = "Get Workspace Dimensions"
-									r.operationID = ""
+									r.operationID = "getWorkspaceDimensions"
 									r.pathPattern = "/htc/workspaces/{workspaceId}/dimensions"
 									r.args = args
 									r.count = 1
