@@ -34,13 +34,13 @@ func Clusters(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	worskpaceId, err := runner.GetWorkspaceId()
-	if err != nil {
+	p := common.IDParams{RequireWorkspaceId: true}
+	if err := runner.GetIds(&p); err != nil {
 		return err
 	}
 
 	ctx := context.Background()
-	res, err := getClusters(ctx, runner.Client, worskpaceId)
+	res, err := getClusters(ctx, runner.Client, p.WorkspaceId)
 	if err != nil {
 		return err
 	}
