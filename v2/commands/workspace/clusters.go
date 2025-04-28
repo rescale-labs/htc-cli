@@ -3,6 +3,8 @@ package workspace
 import (
 	"context"
 	"fmt"
+	"io"
+	"os"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -44,7 +46,49 @@ func Clusters(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Print(res)
+	return writeRows(res, os.Stdout)
+}
+
+func writeRows(clusters *oapi.HTCClusterStatusResponse, w io.Writer) error {
+	projectId := clusters.GcpProjectId.Value
+	for _, cluster := range clusters.Clusters {
+		if _, err := fmt.Fprintf(w, "%-24s %-24s %-24s %-24s %-15s %-24s %-48s \n",
+			"PROJECT ID", "CLUSTER NAME", "REGION", "VERSION", "STATUS", "AUTOSCALING", "SUBNETWORK"); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "%-24s %-24s %-24s %-24s %-15s %-24s %-48s\n",
+			projectId,
+			cluster.Name.Value,
+			cluster.Region.Value,
+			cluster.Version.Value,
+			cluster.Status.Value,
+			cluster.Autoscaling.Value,
+			cluster.Subnetwork.Value,
+		); err != nil {
+			return err
+		}
+		
+		if len(cluster.NodePools) > 0 {
+			if _, err := fmt.Fprintf(w, "\tNODEPOOLS\n\t %-38s %-38s %-24s %-24s %-24s %15s %15s\n",
+				"NAME", "VERSION", "INSTANCE TYPE", "STATUS", "AUTOSCALING", "MIN NODES", "MAX NODES"); err != nil {
+				return err
+			}
+		}
+
+		for _, pool := range cluster.GetNodePools() {
+			if _, err := fmt.Fprintf(w, "\t %-38s %-38s %-24s %-24s %-24t %15d %15d\n",
+				pool.Name.Value,
+				pool.Version.Value,
+				pool.InstanceType.Value,
+				pool.Status.Value,
+				pool.Autoscaling.Value.Enabled.Value,
+				pool.Autoscaling.Value.MinNodeCount.Value,
+				pool.Autoscaling.Value.MaxNodeCount.Value,
+			); err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
 
