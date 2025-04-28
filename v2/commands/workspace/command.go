@@ -11,4 +11,5 @@ var WorkspaceCmd = &cobra.Command{
 
 func init() {
 	WorkspaceCmd.AddCommand(ClustersCmd)
+	WorkspaceCmd.AddCommand(RetentionPolicyCmd)
 }
