@@ -181,6 +181,31 @@ func (UnimplementedHandler) GetProjectLimits(ctx context.Context, params GetProj
 	return r, ht.ErrNotImplemented
 }
 
+// GetProjectTaskRetentionPolicy implements getProjectTaskRetentionPolicy operation.
+//
+// This endpoint is used to retrieve the current task retention policy of a specific project. The
+// task retention policy is necessary in managing the lifecycle of tasks within a project. The task
+// retention policy includes two key aspects:
+// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
+// which an archived task is automatically deleted. Archived tasks can be unarchived during this
+// period, protecting users from prematurely deleting task resources.
+// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
+// of inactivity after which an active task is automatically archived. This feature helps in keeping
+// the project organized by archiving active tasks, ensuring that storage resources are freed
+// optimistically.
+// Setting either value to `0` will result in disabling of that feature. For example, a project's
+// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
+// auto-deleting.
+// If no policy is set at the project level (i.e., the response is a 404), the policy at the
+// workspace level will apply. If the policy has archiveAfter or deleteAfter set to 0, it means that
+// auto-archival or auto-deletion is disabled at the project level and any workspace level policy is
+// ignored.
+//
+// GET /htc/projects/{projectId}/task-retention-policy
+func (UnimplementedHandler) GetProjectTaskRetentionPolicy(ctx context.Context, params GetProjectTaskRetentionPolicyParams) (r GetProjectTaskRetentionPolicyRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetProjects implements getProjects operation.
 //
 // This endpoint will get all projects.
@@ -199,27 +224,6 @@ func (UnimplementedHandler) GetProjects(ctx context.Context, params GetProjectsP
 //
 // GET /htc/projects/{projectId}/container-registry/token
 func (UnimplementedHandler) GetRegistryToken(ctx context.Context, params GetRegistryTokenParams) (r GetRegistryTokenRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// GetTaskRetentionPolicy implements getTaskRetentionPolicy operation.
-//
-// This endpoint is used to retrieve the current task retention policy of a specific Workspace. The
-// task retention policy is necessary in managing the lifecycle of tasks within a Workspace. The task
-// retention policy includes two key aspects:
-// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
-// which an archived task is automatically deleted. Archived tasks can be unarchived during this
-// period, protecting users from prematurely deleting task resources.
-// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
-// of inactivity after which an active task is automatically archived. This feature helps in keeping
-// the project organized by archiving active tasks, ensuring that storage resources are freed
-// optimistically.
-// Setting either value to `0` will result in disabling of that feature. For example, a project's
-// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
-// auto-deleting.
-//
-// GET /htc/workspaces/{workspaceId}/task-retention-policy
-func (UnimplementedHandler) GetTaskRetentionPolicy(ctx context.Context, params GetTaskRetentionPolicyParams) (r GetTaskRetentionPolicyRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -272,6 +276,27 @@ func (UnimplementedHandler) GetWorkspaceDimensions(ctx context.Context, params G
 //
 // GET /htc/workspaces/{workspaceId}/limits
 func (UnimplementedHandler) GetWorkspaceLimits(ctx context.Context, params GetWorkspaceLimitsParams) (r GetWorkspaceLimitsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetWorkspaceTaskRetentionPolicy implements getWorkspaceTaskRetentionPolicy operation.
+//
+// This endpoint is used to retrieve the current task retention policy of a specific Workspace. The
+// task retention policy is necessary in managing the lifecycle of tasks within a Workspace. The task
+// retention policy includes two key aspects:
+// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
+// which an archived task is automatically deleted. Archived tasks can be unarchived during this
+// period, protecting users from prematurely deleting task resources.
+// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
+// of inactivity after which an active task is automatically archived. This feature helps in keeping
+// the project organized by archiving active tasks, ensuring that storage resources are freed
+// optimistically.
+// Setting either value to `0` will result in disabling of that feature. For example, a project's
+// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
+// auto-deleting.
+//
+// GET /htc/workspaces/{workspaceId}/task-retention-policy
+func (UnimplementedHandler) GetWorkspaceTaskRetentionPolicy(ctx context.Context, params GetWorkspaceTaskRetentionPolicyParams) (r GetWorkspaceTaskRetentionPolicyRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -403,54 +428,6 @@ func (UnimplementedHandler) HtcProjectsProjectIdStorageTokensGet(ctx context.Con
 //
 // DELETE /htc/projects/{projectId}/task-retention-policy
 func (UnimplementedHandler) HtcProjectsProjectIdTaskRetentionPolicyDelete(ctx context.Context, params HtcProjectsProjectIdTaskRetentionPolicyDeleteParams) (r HtcProjectsProjectIdTaskRetentionPolicyDeleteRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcProjectsProjectIdTaskRetentionPolicyGet implements GET /htc/projects/{projectId}/task-retention-policy operation.
-//
-// This endpoint is used to retrieve the current task retention policy of a specific project. The
-// task retention policy is necessary in managing the lifecycle of tasks within a project. The task
-// retention policy includes two key aspects:
-// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
-// which an archived task is automatically deleted. Archived tasks can be unarchived during this
-// period, protecting users from prematurely deleting task resources.
-// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
-// of inactivity after which an active task is automatically archived. This feature helps in keeping
-// the project organized by archiving active tasks, ensuring that storage resources are freed
-// optimistically.
-// Setting either value to `0` will result in disabling of that feature. For example, a project's
-// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
-// auto-deleting.
-// If no policy is set at the project level (i.e., the response is a 404), the policy at the
-// workspace level will apply. If the policy has archiveAfter or deleteAfter set to 0, it means that
-// auto-archival or auto-deletion is disabled at the project level and any workspace level policy is
-// ignored.
-//
-// GET /htc/projects/{projectId}/task-retention-policy
-func (UnimplementedHandler) HtcProjectsProjectIdTaskRetentionPolicyGet(ctx context.Context, params HtcProjectsProjectIdTaskRetentionPolicyGetParams) (r HtcProjectsProjectIdTaskRetentionPolicyGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcProjectsProjectIdTaskRetentionPolicyPut implements PUT /htc/projects/{projectId}/task-retention-policy operation.
-//
-// This endpoint enables project administrators to define or update the task retention policy for a
-// specific project. The task retention policy includes two key aspects:
-// * **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in
-// hours) after which an archived task is automatically deleted. This control allows for flexibility
-// in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before
-// being permanently deleted. Archived tasks can be unarchived during this period, protecting users
-// from prematurely deleting task resources
-// * **Auto-Archive After Inactivity**: The `archiveAfter` field allows administrators to specify the
-// duration (in hours) of inactivity after which an active task is automatically archived. This
-// feature helps in keeping the project organized by archiving active tasks, ensuring that storage
-// resources are freed optimistically.
-// Setting either value to `0` will result in disabling of that feature. For example, a project's
-// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
-// auto-deleting.If no policy is set at the project level, the workspace-level policy (if any) will
-// be applied to the project.
-//
-// PUT /htc/projects/{projectId}/task-retention-policy
-func (UnimplementedHandler) HtcProjectsProjectIdTaskRetentionPolicyPut(ctx context.Context, req OptTaskRetentionPolicy, params HtcProjectsProjectIdTaskRetentionPolicyPutParams) (r HtcProjectsProjectIdTaskRetentionPolicyPutRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -604,7 +581,30 @@ func (UnimplementedHandler) OAuth2TokenPost(ctx context.Context) (r OAuth2TokenP
 	return r, ht.ErrNotImplemented
 }
 
-// PutTaskRetentionPolicy implements putTaskRetentionPolicy operation.
+// PutProjectTaskRetentionPolicy implements putProjectTaskRetentionPolicy operation.
+//
+// This endpoint enables project administrators to define or update the task retention policy for a
+// specific project. The task retention policy includes two key aspects:
+// * **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in
+// hours) after which an archived task is automatically deleted. This control allows for flexibility
+// in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before
+// being permanently deleted. Archived tasks can be unarchived during this period, protecting users
+// from prematurely deleting task resources
+// * **Auto-Archive After Inactivity**: The `archiveAfter` field allows administrators to specify the
+// duration (in hours) of inactivity after which an active task is automatically archived. This
+// feature helps in keeping the project organized by archiving active tasks, ensuring that storage
+// resources are freed optimistically.
+// Setting either value to `0` will result in disabling of that feature. For example, a project's
+// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
+// auto-deleting.If no policy is set at the project level, the workspace-level policy (if any) will
+// be applied to the project.
+//
+// PUT /htc/projects/{projectId}/task-retention-policy
+func (UnimplementedHandler) PutProjectTaskRetentionPolicy(ctx context.Context, req OptTaskRetentionPolicy, params PutProjectTaskRetentionPolicyParams) (r PutProjectTaskRetentionPolicyRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// PutWorkspaceTaskRetentionPolicy implements putWorkspaceTaskRetentionPolicy operation.
 //
 // This endpoint enables Workspace administrators to define or update the task retention policy for a
 // specific workspace. The task retention policy includes two key aspects:
@@ -624,7 +624,7 @@ func (UnimplementedHandler) OAuth2TokenPost(ctx context.Context) (r OAuth2TokenP
 // defined, the project-level policy takes precedence over the workspace-level policy.
 //
 // PUT /htc/workspaces/{workspaceId}/task-retention-policy
-func (UnimplementedHandler) PutTaskRetentionPolicy(ctx context.Context, req OptWorkspaceTaskRetentionPolicy, params PutTaskRetentionPolicyParams) (r PutTaskRetentionPolicyRes, _ error) {
+func (UnimplementedHandler) PutWorkspaceTaskRetentionPolicy(ctx context.Context, req OptWorkspaceTaskRetentionPolicy, params PutWorkspaceTaskRetentionPolicyParams) (r PutWorkspaceTaskRetentionPolicyRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

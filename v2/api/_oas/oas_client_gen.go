@@ -124,48 +124,6 @@ type Invoker interface {
 	//
 	// DELETE /htc/projects/{projectId}/task-retention-policy
 	HtcProjectsProjectIdTaskRetentionPolicyDelete(ctx context.Context, params HtcProjectsProjectIdTaskRetentionPolicyDeleteParams) (HtcProjectsProjectIdTaskRetentionPolicyDeleteRes, error)
-	// HtcProjectsProjectIdTaskRetentionPolicyGet invokes GET /htc/projects/{projectId}/task-retention-policy operation.
-	//
-	// This endpoint is used to retrieve the current task retention policy of a specific project. The
-	// task retention policy is necessary in managing the lifecycle of tasks within a project. The task
-	// retention policy includes two key aspects:
-	// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
-	// which an archived task is automatically deleted. Archived tasks can be unarchived during this
-	// period, protecting users from prematurely deleting task resources.
-	// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
-	// of inactivity after which an active task is automatically archived. This feature helps in keeping
-	// the project organized by archiving active tasks, ensuring that storage resources are freed
-	// optimistically.
-	// Setting either value to `0` will result in disabling of that feature. For example, a project's
-	// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
-	// auto-deleting.
-	// If no policy is set at the project level (i.e., the response is a 404), the policy at the
-	// workspace level will apply. If the policy has archiveAfter or deleteAfter set to 0, it means that
-	// auto-archival or auto-deletion is disabled at the project level and any workspace level policy is
-	// ignored.
-	//
-	// GET /htc/projects/{projectId}/task-retention-policy
-	HtcProjectsProjectIdTaskRetentionPolicyGet(ctx context.Context, params HtcProjectsProjectIdTaskRetentionPolicyGetParams) (HtcProjectsProjectIdTaskRetentionPolicyGetRes, error)
-	// HtcProjectsProjectIdTaskRetentionPolicyPut invokes PUT /htc/projects/{projectId}/task-retention-policy operation.
-	//
-	// This endpoint enables project administrators to define or update the task retention policy for a
-	// specific project. The task retention policy includes two key aspects:
-	// * **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in
-	// hours) after which an archived task is automatically deleted. This control allows for flexibility
-	// in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before
-	// being permanently deleted. Archived tasks can be unarchived during this period, protecting users
-	// from prematurely deleting task resources
-	// * **Auto-Archive After Inactivity**: The `archiveAfter` field allows administrators to specify the
-	// duration (in hours) of inactivity after which an active task is automatically archived. This
-	// feature helps in keeping the project organized by archiving active tasks, ensuring that storage
-	// resources are freed optimistically.
-	// Setting either value to `0` will result in disabling of that feature. For example, a project's
-	// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
-	// auto-deleting.If no policy is set at the project level, the workspace-level policy (if any) will
-	// be applied to the project.
-	//
-	// PUT /htc/projects/{projectId}/task-retention-policy
-	HtcProjectsProjectIdTaskRetentionPolicyPut(ctx context.Context, request OptTaskRetentionPolicy, params HtcProjectsProjectIdTaskRetentionPolicyPutParams) (HtcProjectsProjectIdTaskRetentionPolicyPutRes, error)
 	// HtcProjectsProjectIdTasksTaskIdDelete invokes DELETE /htc/projects/{projectId}/tasks/{taskId} operation.
 	//
 	// This endpoint will delete a task by ID.
@@ -429,12 +387,54 @@ type ProjectInvoker interface {
 	//
 	// GET /htc/projects/{projectId}/limits
 	GetProjectLimits(ctx context.Context, params GetProjectLimitsParams) (GetProjectLimitsRes, error)
+	// GetProjectTaskRetentionPolicy invokes getProjectTaskRetentionPolicy operation.
+	//
+	// This endpoint is used to retrieve the current task retention policy of a specific project. The
+	// task retention policy is necessary in managing the lifecycle of tasks within a project. The task
+	// retention policy includes two key aspects:
+	// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
+	// which an archived task is automatically deleted. Archived tasks can be unarchived during this
+	// period, protecting users from prematurely deleting task resources.
+	// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
+	// of inactivity after which an active task is automatically archived. This feature helps in keeping
+	// the project organized by archiving active tasks, ensuring that storage resources are freed
+	// optimistically.
+	// Setting either value to `0` will result in disabling of that feature. For example, a project's
+	// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
+	// auto-deleting.
+	// If no policy is set at the project level (i.e., the response is a 404), the policy at the
+	// workspace level will apply. If the policy has archiveAfter or deleteAfter set to 0, it means that
+	// auto-archival or auto-deletion is disabled at the project level and any workspace level policy is
+	// ignored.
+	//
+	// GET /htc/projects/{projectId}/task-retention-policy
+	GetProjectTaskRetentionPolicy(ctx context.Context, params GetProjectTaskRetentionPolicyParams) (GetProjectTaskRetentionPolicyRes, error)
 	// GetProjects invokes getProjects operation.
 	//
 	// This endpoint will get all projects.
 	//
 	// GET /htc/projects
 	GetProjects(ctx context.Context, params GetProjectsParams) (GetProjectsRes, error)
+	// PutProjectTaskRetentionPolicy invokes putProjectTaskRetentionPolicy operation.
+	//
+	// This endpoint enables project administrators to define or update the task retention policy for a
+	// specific project. The task retention policy includes two key aspects:
+	// * **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in
+	// hours) after which an archived task is automatically deleted. This control allows for flexibility
+	// in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before
+	// being permanently deleted. Archived tasks can be unarchived during this period, protecting users
+	// from prematurely deleting task resources
+	// * **Auto-Archive After Inactivity**: The `archiveAfter` field allows administrators to specify the
+	// duration (in hours) of inactivity after which an active task is automatically archived. This
+	// feature helps in keeping the project organized by archiving active tasks, ensuring that storage
+	// resources are freed optimistically.
+	// Setting either value to `0` will result in disabling of that feature. For example, a project's
+	// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
+	// auto-deleting.If no policy is set at the project level, the workspace-level policy (if any) will
+	// be applied to the project.
+	//
+	// PUT /htc/projects/{projectId}/task-retention-policy
+	PutProjectTaskRetentionPolicy(ctx context.Context, request OptTaskRetentionPolicy, params PutProjectTaskRetentionPolicyParams) (PutProjectTaskRetentionPolicyRes, error)
 }
 
 // TaskInvoker invokes operations described by OpenAPI v3 specification.
@@ -472,24 +472,6 @@ type WorkspaceInvoker interface {
 	//
 	// GET /htc/gcp/clusters/{workspaceId}
 	GetGCPClusters(ctx context.Context, params GetGCPClustersParams) (GetGCPClustersRes, error)
-	// GetTaskRetentionPolicy invokes getTaskRetentionPolicy operation.
-	//
-	// This endpoint is used to retrieve the current task retention policy of a specific Workspace. The
-	// task retention policy is necessary in managing the lifecycle of tasks within a Workspace. The task
-	// retention policy includes two key aspects:
-	// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
-	// which an archived task is automatically deleted. Archived tasks can be unarchived during this
-	// period, protecting users from prematurely deleting task resources.
-	// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
-	// of inactivity after which an active task is automatically archived. This feature helps in keeping
-	// the project organized by archiving active tasks, ensuring that storage resources are freed
-	// optimistically.
-	// Setting either value to `0` will result in disabling of that feature. For example, a project's
-	// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
-	// auto-deleting.
-	//
-	// GET /htc/workspaces/{workspaceId}/task-retention-policy
-	GetTaskRetentionPolicy(ctx context.Context, params GetTaskRetentionPolicyParams) (GetTaskRetentionPolicyRes, error)
 	// GetWorkspaceDimensions invokes getWorkspaceDimensions operation.
 	//
 	// This endpoint provides a comprehensive view of the various hardware configurations and
@@ -509,7 +491,25 @@ type WorkspaceInvoker interface {
 	//
 	// GET /htc/workspaces/{workspaceId}/limits
 	GetWorkspaceLimits(ctx context.Context, params GetWorkspaceLimitsParams) (GetWorkspaceLimitsRes, error)
-	// PutTaskRetentionPolicy invokes putTaskRetentionPolicy operation.
+	// GetWorkspaceTaskRetentionPolicy invokes getWorkspaceTaskRetentionPolicy operation.
+	//
+	// This endpoint is used to retrieve the current task retention policy of a specific Workspace. The
+	// task retention policy is necessary in managing the lifecycle of tasks within a Workspace. The task
+	// retention policy includes two key aspects:
+	// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
+	// which an archived task is automatically deleted. Archived tasks can be unarchived during this
+	// period, protecting users from prematurely deleting task resources.
+	// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
+	// of inactivity after which an active task is automatically archived. This feature helps in keeping
+	// the project organized by archiving active tasks, ensuring that storage resources are freed
+	// optimistically.
+	// Setting either value to `0` will result in disabling of that feature. For example, a project's
+	// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
+	// auto-deleting.
+	//
+	// GET /htc/workspaces/{workspaceId}/task-retention-policy
+	GetWorkspaceTaskRetentionPolicy(ctx context.Context, params GetWorkspaceTaskRetentionPolicyParams) (GetWorkspaceTaskRetentionPolicyRes, error)
+	// PutWorkspaceTaskRetentionPolicy invokes putWorkspaceTaskRetentionPolicy operation.
 	//
 	// This endpoint enables Workspace administrators to define or update the task retention policy for a
 	// specific workspace. The task retention policy includes two key aspects:
@@ -529,7 +529,7 @@ type WorkspaceInvoker interface {
 	// defined, the project-level policy takes precedence over the workspace-level policy.
 	//
 	// PUT /htc/workspaces/{workspaceId}/task-retention-policy
-	PutTaskRetentionPolicy(ctx context.Context, request OptWorkspaceTaskRetentionPolicy, params PutTaskRetentionPolicyParams) (PutTaskRetentionPolicyRes, error)
+	PutWorkspaceTaskRetentionPolicy(ctx context.Context, request OptWorkspaceTaskRetentionPolicy, params PutWorkspaceTaskRetentionPolicyParams) (PutWorkspaceTaskRetentionPolicyRes, error)
 }
 
 // Client implements OAS client.
@@ -2398,6 +2398,110 @@ func (c *Client) sendGetProjectLimits(ctx context.Context, params GetProjectLimi
 	return result, nil
 }
 
+// GetProjectTaskRetentionPolicy invokes getProjectTaskRetentionPolicy operation.
+//
+// This endpoint is used to retrieve the current task retention policy of a specific project. The
+// task retention policy is necessary in managing the lifecycle of tasks within a project. The task
+// retention policy includes two key aspects:
+// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
+// which an archived task is automatically deleted. Archived tasks can be unarchived during this
+// period, protecting users from prematurely deleting task resources.
+// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
+// of inactivity after which an active task is automatically archived. This feature helps in keeping
+// the project organized by archiving active tasks, ensuring that storage resources are freed
+// optimistically.
+// Setting either value to `0` will result in disabling of that feature. For example, a project's
+// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
+// auto-deleting.
+// If no policy is set at the project level (i.e., the response is a 404), the policy at the
+// workspace level will apply. If the policy has archiveAfter or deleteAfter set to 0, it means that
+// auto-archival or auto-deletion is disabled at the project level and any workspace level policy is
+// ignored.
+//
+// GET /htc/projects/{projectId}/task-retention-policy
+func (c *Client) GetProjectTaskRetentionPolicy(ctx context.Context, params GetProjectTaskRetentionPolicyParams) (GetProjectTaskRetentionPolicyRes, error) {
+	res, err := c.sendGetProjectTaskRetentionPolicy(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetProjectTaskRetentionPolicy(ctx context.Context, params GetProjectTaskRetentionPolicyParams) (res GetProjectTaskRetentionPolicyRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/task-retention-policy"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetProjectTaskRetentionPolicy", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetProjectTaskRetentionPolicyResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // GetProjects invokes getProjects operation.
 //
 // This endpoint will get all projects.
@@ -2605,106 +2709,6 @@ func (c *Client) sendGetRegistryToken(ctx context.Context, params GetRegistryTok
 	defer resp.Body.Close()
 
 	result, err := decodeGetRegistryTokenResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// GetTaskRetentionPolicy invokes getTaskRetentionPolicy operation.
-//
-// This endpoint is used to retrieve the current task retention policy of a specific Workspace. The
-// task retention policy is necessary in managing the lifecycle of tasks within a Workspace. The task
-// retention policy includes two key aspects:
-// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
-// which an archived task is automatically deleted. Archived tasks can be unarchived during this
-// period, protecting users from prematurely deleting task resources.
-// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
-// of inactivity after which an active task is automatically archived. This feature helps in keeping
-// the project organized by archiving active tasks, ensuring that storage resources are freed
-// optimistically.
-// Setting either value to `0` will result in disabling of that feature. For example, a project's
-// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
-// auto-deleting.
-//
-// GET /htc/workspaces/{workspaceId}/task-retention-policy
-func (c *Client) GetTaskRetentionPolicy(ctx context.Context, params GetTaskRetentionPolicyParams) (GetTaskRetentionPolicyRes, error) {
-	res, err := c.sendGetTaskRetentionPolicy(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendGetTaskRetentionPolicy(ctx context.Context, params GetTaskRetentionPolicyParams) (res GetTaskRetentionPolicyRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/htc/workspaces/"
-	{
-		// Encode "workspaceId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "workspaceId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.WorkspaceId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/task-retention-policy"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "GetTaskRetentionPolicy", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeGetTaskRetentionPolicyResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -3205,6 +3209,106 @@ func (c *Client) sendGetWorkspaceLimits(ctx context.Context, params GetWorkspace
 	defer resp.Body.Close()
 
 	result, err := decodeGetWorkspaceLimitsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetWorkspaceTaskRetentionPolicy invokes getWorkspaceTaskRetentionPolicy operation.
+//
+// This endpoint is used to retrieve the current task retention policy of a specific Workspace. The
+// task retention policy is necessary in managing the lifecycle of tasks within a Workspace. The task
+// retention policy includes two key aspects:
+// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
+// which an archived task is automatically deleted. Archived tasks can be unarchived during this
+// period, protecting users from prematurely deleting task resources.
+// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
+// of inactivity after which an active task is automatically archived. This feature helps in keeping
+// the project organized by archiving active tasks, ensuring that storage resources are freed
+// optimistically.
+// Setting either value to `0` will result in disabling of that feature. For example, a project's
+// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
+// auto-deleting.
+//
+// GET /htc/workspaces/{workspaceId}/task-retention-policy
+func (c *Client) GetWorkspaceTaskRetentionPolicy(ctx context.Context, params GetWorkspaceTaskRetentionPolicyParams) (GetWorkspaceTaskRetentionPolicyRes, error) {
+	res, err := c.sendGetWorkspaceTaskRetentionPolicy(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetWorkspaceTaskRetentionPolicy(ctx context.Context, params GetWorkspaceTaskRetentionPolicyParams) (res GetWorkspaceTaskRetentionPolicyRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/htc/workspaces/"
+	{
+		// Encode "workspaceId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "workspaceId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.WorkspaceId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/task-retention-policy"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetWorkspaceTaskRetentionPolicy", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetWorkspaceTaskRetentionPolicyResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -4384,215 +4488,6 @@ func (c *Client) sendHtcProjectsProjectIdTaskRetentionPolicyDelete(ctx context.C
 	defer resp.Body.Close()
 
 	result, err := decodeHtcProjectsProjectIdTaskRetentionPolicyDeleteResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcProjectsProjectIdTaskRetentionPolicyGet invokes GET /htc/projects/{projectId}/task-retention-policy operation.
-//
-// This endpoint is used to retrieve the current task retention policy of a specific project. The
-// task retention policy is necessary in managing the lifecycle of tasks within a project. The task
-// retention policy includes two key aspects:
-// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
-// which an archived task is automatically deleted. Archived tasks can be unarchived during this
-// period, protecting users from prematurely deleting task resources.
-// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
-// of inactivity after which an active task is automatically archived. This feature helps in keeping
-// the project organized by archiving active tasks, ensuring that storage resources are freed
-// optimistically.
-// Setting either value to `0` will result in disabling of that feature. For example, a project's
-// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
-// auto-deleting.
-// If no policy is set at the project level (i.e., the response is a 404), the policy at the
-// workspace level will apply. If the policy has archiveAfter or deleteAfter set to 0, it means that
-// auto-archival or auto-deletion is disabled at the project level and any workspace level policy is
-// ignored.
-//
-// GET /htc/projects/{projectId}/task-retention-policy
-func (c *Client) HtcProjectsProjectIdTaskRetentionPolicyGet(ctx context.Context, params HtcProjectsProjectIdTaskRetentionPolicyGetParams) (HtcProjectsProjectIdTaskRetentionPolicyGetRes, error) {
-	res, err := c.sendHtcProjectsProjectIdTaskRetentionPolicyGet(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendHtcProjectsProjectIdTaskRetentionPolicyGet(ctx context.Context, params HtcProjectsProjectIdTaskRetentionPolicyGetParams) (res HtcProjectsProjectIdTaskRetentionPolicyGetRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/task-retention-policy"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcProjectsProjectIdTaskRetentionPolicyGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcProjectsProjectIdTaskRetentionPolicyGetResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcProjectsProjectIdTaskRetentionPolicyPut invokes PUT /htc/projects/{projectId}/task-retention-policy operation.
-//
-// This endpoint enables project administrators to define or update the task retention policy for a
-// specific project. The task retention policy includes two key aspects:
-// * **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in
-// hours) after which an archived task is automatically deleted. This control allows for flexibility
-// in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before
-// being permanently deleted. Archived tasks can be unarchived during this period, protecting users
-// from prematurely deleting task resources
-// * **Auto-Archive After Inactivity**: The `archiveAfter` field allows administrators to specify the
-// duration (in hours) of inactivity after which an active task is automatically archived. This
-// feature helps in keeping the project organized by archiving active tasks, ensuring that storage
-// resources are freed optimistically.
-// Setting either value to `0` will result in disabling of that feature. For example, a project's
-// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
-// auto-deleting.If no policy is set at the project level, the workspace-level policy (if any) will
-// be applied to the project.
-//
-// PUT /htc/projects/{projectId}/task-retention-policy
-func (c *Client) HtcProjectsProjectIdTaskRetentionPolicyPut(ctx context.Context, request OptTaskRetentionPolicy, params HtcProjectsProjectIdTaskRetentionPolicyPutParams) (HtcProjectsProjectIdTaskRetentionPolicyPutRes, error) {
-	res, err := c.sendHtcProjectsProjectIdTaskRetentionPolicyPut(ctx, request, params)
-	return res, err
-}
-
-func (c *Client) sendHtcProjectsProjectIdTaskRetentionPolicyPut(ctx context.Context, request OptTaskRetentionPolicy, params HtcProjectsProjectIdTaskRetentionPolicyPutParams) (res HtcProjectsProjectIdTaskRetentionPolicyPutRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/task-retention-policy"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "PUT", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeHtcProjectsProjectIdTaskRetentionPolicyPutRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcProjectsProjectIdTaskRetentionPolicyPut", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcProjectsProjectIdTaskRetentionPolicyPutResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -6205,10 +6100,10 @@ func (c *Client) sendOAuth2TokenPost(ctx context.Context) (res OAuth2TokenPostRe
 	return result, nil
 }
 
-// PutTaskRetentionPolicy invokes putTaskRetentionPolicy operation.
+// PutProjectTaskRetentionPolicy invokes putProjectTaskRetentionPolicy operation.
 //
-// This endpoint enables Workspace administrators to define or update the task retention policy for a
-// specific workspace. The task retention policy includes two key aspects:
+// This endpoint enables project administrators to define or update the task retention policy for a
+// specific project. The task retention policy includes two key aspects:
 // * **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in
 // hours) after which an archived task is automatically deleted. This control allows for flexibility
 // in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before
@@ -6218,32 +6113,31 @@ func (c *Client) sendOAuth2TokenPost(ctx context.Context) (res OAuth2TokenPostRe
 // duration (in hours) of inactivity after which an active task is automatically archived. This
 // feature helps in keeping the project organized by archiving active tasks, ensuring that storage
 // resources are freed optimistically.
-// Setting either value to `0` will result in disabling of that feature. For example, a workspace's
+// Setting either value to `0` will result in disabling of that feature. For example, a project's
 // task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
-// auto-deleting. The policy applies to all projects within the workspace that do not have their own
-// project-level policy defined. If a project within the workspace has its own retention policy
-// defined, the project-level policy takes precedence over the workspace-level policy.
+// auto-deleting.If no policy is set at the project level, the workspace-level policy (if any) will
+// be applied to the project.
 //
-// PUT /htc/workspaces/{workspaceId}/task-retention-policy
-func (c *Client) PutTaskRetentionPolicy(ctx context.Context, request OptWorkspaceTaskRetentionPolicy, params PutTaskRetentionPolicyParams) (PutTaskRetentionPolicyRes, error) {
-	res, err := c.sendPutTaskRetentionPolicy(ctx, request, params)
+// PUT /htc/projects/{projectId}/task-retention-policy
+func (c *Client) PutProjectTaskRetentionPolicy(ctx context.Context, request OptTaskRetentionPolicy, params PutProjectTaskRetentionPolicyParams) (PutProjectTaskRetentionPolicyRes, error) {
+	res, err := c.sendPutProjectTaskRetentionPolicy(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendPutTaskRetentionPolicy(ctx context.Context, request OptWorkspaceTaskRetentionPolicy, params PutTaskRetentionPolicyParams) (res PutTaskRetentionPolicyRes, err error) {
+func (c *Client) sendPutProjectTaskRetentionPolicy(ctx context.Context, request OptTaskRetentionPolicy, params PutProjectTaskRetentionPolicyParams) (res PutProjectTaskRetentionPolicyRes, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [3]string
-	pathParts[0] = "/htc/workspaces/"
+	pathParts[0] = "/htc/projects/"
 	{
-		// Encode "workspaceId" parameter.
+		// Encode "projectId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "workspaceId",
+			Param:   "projectId",
 			Style:   uri.PathStyleSimple,
 			Explode: false,
 		})
 		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.WorkspaceId))
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
@@ -6260,7 +6154,7 @@ func (c *Client) sendPutTaskRetentionPolicy(ctx context.Context, request OptWork
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-	if err := encodePutTaskRetentionPolicyRequest(request, r); err != nil {
+	if err := encodePutProjectTaskRetentionPolicyRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}
 
@@ -6269,7 +6163,7 @@ func (c *Client) sendPutTaskRetentionPolicy(ctx context.Context, request OptWork
 		var satisfied bitset
 		{
 
-			switch err := c.securitySecurityScheme(ctx, "PutTaskRetentionPolicy", r); {
+			switch err := c.securitySecurityScheme(ctx, "PutProjectTaskRetentionPolicy", r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -6303,7 +6197,113 @@ func (c *Client) sendPutTaskRetentionPolicy(ctx context.Context, request OptWork
 	}
 	defer resp.Body.Close()
 
-	result, err := decodePutTaskRetentionPolicyResponse(resp)
+	result, err := decodePutProjectTaskRetentionPolicyResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// PutWorkspaceTaskRetentionPolicy invokes putWorkspaceTaskRetentionPolicy operation.
+//
+// This endpoint enables Workspace administrators to define or update the task retention policy for a
+// specific workspace. The task retention policy includes two key aspects:
+// * **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in
+// hours) after which an archived task is automatically deleted. This control allows for flexibility
+// in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before
+// being permanently deleted. Archived tasks can be unarchived during this period, protecting users
+// from prematurely deleting task resources
+// * **Auto-Archive After Inactivity**: The `archiveAfter` field allows administrators to specify the
+// duration (in hours) of inactivity after which an active task is automatically archived. This
+// feature helps in keeping the project organized by archiving active tasks, ensuring that storage
+// resources are freed optimistically.
+// Setting either value to `0` will result in disabling of that feature. For example, a workspace's
+// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
+// auto-deleting. The policy applies to all projects within the workspace that do not have their own
+// project-level policy defined. If a project within the workspace has its own retention policy
+// defined, the project-level policy takes precedence over the workspace-level policy.
+//
+// PUT /htc/workspaces/{workspaceId}/task-retention-policy
+func (c *Client) PutWorkspaceTaskRetentionPolicy(ctx context.Context, request OptWorkspaceTaskRetentionPolicy, params PutWorkspaceTaskRetentionPolicyParams) (PutWorkspaceTaskRetentionPolicyRes, error) {
+	res, err := c.sendPutWorkspaceTaskRetentionPolicy(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendPutWorkspaceTaskRetentionPolicy(ctx context.Context, request OptWorkspaceTaskRetentionPolicy, params PutWorkspaceTaskRetentionPolicyParams) (res PutWorkspaceTaskRetentionPolicyRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/htc/workspaces/"
+	{
+		// Encode "workspaceId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "workspaceId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.WorkspaceId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/task-retention-policy"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "PUT", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodePutWorkspaceTaskRetentionPolicyRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "PutWorkspaceTaskRetentionPolicy", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodePutWorkspaceTaskRetentionPolicyResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

@@ -637,6 +637,47 @@ func encodeGetProjectLimitsResponse(response GetProjectLimitsRes, w http.Respons
 	}
 }
 
+func encodeGetProjectTaskRetentionPolicyResponse(response GetProjectTaskRetentionPolicyRes, w http.ResponseWriter) error {
+	switch response := response.(type) {
+	case *TaskRetentionPolicy:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetProjectTaskRetentionPolicyUnauthorized:
+		w.WriteHeader(401)
+
+		return nil
+
+	case *GetProjectTaskRetentionPolicyForbidden:
+		w.WriteHeader(403)
+
+		return nil
+
+	case *OAuth2ErrorResponse:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeGetProjectsResponse(response GetProjectsRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCProjectsResponse:
@@ -700,47 +741,6 @@ func encodeGetRegistryTokenResponse(response GetRegistryTokenRes, w http.Respons
 		return nil
 
 	case *GetRegistryTokenForbidden:
-		w.WriteHeader(403)
-
-		return nil
-
-	case *OAuth2ErrorResponse:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(404)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeGetTaskRetentionPolicyResponse(response GetTaskRetentionPolicyRes, w http.ResponseWriter) error {
-	switch response := response.(type) {
-	case *WorkspaceTaskRetentionPolicy:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *GetTaskRetentionPolicyUnauthorized:
-		w.WriteHeader(401)
-
-		return nil
-
-	case *GetTaskRetentionPolicyForbidden:
 		w.WriteHeader(403)
 
 		return nil
@@ -936,6 +936,47 @@ func encodeGetWorkspaceLimitsResponse(response GetWorkspaceLimitsRes, w http.Res
 		return nil
 
 	case *GetWorkspaceLimitsForbidden:
+		w.WriteHeader(403)
+
+		return nil
+
+	case *OAuth2ErrorResponse:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodeGetWorkspaceTaskRetentionPolicyResponse(response GetWorkspaceTaskRetentionPolicyRes, w http.ResponseWriter) error {
+	switch response := response.(type) {
+	case *WorkspaceTaskRetentionPolicy:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetWorkspaceTaskRetentionPolicyUnauthorized:
+		w.WriteHeader(401)
+
+		return nil
+
+	case *GetWorkspaceTaskRetentionPolicyForbidden:
 		w.WriteHeader(403)
 
 		return nil
@@ -1407,88 +1448,6 @@ func encodeHtcProjectsProjectIdTaskRetentionPolicyDeleteResponse(response HtcPro
 		return nil
 
 	case *HtcProjectsProjectIdTaskRetentionPolicyDeleteForbidden:
-		w.WriteHeader(403)
-
-		return nil
-
-	case *OAuth2ErrorResponse:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(404)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeHtcProjectsProjectIdTaskRetentionPolicyGetResponse(response HtcProjectsProjectIdTaskRetentionPolicyGetRes, w http.ResponseWriter) error {
-	switch response := response.(type) {
-	case *TaskRetentionPolicy:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *HtcProjectsProjectIdTaskRetentionPolicyGetUnauthorized:
-		w.WriteHeader(401)
-
-		return nil
-
-	case *HtcProjectsProjectIdTaskRetentionPolicyGetForbidden:
-		w.WriteHeader(403)
-
-		return nil
-
-	case *OAuth2ErrorResponse:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(404)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeHtcProjectsProjectIdTaskRetentionPolicyPutResponse(response HtcProjectsProjectIdTaskRetentionPolicyPutRes, w http.ResponseWriter) error {
-	switch response := response.(type) {
-	case *TaskRetentionPolicy:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(201)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *HtcProjectsProjectIdTaskRetentionPolicyPutUnauthorized:
-		w.WriteHeader(401)
-
-		return nil
-
-	case *HtcProjectsProjectIdTaskRetentionPolicyPutForbidden:
 		w.WriteHeader(403)
 
 		return nil
@@ -2103,9 +2062,9 @@ func encodeOAuth2TokenPostResponse(response OAuth2TokenPostRes, w http.ResponseW
 	}
 }
 
-func encodePutTaskRetentionPolicyResponse(response PutTaskRetentionPolicyRes, w http.ResponseWriter) error {
+func encodePutProjectTaskRetentionPolicyResponse(response PutProjectTaskRetentionPolicyRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
-	case *WorkspaceTaskRetentionPolicy:
+	case *TaskRetentionPolicy:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(201)
 
@@ -2117,12 +2076,12 @@ func encodePutTaskRetentionPolicyResponse(response PutTaskRetentionPolicyRes, w 
 
 		return nil
 
-	case *PutTaskRetentionPolicyUnauthorized:
+	case *PutProjectTaskRetentionPolicyUnauthorized:
 		w.WriteHeader(401)
 
 		return nil
 
-	case *PutTaskRetentionPolicyForbidden:
+	case *PutProjectTaskRetentionPolicyForbidden:
 		w.WriteHeader(403)
 
 		return nil
@@ -2139,7 +2098,48 @@ func encodePutTaskRetentionPolicyResponse(response PutTaskRetentionPolicyRes, w 
 
 		return nil
 
-	case *PutTaskRetentionPolicyMethodNotAllowed:
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodePutWorkspaceTaskRetentionPolicyResponse(response PutWorkspaceTaskRetentionPolicyRes, w http.ResponseWriter) error {
+	switch response := response.(type) {
+	case *WorkspaceTaskRetentionPolicy:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(201)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *PutWorkspaceTaskRetentionPolicyUnauthorized:
+		w.WriteHeader(401)
+
+		return nil
+
+	case *PutWorkspaceTaskRetentionPolicyForbidden:
+		w.WriteHeader(403)
+
+		return nil
+
+	case *OAuth2ErrorResponse:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *PutWorkspaceTaskRetentionPolicyMethodNotAllowed:
 		w.WriteHeader(405)
 
 		return nil

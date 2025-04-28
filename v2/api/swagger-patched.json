@@ -3465,6 +3465,7 @@
          },
          "get": {
             "description": "This endpoint is used to retrieve the current task retention policy of a specific project. The task retention policy is necessary in managing the lifecycle of tasks within a project. The task retention policy includes two key aspects:\n\n* **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after which an archived task is automatically deleted. Archived tasks can be unarchived during this period, protecting users from prematurely deleting task resources.\n\n* **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours) of inactivity after which an active task is automatically archived. This feature helps in keeping the project organized by archiving active tasks, ensuring that storage resources are freed optimistically.\n\nSetting either value to `0` will result in disabling of that feature. For example, a project's task retention policy with `deleteAfter` set to `0` will result in tasks within that project never auto-deleting. \n\nIf no policy is set at the project level (i.e., the response is a 404), the policy at the workspace level will apply. If the policy has archiveAfter or deleteAfter set to 0, it means that auto-archival or auto-deletion is disabled at the project level and any workspace level policy is ignored",
+            "operationId": "getProjectTaskRetentionPolicy",
             "parameters": [
                {
                   "in": "path",
@@ -3511,10 +3512,12 @@
             "summary": "Get Project Task Retention Policy",
             "tags": [
                "Project Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Project"
          },
          "put": {
             "description": "This endpoint enables project administrators to define or update the task retention policy for a specific project. The task retention policy includes two key aspects:\n\n* **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in hours) after which an archived task is automatically deleted. This control allows for flexibility in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before being permanently deleted. Archived tasks can be unarchived during this period, protecting users from prematurely deleting task resources\n\n* **Auto-Archive After Inactivity**: The `archiveAfter` field allows administrators to specify the duration (in hours) of inactivity after which an active task is automatically archived. This feature helps in keeping the project organized by archiving active tasks, ensuring that storage resources are freed optimistically.\n\nSetting either value to `0` will result in disabling of that feature. For example, a project's task retention policy with `deleteAfter` set to `0` will result in tasks within that project never auto-deleting.If no policy is set at the project level, the workspace-level policy (if any) will be applied to the project.",
+            "operationId": "putProjectTaskRetentionPolicy",
             "parameters": [
                {
                   "in": "path",
@@ -3570,7 +3573,8 @@
             "summary": "Modify Project Task Retention Policy",
             "tags": [
                "Project Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Project"
          }
       },
       "/htc/projects/{projectId}/tasks": {
@@ -5362,7 +5366,7 @@
       "/htc/workspaces/{workspaceId}/task-retention-policy": {
          "get": {
             "description": "This endpoint is used to retrieve the current task retention policy of a specific Workspace. The task retention policy is necessary in managing the lifecycle of tasks within a Workspace. The task retention policy includes two key aspects:\n\n* **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after which an archived task is automatically deleted. Archived tasks can be unarchived during this period, protecting users from prematurely deleting task resources.\n\n* **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours) of inactivity after which an active task is automatically archived. This feature helps in keeping the project organized by archiving active tasks, ensuring that storage resources are freed optimistically.\n\nSetting either value to `0` will result in disabling of that feature. For example, a project's task retention policy with `deleteAfter` set to `0` will result in tasks within that project never auto-deleting.",
-            "operationId": "getTaskRetentionPolicy",
+            "operationId": "getWorkspaceTaskRetentionPolicy",
             "parameters": [
                {
                   "in": "path",
@@ -5414,7 +5418,7 @@
          },
          "put": {
             "description": "This endpoint enables Workspace administrators to define or update the task retention policy for a specific workspace. The task retention policy includes two key aspects:\n\n* **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in hours) after which an archived task is automatically deleted. This control allows for flexibility in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before being permanently deleted. Archived tasks can be unarchived during this period, protecting users from prematurely deleting task resources\n\n* **Auto-Archive After Inactivity**: The `archiveAfter` field allows administrators to specify the duration (in hours) of inactivity after which an active task is automatically archived. This feature helps in keeping the project organized by archiving active tasks, ensuring that storage resources are freed optimistically.\n\nSetting either value to `0` will result in disabling of that feature. For example, a workspace's task retention policy with `deleteAfter` set to `0` will result in tasks within that project never auto-deleting. The policy applies to all projects within the workspace that do not have their own project-level policy defined. If a project within the workspace has its own retention policy defined, the project-level policy takes precedence over the workspace-level policy.",
-            "operationId": "putTaskRetentionPolicy",
+            "operationId": "putWorkspaceTaskRetentionPolicy",
             "parameters": [
                {
                   "in": "path",

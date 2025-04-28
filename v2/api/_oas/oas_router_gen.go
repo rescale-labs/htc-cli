@@ -649,11 +649,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												args[0],
 											}, elemIsEscaped, w, r)
 										case "GET":
-											s.handleHtcProjectsProjectIdTaskRetentionPolicyGetRequest([1]string{
+											s.handleGetProjectTaskRetentionPolicyRequest([1]string{
 												args[0],
 											}, elemIsEscaped, w, r)
 										case "PUT":
-											s.handleHtcProjectsProjectIdTaskRetentionPolicyPutRequest([1]string{
+											s.handlePutProjectTaskRetentionPolicyRequest([1]string{
 												args[0],
 											}, elemIsEscaped, w, r)
 										default:
@@ -1376,11 +1376,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								// Leaf node.
 								switch r.Method {
 								case "GET":
-									s.handleGetTaskRetentionPolicyRequest([1]string{
+									s.handleGetWorkspaceTaskRetentionPolicyRequest([1]string{
 										args[0],
 									}, elemIsEscaped, w, r)
 								case "PUT":
-									s.handlePutTaskRetentionPolicyRequest([1]string{
+									s.handlePutWorkspaceTaskRetentionPolicyRequest([1]string{
 										args[0],
 									}, elemIsEscaped, w, r)
 								default:
@@ -2182,17 +2182,17 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.count = 1
 											return r, true
 										case "GET":
-											r.name = "HtcProjectsProjectIdTaskRetentionPolicyGet"
+											r.name = "GetProjectTaskRetentionPolicy"
 											r.summary = "Get Project Task Retention Policy"
-											r.operationID = ""
+											r.operationID = "getProjectTaskRetentionPolicy"
 											r.pathPattern = "/htc/projects/{projectId}/task-retention-policy"
 											r.args = args
 											r.count = 1
 											return r, true
 										case "PUT":
-											r.name = "HtcProjectsProjectIdTaskRetentionPolicyPut"
+											r.name = "PutProjectTaskRetentionPolicy"
 											r.summary = "Modify Project Task Retention Policy"
-											r.operationID = ""
+											r.operationID = "putProjectTaskRetentionPolicy"
 											r.pathPattern = "/htc/projects/{projectId}/task-retention-policy"
 											r.args = args
 											r.count = 1
@@ -2954,17 +2954,17 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								// Leaf node.
 								switch method {
 								case "GET":
-									r.name = "GetTaskRetentionPolicy"
+									r.name = "GetWorkspaceTaskRetentionPolicy"
 									r.summary = "Get Workspace Task Retention Policy"
-									r.operationID = "getTaskRetentionPolicy"
+									r.operationID = "getWorkspaceTaskRetentionPolicy"
 									r.pathPattern = "/htc/workspaces/{workspaceId}/task-retention-policy"
 									r.args = args
 									r.count = 1
 									return r, true
 								case "PUT":
-									r.name = "PutTaskRetentionPolicy"
+									r.name = "PutWorkspaceTaskRetentionPolicy"
 									r.summary = "Modify Workspace Task Retention Policy"
-									r.operationID = "putTaskRetentionPolicy"
+									r.operationID = "putWorkspaceTaskRetentionPolicy"
 									r.pathPattern = "/htc/workspaces/{workspaceId}/task-retention-policy"
 									r.args = args
 									r.count = 1
