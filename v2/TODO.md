@@ -8,25 +8,29 @@ As things check off, please remember to copy to
 ## Soon
 
 Essential API operations:
-  * project create
-  * `project retention-policy get` returns error on 404 instead of nothing
-  * Limits:
+  * Project limits, dimensions, and task retention policy (ENK-2469):
+    * `project dimensions apply`
+    * `project limits apply`
+    * `project retention-policy apply`
+  * Workspace limits, dimensions, and task retention policy (ENK-2450):
     * `workspace dimensions get`
     * `workspace limits get`
-    * CRUD for both project + workspace limits
-  * `clusters get`
+    * `workspace retention-policy get`
+    * `workspace dimensions apply`
+    * `workspace limits apply`
+    * `workspace retention-policy apply`
+  * `clusters get` (ENK-2651)
+  * Jobs:
+    * GET /jobs/{jobId}/events  (ENK-2652)
+    * POST /jobs/cancel (ENK-2653)
+  * Tasks:
+    * GET /tasks/summary-statistics (ENK-2654)
 	* Fix JSON output:
 		* Make runner.PrintResult should require `tabler.Tabler` interface
 		* Make tabler.Tabler interface include `MarshalJSON([]byte) error`
     * Document in the interface why this is important (because for non-slice
       types, we need to use oapi's `MarshalJSON()` implementation, otherwise
       JSON encoding can fail, as it did quite unpleasantly with tabler.HTCJob.
-  * Jobs:
-    * GET /jobs/{jobId}/events
-    * GET /jobs/{jobId}/logs
-    * POST /jobs/cancel
-  * Tasks:
-    * GET /tasks/summary-statistics
 
 Warts:
   * We now have `--project-id` on CLI, `project_id` in TOML, and `projectId` in some (but not all!) JSON. Will need to ask for Enkis' thoughts on this.
@@ -64,7 +68,7 @@ Automation:
 
 things we run a lot in my team are:
   * list out all the workspaces - with the name / ID and (possibly) API key
-  * list out all the projects that are configured as part of a given WS
+  * [done] list out all the projects that are configured as part of a given WS
   * describe the vcpu-limits of a project
     * and set the vcpu-limits of a project
   * describe the dimensions of a project
