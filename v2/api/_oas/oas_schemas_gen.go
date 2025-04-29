@@ -286,6 +286,16 @@ type CreateProjectForbidden struct{}
 
 func (*CreateProjectForbidden) createProjectRes() {}
 
+// CreateProjectLimitForbidden is response for CreateProjectLimit operation.
+type CreateProjectLimitForbidden struct{}
+
+func (*CreateProjectLimitForbidden) createProjectLimitRes() {}
+
+// CreateProjectLimitUnauthorized is response for CreateProjectLimit operation.
+type CreateProjectLimitUnauthorized struct{}
+
+func (*CreateProjectLimitUnauthorized) createProjectLimitRes() {}
+
 // CreateProjectUnauthorized is response for CreateProject operation.
 type CreateProjectUnauthorized struct{}
 
@@ -2775,9 +2785,9 @@ func (s *HTCProjectLimit) SetWorkspaceId(val OptString) {
 	s.WorkspaceId = val
 }
 
+func (*HTCProjectLimit) createProjectLimitRes()                {}
 func (*HTCProjectLimit) htcProjectsProjectIdLimitsIDGetRes()   {}
 func (*HTCProjectLimit) htcProjectsProjectIdLimitsIDPatchRes() {}
-func (*HTCProjectLimit) htcProjectsProjectIdLimitsPostRes()    {}
 
 type HTCProjectLimitModifierRole string
 
@@ -3835,16 +3845,6 @@ type HtcProjectsProjectIdLimitsIDPatchUnauthorized struct{}
 
 func (*HtcProjectsProjectIdLimitsIDPatchUnauthorized) htcProjectsProjectIdLimitsIDPatchRes() {}
 
-// HtcProjectsProjectIdLimitsPostForbidden is response for HtcProjectsProjectIdLimitsPost operation.
-type HtcProjectsProjectIdLimitsPostForbidden struct{}
-
-func (*HtcProjectsProjectIdLimitsPostForbidden) htcProjectsProjectIdLimitsPostRes() {}
-
-// HtcProjectsProjectIdLimitsPostUnauthorized is response for HtcProjectsProjectIdLimitsPost operation.
-type HtcProjectsProjectIdLimitsPostUnauthorized struct{}
-
-func (*HtcProjectsProjectIdLimitsPostUnauthorized) htcProjectsProjectIdLimitsPostRes() {}
-
 // HtcProjectsProjectIdPatchForbidden is response for HtcProjectsProjectIdPatch operation.
 type HtcProjectsProjectIdPatchForbidden struct{}
 
@@ -4729,6 +4729,7 @@ func (s *OAuth2ErrorResponse) SetErrorDescription(val OptString) {
 }
 
 func (*OAuth2ErrorResponse) authTokenWhoamiGetRes()                                       {}
+func (*OAuth2ErrorResponse) createProjectLimitRes()                                       {}
 func (*OAuth2ErrorResponse) createRepoRes()                                               {}
 func (*OAuth2ErrorResponse) createTaskRes()                                               {}
 func (*OAuth2ErrorResponse) getGCPClustersRes()                                           {}
@@ -4749,7 +4750,6 @@ func (*OAuth2ErrorResponse) htcProjectsProjectIdLimitsDeleteRes()               
 func (*OAuth2ErrorResponse) htcProjectsProjectIdLimitsIDDeleteRes()                       {}
 func (*OAuth2ErrorResponse) htcProjectsProjectIdLimitsIDGetRes()                          {}
 func (*OAuth2ErrorResponse) htcProjectsProjectIdLimitsIDPatchRes()                        {}
-func (*OAuth2ErrorResponse) htcProjectsProjectIdLimitsPostRes()                           {}
 func (*OAuth2ErrorResponse) htcProjectsProjectIdPatchRes()                                {}
 func (*OAuth2ErrorResponse) htcProjectsProjectIdStoragePresignedURLGetRes()               {}
 func (*OAuth2ErrorResponse) htcProjectsProjectIdStorageTokenGetRes()                      {}

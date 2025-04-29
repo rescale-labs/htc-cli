@@ -9,6 +9,10 @@ type CancelJobsRes interface {
 	cancelJobsRes()
 }
 
+type CreateProjectLimitRes interface {
+	createProjectLimitRes()
+}
+
 type CreateProjectRes interface {
 	createProjectRes()
 }
@@ -119,10 +123,6 @@ type HtcProjectsProjectIdLimitsIDGetRes interface {
 
 type HtcProjectsProjectIdLimitsIDPatchRes interface {
 	htcProjectsProjectIdLimitsIDPatchRes()
-}
-
-type HtcProjectsProjectIdLimitsPostRes interface {
-	htcProjectsProjectIdLimitsPostRes()
 }
 
 type HtcProjectsProjectIdPatchRes interface {

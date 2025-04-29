@@ -65,17 +65,6 @@ type Handler interface {
 	//
 	// PATCH /htc/projects/{projectId}/limits/{id}
 	HtcProjectsProjectIdLimitsIDPatch(ctx context.Context, req OptHTCLimitUpdate, params HtcProjectsProjectIdLimitsIDPatchParams) (HtcProjectsProjectIdLimitsIDPatchRes, error)
-	// HtcProjectsProjectIdLimitsPost implements POST /htc/projects/{projectId}/limits operation.
-	//
-	// This endpoint will add a new limit to this project or overwrite an existing limit if one already
-	// exists with the provided `modifierRole`.
-	// Jobs submitted to this project will only run when the active resource count falls below the
-	// minimum of all limits associated with this project.
-	// Any user who belongs the project's workspace can modify the `PROJECT_ADMIN` limit. Higher
-	// permissions are required to modify the `WORKSPACE_ADMIN` limit.
-	//
-	// POST /htc/projects/{projectId}/limits
-	HtcProjectsProjectIdLimitsPost(ctx context.Context, req OptHTCLimitCreate, params HtcProjectsProjectIdLimitsPostParams) (HtcProjectsProjectIdLimitsPostRes, error)
 	// HtcProjectsProjectIdPatch implements PATCH /htc/projects/{projectId} operation.
 	//
 	// This endpoint allows for updating a project's regions.
@@ -350,6 +339,17 @@ type ProjectHandler interface {
 	//
 	// POST /htc/projects
 	CreateProject(ctx context.Context, req OptHTCProject) (CreateProjectRes, error)
+	// CreateProjectLimit implements createProjectLimit operation.
+	//
+	// This endpoint will add a new limit to this project or overwrite an existing limit if one already
+	// exists with the provided `modifierRole`.
+	// Jobs submitted to this project will only run when the active resource count falls below the
+	// minimum of all limits associated with this project.
+	// Any user who belongs the project's workspace can modify the `PROJECT_ADMIN` limit. Higher
+	// permissions are required to modify the `WORKSPACE_ADMIN` limit.
+	//
+	// POST /htc/projects/{projectId}/limits
+	CreateProjectLimit(ctx context.Context, req OptHTCLimitCreate, params CreateProjectLimitParams) (CreateProjectLimitRes, error)
 	// GetProject implements getProject operation.
 	//
 	// This endpoint will get a project by id.

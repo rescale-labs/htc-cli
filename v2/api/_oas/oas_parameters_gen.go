@@ -185,6 +185,71 @@ func decodeCancelJobsParams(args [2]string, argsEscaped bool, r *http.Request) (
 	return params, nil
 }
 
+// CreateProjectLimitParams is parameters of createProjectLimit operation.
+type CreateProjectLimitParams struct {
+	ProjectId string
+}
+
+func unpackCreateProjectLimitParams(packed middleware.Parameters) (params CreateProjectLimitParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "projectId",
+			In:   "path",
+		}
+		params.ProjectId = packed[key].(string)
+	}
+	return params
+}
+
+func decodeCreateProjectLimitParams(args [1]string, argsEscaped bool, r *http.Request) (params CreateProjectLimitParams, _ error) {
+	// Decode path: projectId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "projectId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.ProjectId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "projectId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // CreateRepoParams is parameters of createRepo operation.
 type CreateRepoParams struct {
 	ProjectId string
@@ -3462,71 +3527,6 @@ func decodeHtcProjectsProjectIdLimitsIDPatchParams(args [2]string, argsEscaped b
 			Err:  err,
 		}
 	}
-	// Decode path: projectId.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "projectId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.ProjectId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "projectId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
-// HtcProjectsProjectIdLimitsPostParams is parameters of POST /htc/projects/{projectId}/limits operation.
-type HtcProjectsProjectIdLimitsPostParams struct {
-	ProjectId string
-}
-
-func unpackHtcProjectsProjectIdLimitsPostParams(packed middleware.Parameters) (params HtcProjectsProjectIdLimitsPostParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "projectId",
-			In:   "path",
-		}
-		params.ProjectId = packed[key].(string)
-	}
-	return params
-}
-
-func decodeHtcProjectsProjectIdLimitsPostParams(args [1]string, argsEscaped bool, r *http.Request) (params HtcProjectsProjectIdLimitsPostParams, _ error) {
 	// Decode path: projectId.
 	if err := func() error {
 		param := args[0]

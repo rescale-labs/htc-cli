@@ -117,6 +117,47 @@ func encodeCreateProjectResponse(response CreateProjectRes, w http.ResponseWrite
 	}
 }
 
+func encodeCreateProjectLimitResponse(response CreateProjectLimitRes, w http.ResponseWriter) error {
+	switch response := response.(type) {
+	case *HTCProjectLimit:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(201)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *CreateProjectLimitUnauthorized:
+		w.WriteHeader(401)
+
+		return nil
+
+	case *CreateProjectLimitForbidden:
+		w.WriteHeader(403)
+
+		return nil
+
+	case *OAuth2ErrorResponse:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeCreateRepoResponse(response CreateRepoRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCRepository:
@@ -1168,47 +1209,6 @@ func encodeHtcProjectsProjectIdLimitsIDPatchResponse(response HtcProjectsProject
 		return nil
 
 	case *HtcProjectsProjectIdLimitsIDPatchForbidden:
-		w.WriteHeader(403)
-
-		return nil
-
-	case *OAuth2ErrorResponse:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(404)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeHtcProjectsProjectIdLimitsPostResponse(response HtcProjectsProjectIdLimitsPostRes, w http.ResponseWriter) error {
-	switch response := response.(type) {
-	case *HTCProjectLimit:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(201)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *HtcProjectsProjectIdLimitsPostUnauthorized:
-		w.WriteHeader(401)
-
-		return nil
-
-	case *HtcProjectsProjectIdLimitsPostForbidden:
 		w.WriteHeader(403)
 
 		return nil

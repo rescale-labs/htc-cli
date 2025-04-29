@@ -2955,6 +2955,7 @@
          },
          "post": {
             "description": "This endpoint will add a new limit to this project or overwrite an existing limit if one already exists with the provided `modifierRole`.\n\nJobs submitted to this project will only run when the active resource count falls below the minimum of all limits associated with this project.\n\nAny user who belongs the project's workspace can modify the `PROJECT_ADMIN` limit. Higher permissions are required to modify the `WORKSPACE_ADMIN` limit",
+            "operationId": "createProjectLimit",
             "parameters": [
                {
                   "in": "path",
@@ -3010,7 +3011,8 @@
             "summary": "Create a Project Limit",
             "tags": [
                "Project Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Project"
          }
       },
       "/htc/projects/{projectId}/limits/{id}": {

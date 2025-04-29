@@ -143,6 +143,10 @@ local patches = {
           },
         },
       },
+      post+: {
+        'x-ogen-operation-group': 'Project',
+        operationId: 'createProjectLimit',
+      }
     },
     '/htc/projects/{projectId}/task-retention-policy'+: {
       get+: {

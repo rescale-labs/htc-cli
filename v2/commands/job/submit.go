@@ -78,11 +78,6 @@ func Submit(cmd *cobra.Command, args []string) error {
 	if len(args) != 1 {
 		return fmt.Errorf("Error: job yaml not provided")
 	}
-	f, err := common.OpenArg(args[0])
-	if err != nil {
-		return err
-	}
-	defer f.Close()
 
 	req := submitRequest{
 		params: oapi.SubmitJobsParams{
@@ -92,9 +87,8 @@ func Submit(cmd *cobra.Command, args []string) error {
 		},
 	}
 
-	dec := json.NewDecoder(f)
-	if err := dec.Decode(&req.batch); err != nil {
-		return fmt.Errorf("Error parsing %s: %v", args[0], err)
+	if err := common.DecodeFile(&req.batch, args[0]); err != nil {
+		return err
 	}
 
 	// Patch job environment with envMap

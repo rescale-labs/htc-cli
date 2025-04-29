@@ -19,15 +19,8 @@ func createProject(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	f, err := common.OpenArg(args[0])
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	dec := json.NewDecoder(f)
 	var proj oapi.HTCProject
-	if err := dec.Decode(&proj); err != nil {
+	if err := common.DecodeFile(&proj, args[0]); err != nil {
 		return err
 	}
 

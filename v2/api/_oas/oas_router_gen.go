@@ -455,7 +455,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											args[0],
 										}, elemIsEscaped, w, r)
 									case "POST":
-										s.handleHtcProjectsProjectIdLimitsPostRequest([1]string{
+										s.handleCreateProjectLimitRequest([1]string{
 											args[0],
 										}, elemIsEscaped, w, r)
 									default:
@@ -1968,9 +1968,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.count = 1
 										return r, true
 									case "POST":
-										r.name = "HtcProjectsProjectIdLimitsPost"
+										r.name = "CreateProjectLimit"
 										r.summary = "Create a Project Limit"
-										r.operationID = ""
+										r.operationID = "createProjectLimit"
 										r.pathPattern = "/htc/projects/{projectId}/limits"
 										r.args = args
 										r.count = 1

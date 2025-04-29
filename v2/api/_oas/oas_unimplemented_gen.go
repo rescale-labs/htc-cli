@@ -42,6 +42,20 @@ func (UnimplementedHandler) CreateProject(ctx context.Context, req OptHTCProject
 	return r, ht.ErrNotImplemented
 }
 
+// CreateProjectLimit implements createProjectLimit operation.
+//
+// This endpoint will add a new limit to this project or overwrite an existing limit if one already
+// exists with the provided `modifierRole`.
+// Jobs submitted to this project will only run when the active resource count falls below the
+// minimum of all limits associated with this project.
+// Any user who belongs the project's workspace can modify the `PROJECT_ADMIN` limit. Higher
+// permissions are required to modify the `WORKSPACE_ADMIN` limit.
+//
+// POST /htc/projects/{projectId}/limits
+func (UnimplementedHandler) CreateProjectLimit(ctx context.Context, req OptHTCLimitCreate, params CreateProjectLimitParams) (r CreateProjectLimitRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // CreateRepo implements createRepo operation.
 //
 // This endpoint will create a private container repository belonging to this project
@@ -356,20 +370,6 @@ func (UnimplementedHandler) HtcProjectsProjectIdLimitsIDGet(ctx context.Context,
 //
 // PATCH /htc/projects/{projectId}/limits/{id}
 func (UnimplementedHandler) HtcProjectsProjectIdLimitsIDPatch(ctx context.Context, req OptHTCLimitUpdate, params HtcProjectsProjectIdLimitsIDPatchParams) (r HtcProjectsProjectIdLimitsIDPatchRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// HtcProjectsProjectIdLimitsPost implements POST /htc/projects/{projectId}/limits operation.
-//
-// This endpoint will add a new limit to this project or overwrite an existing limit if one already
-// exists with the provided `modifierRole`.
-// Jobs submitted to this project will only run when the active resource count falls below the
-// minimum of all limits associated with this project.
-// Any user who belongs the project's workspace can modify the `PROJECT_ADMIN` limit. Higher
-// permissions are required to modify the `WORKSPACE_ADMIN` limit.
-//
-// POST /htc/projects/{projectId}/limits
-func (UnimplementedHandler) HtcProjectsProjectIdLimitsPost(ctx context.Context, req OptHTCLimitCreate, params HtcProjectsProjectIdLimitsPostParams) (r HtcProjectsProjectIdLimitsPostRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

@@ -53,15 +53,8 @@ func putTaskRetentionPolicy(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	f, err := common.OpenArg(args[0])
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	dec := json.NewDecoder(f)
 	var policy oapi.WorkspaceTaskRetentionPolicy
-	if err := dec.Decode(&policy); err != nil {
+	if err := common.DecodeFile(&policy, args[0]); err != nil {
 		return err
 	}
 

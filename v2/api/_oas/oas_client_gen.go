@@ -74,17 +74,6 @@ type Invoker interface {
 	//
 	// PATCH /htc/projects/{projectId}/limits/{id}
 	HtcProjectsProjectIdLimitsIDPatch(ctx context.Context, request OptHTCLimitUpdate, params HtcProjectsProjectIdLimitsIDPatchParams) (HtcProjectsProjectIdLimitsIDPatchRes, error)
-	// HtcProjectsProjectIdLimitsPost invokes POST /htc/projects/{projectId}/limits operation.
-	//
-	// This endpoint will add a new limit to this project or overwrite an existing limit if one already
-	// exists with the provided `modifierRole`.
-	// Jobs submitted to this project will only run when the active resource count falls below the
-	// minimum of all limits associated with this project.
-	// Any user who belongs the project's workspace can modify the `PROJECT_ADMIN` limit. Higher
-	// permissions are required to modify the `WORKSPACE_ADMIN` limit.
-	//
-	// POST /htc/projects/{projectId}/limits
-	HtcProjectsProjectIdLimitsPost(ctx context.Context, request OptHTCLimitCreate, params HtcProjectsProjectIdLimitsPostParams) (HtcProjectsProjectIdLimitsPostRes, error)
 	// HtcProjectsProjectIdPatch invokes PATCH /htc/projects/{projectId} operation.
 	//
 	// This endpoint allows for updating a project's regions.
@@ -359,6 +348,17 @@ type ProjectInvoker interface {
 	//
 	// POST /htc/projects
 	CreateProject(ctx context.Context, request OptHTCProject) (CreateProjectRes, error)
+	// CreateProjectLimit invokes createProjectLimit operation.
+	//
+	// This endpoint will add a new limit to this project or overwrite an existing limit if one already
+	// exists with the provided `modifierRole`.
+	// Jobs submitted to this project will only run when the active resource count falls below the
+	// minimum of all limits associated with this project.
+	// Any user who belongs the project's workspace can modify the `PROJECT_ADMIN` limit. Higher
+	// permissions are required to modify the `WORKSPACE_ADMIN` limit.
+	//
+	// POST /htc/projects/{projectId}/limits
+	CreateProjectLimit(ctx context.Context, request OptHTCLimitCreate, params CreateProjectLimitParams) (CreateProjectLimitRes, error)
 	// GetProject invokes getProject operation.
 	//
 	// This endpoint will get a project by id.
@@ -845,6 +845,102 @@ func (c *Client) sendCreateProject(ctx context.Context, request OptHTCProject) (
 	defer resp.Body.Close()
 
 	result, err := decodeCreateProjectResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CreateProjectLimit invokes createProjectLimit operation.
+//
+// This endpoint will add a new limit to this project or overwrite an existing limit if one already
+// exists with the provided `modifierRole`.
+// Jobs submitted to this project will only run when the active resource count falls below the
+// minimum of all limits associated with this project.
+// Any user who belongs the project's workspace can modify the `PROJECT_ADMIN` limit. Higher
+// permissions are required to modify the `WORKSPACE_ADMIN` limit.
+//
+// POST /htc/projects/{projectId}/limits
+func (c *Client) CreateProjectLimit(ctx context.Context, request OptHTCLimitCreate, params CreateProjectLimitParams) (CreateProjectLimitRes, error) {
+	res, err := c.sendCreateProjectLimit(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendCreateProjectLimit(ctx context.Context, request OptHTCLimitCreate, params CreateProjectLimitParams) (res CreateProjectLimitRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/limits"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCreateProjectLimitRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "CreateProjectLimit", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeCreateProjectLimitResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -3823,102 +3919,6 @@ func (c *Client) sendHtcProjectsProjectIdLimitsIDPatch(ctx context.Context, requ
 	defer resp.Body.Close()
 
 	result, err := decodeHtcProjectsProjectIdLimitsIDPatchResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcProjectsProjectIdLimitsPost invokes POST /htc/projects/{projectId}/limits operation.
-//
-// This endpoint will add a new limit to this project or overwrite an existing limit if one already
-// exists with the provided `modifierRole`.
-// Jobs submitted to this project will only run when the active resource count falls below the
-// minimum of all limits associated with this project.
-// Any user who belongs the project's workspace can modify the `PROJECT_ADMIN` limit. Higher
-// permissions are required to modify the `WORKSPACE_ADMIN` limit.
-//
-// POST /htc/projects/{projectId}/limits
-func (c *Client) HtcProjectsProjectIdLimitsPost(ctx context.Context, request OptHTCLimitCreate, params HtcProjectsProjectIdLimitsPostParams) (HtcProjectsProjectIdLimitsPostRes, error) {
-	res, err := c.sendHtcProjectsProjectIdLimitsPost(ctx, request, params)
-	return res, err
-}
-
-func (c *Client) sendHtcProjectsProjectIdLimitsPost(ctx context.Context, request OptHTCLimitCreate, params HtcProjectsProjectIdLimitsPostParams) (res HtcProjectsProjectIdLimitsPostRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/limits"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "POST", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeHtcProjectsProjectIdLimitsPostRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcProjectsProjectIdLimitsPost", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcProjectsProjectIdLimitsPostResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

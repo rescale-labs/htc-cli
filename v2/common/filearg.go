@@ -1,6 +1,7 @@
 package common
 
 import (
+	"encoding/json"
 	"io"
 	"os"
 )
@@ -12,4 +13,15 @@ func OpenArg(path string) (io.ReadCloser, error) {
 		return os.Stdin, nil
 	}
 	return os.Open(path)
+}
+
+// Decode a provided JSON file into the template type
+func DecodeFile(target any, path string) error {
+    f, err := OpenArg(path)
+    if err != nil {
+        return err
+    }
+    defer f.Close()
+
+    return json.NewDecoder(f).Decode(target)
 }
