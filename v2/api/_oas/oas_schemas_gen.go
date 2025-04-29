@@ -281,6 +281,16 @@ func (s *ContainerDetails) SetReason(val OptString) {
 	s.Reason = val
 }
 
+// CreateProjectDimensionsForbidden is response for CreateProjectDimensions operation.
+type CreateProjectDimensionsForbidden struct{}
+
+func (*CreateProjectDimensionsForbidden) createProjectDimensionsRes() {}
+
+// CreateProjectDimensionsUnauthorized is response for CreateProjectDimensions operation.
+type CreateProjectDimensionsUnauthorized struct{}
+
+func (*CreateProjectDimensionsUnauthorized) createProjectDimensionsRes() {}
+
 // CreateProjectForbidden is response for CreateProject operation.
 type CreateProjectForbidden struct{}
 
@@ -2679,7 +2689,8 @@ func (*HTCProject) htcProjectsProjectIdPatchRes() {}
 
 type HTCProjectDimensions []HTCComputeEnvironment
 
-func (*HTCProjectDimensions) getProjectDimensionsRes() {}
+func (*HTCProjectDimensions) createProjectDimensionsRes() {}
+func (*HTCProjectDimensions) getProjectDimensionsRes()    {}
 
 // Ref: #/components/schemas/HTCProjectLimit
 type HTCProjectLimit struct {
@@ -3780,21 +3791,6 @@ func (s *HTCWorkspaceLimit) SetWorkspaceId(val OptString) {
 
 func (*HTCWorkspaceLimit) getWorkspaceLimitsRes() {}
 
-type HtcProjectsProjectIdDimensionsPutCreatedApplicationJSON []HTCComputeEnvironment
-
-func (*HtcProjectsProjectIdDimensionsPutCreatedApplicationJSON) htcProjectsProjectIdDimensionsPutRes() {
-}
-
-// HtcProjectsProjectIdDimensionsPutForbidden is response for HtcProjectsProjectIdDimensionsPut operation.
-type HtcProjectsProjectIdDimensionsPutForbidden struct{}
-
-func (*HtcProjectsProjectIdDimensionsPutForbidden) htcProjectsProjectIdDimensionsPutRes() {}
-
-// HtcProjectsProjectIdDimensionsPutUnauthorized is response for HtcProjectsProjectIdDimensionsPut operation.
-type HtcProjectsProjectIdDimensionsPutUnauthorized struct{}
-
-func (*HtcProjectsProjectIdDimensionsPutUnauthorized) htcProjectsProjectIdDimensionsPutRes() {}
-
 // HtcProjectsProjectIdLimitsDeleteForbidden is response for HtcProjectsProjectIdLimitsDelete operation.
 type HtcProjectsProjectIdLimitsDeleteForbidden struct{}
 
@@ -4729,6 +4725,7 @@ func (s *OAuth2ErrorResponse) SetErrorDescription(val OptString) {
 }
 
 func (*OAuth2ErrorResponse) authTokenWhoamiGetRes()                                       {}
+func (*OAuth2ErrorResponse) createProjectDimensionsRes()                                  {}
 func (*OAuth2ErrorResponse) createProjectLimitRes()                                       {}
 func (*OAuth2ErrorResponse) createRepoRes()                                               {}
 func (*OAuth2ErrorResponse) createTaskRes()                                               {}
@@ -4745,7 +4742,6 @@ func (*OAuth2ErrorResponse) getTokenRes()                                       
 func (*OAuth2ErrorResponse) getWorkspaceDimensionsRes()                                   {}
 func (*OAuth2ErrorResponse) getWorkspaceLimitsRes()                                       {}
 func (*OAuth2ErrorResponse) getWorkspaceTaskRetentionPolicyRes()                          {}
-func (*OAuth2ErrorResponse) htcProjectsProjectIdDimensionsPutRes()                        {}
 func (*OAuth2ErrorResponse) htcProjectsProjectIdLimitsDeleteRes()                         {}
 func (*OAuth2ErrorResponse) htcProjectsProjectIdLimitsIDDeleteRes()                       {}
 func (*OAuth2ErrorResponse) htcProjectsProjectIdLimitsIDGetRes()                          {}

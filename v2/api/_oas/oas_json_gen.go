@@ -6651,56 +6651,6 @@ func (s *HTCWorkspaceLimit) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes HtcProjectsProjectIdDimensionsPutCreatedApplicationJSON as json.
-func (s HtcProjectsProjectIdDimensionsPutCreatedApplicationJSON) Encode(e *jx.Encoder) {
-	unwrapped := []HTCComputeEnvironment(s)
-
-	e.ArrStart()
-	for _, elem := range unwrapped {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes HtcProjectsProjectIdDimensionsPutCreatedApplicationJSON from json.
-func (s *HtcProjectsProjectIdDimensionsPutCreatedApplicationJSON) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode HtcProjectsProjectIdDimensionsPutCreatedApplicationJSON to nil")
-	}
-	var unwrapped []HTCComputeEnvironment
-	if err := func() error {
-		unwrapped = make([]HTCComputeEnvironment, 0)
-		if err := d.Arr(func(d *jx.Decoder) error {
-			var elem HTCComputeEnvironment
-			if err := elem.Decode(d); err != nil {
-				return err
-			}
-			unwrapped = append(unwrapped, elem)
-			return nil
-		}); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = HtcProjectsProjectIdDimensionsPutCreatedApplicationJSON(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s HtcProjectsProjectIdDimensionsPutCreatedApplicationJSON) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *HtcProjectsProjectIdDimensionsPutCreatedApplicationJSON) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode implements json.Marshaler.
 func (s *HtcProjectsProjectIdTasksTaskIdDeleteOK) Encode(e *jx.Encoder) {
 	e.ObjStart()

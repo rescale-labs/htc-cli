@@ -425,7 +425,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											args[0],
 										}, elemIsEscaped, w, r)
 									case "PUT":
-										s.handleHtcProjectsProjectIdDimensionsPutRequest([1]string{
+										s.handleCreateProjectDimensionsRequest([1]string{
 											args[0],
 										}, elemIsEscaped, w, r)
 									default:
@@ -1928,9 +1928,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.count = 1
 										return r, true
 									case "PUT":
-										r.name = "HtcProjectsProjectIdDimensionsPut"
+										r.name = "CreateProjectDimensions"
 										r.summary = "Modify Project Dimensions"
-										r.operationID = ""
+										r.operationID = "createProjectDimensions"
 										r.pathPattern = "/htc/projects/{projectId}/dimensions"
 										r.args = args
 										r.count = 1

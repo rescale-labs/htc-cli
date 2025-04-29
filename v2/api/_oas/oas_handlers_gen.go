@@ -379,6 +379,155 @@ func (s *Server) handleCreateProjectRequest(args [0]string, argsEscaped bool, w 
 	}
 }
 
+// handleCreateProjectDimensionsRequest handles createProjectDimensions operation.
+//
+// This endpoint allows _workspace_, _organization_, and _Rescale administrators_ to _create_,
+// _update_, or _delete_ the dimension combinations for a project. It accepts a list of dimension
+// combinations, each specifying a unique set of computing environment attributes to tailor the
+// computing environment(s) of a project to match specific job requirements.
+// For example, a project’s dimensions can be configured to require jobs to run on a particular
+// type of processor architecture, within a certain region, and with or without hyperthreading.
+// It's important to note that the dimensions set through this endpoint must align with the available
+// dimensions at the workspace level.
+// **In the event that a project's dimension requirements need to be reset to allow for a broader
+// range of job types, sending an empty list to this endpoint will remove all existing dimension
+// restrictions, returning the project to a state where it can accommodate any dimension available in
+// the workspace.**.
+//
+// PUT /htc/projects/{projectId}/dimensions
+func (s *Server) handleCreateProjectDimensionsRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var (
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "CreateProjectDimensions",
+			ID:   "createProjectDimensions",
+		}
+	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securitySecurityScheme(ctx, "CreateProjectDimensions", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "SecurityScheme",
+					Err:              err,
+				}
+				defer recordError("Security:SecurityScheme", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+	params, err := decodeCreateProjectDimensionsParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	request, close, err := s.decodeCreateProjectDimensionsRequest(r)
+	if err != nil {
+		err = &ogenerrors.DecodeRequestError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeRequest", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
+
+	var response CreateProjectDimensionsRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:          ctx,
+			OperationName:    "CreateProjectDimensions",
+			OperationSummary: "Modify Project Dimensions",
+			OperationID:      "createProjectDimensions",
+			Body:             request,
+			Params: middleware.Parameters{
+				{
+					Name: "projectId",
+					In:   "path",
+				}: params.ProjectId,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = []HTCComputeEnvironment
+			Params   = CreateProjectDimensionsParams
+			Response = CreateProjectDimensionsRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackCreateProjectDimensionsParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.CreateProjectDimensions(ctx, request, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.CreateProjectDimensions(ctx, request, params)
+	}
+	if err != nil {
+		defer recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeCreateProjectDimensionsResponse(response, w); err != nil {
+		defer recordError("EncodeResponse", err)
+		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+		}
+		return
+	}
+}
+
 // handleCreateProjectLimitRequest handles createProjectLimit operation.
 //
 // This endpoint will add a new limit to this project or overwrite an existing limit if one already
@@ -3395,155 +3544,6 @@ func (s *Server) handleGetWorkspaceTaskRetentionPolicyRequest(args [1]string, ar
 	}
 
 	if err := encodeGetWorkspaceTaskRetentionPolicyResponse(response, w); err != nil {
-		defer recordError("EncodeResponse", err)
-		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
-			s.cfg.ErrorHandler(ctx, w, r, err)
-		}
-		return
-	}
-}
-
-// handleHtcProjectsProjectIdDimensionsPutRequest handles PUT /htc/projects/{projectId}/dimensions operation.
-//
-// This endpoint allows _workspace_, _organization_, and _Rescale administrators_ to _create_,
-// _update_, or _delete_ the dimension combinations for a project. It accepts a list of dimension
-// combinations, each specifying a unique set of computing environment attributes to tailor the
-// computing environment(s) of a project to match specific job requirements.
-// For example, a project’s dimensions can be configured to require jobs to run on a particular
-// type of processor architecture, within a certain region, and with or without hyperthreading.
-// It's important to note that the dimensions set through this endpoint must align with the available
-// dimensions at the workspace level.
-// **In the event that a project's dimension requirements need to be reset to allow for a broader
-// range of job types, sending an empty list to this endpoint will remove all existing dimension
-// restrictions, returning the project to a state where it can accommodate any dimension available in
-// the workspace.**.
-//
-// PUT /htc/projects/{projectId}/dimensions
-func (s *Server) handleHtcProjectsProjectIdDimensionsPutRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var (
-		err          error
-		opErrContext = ogenerrors.OperationContext{
-			Name: "HtcProjectsProjectIdDimensionsPut",
-			ID:   "",
-		}
-	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securitySecurityScheme(ctx, "HtcProjectsProjectIdDimensionsPut", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "SecurityScheme",
-					Err:              err,
-				}
-				defer recordError("Security:SecurityScheme", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
-	params, err := decodeHtcProjectsProjectIdDimensionsPutParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-	request, close, err := s.decodeHtcProjectsProjectIdDimensionsPutRequest(r)
-	if err != nil {
-		err = &ogenerrors.DecodeRequestError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeRequest", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-	defer func() {
-		if err := close(); err != nil {
-			recordError("CloseRequest", err)
-		}
-	}()
-
-	var response HtcProjectsProjectIdDimensionsPutRes
-	if m := s.cfg.Middleware; m != nil {
-		mreq := middleware.Request{
-			Context:          ctx,
-			OperationName:    "HtcProjectsProjectIdDimensionsPut",
-			OperationSummary: "Modify Project Dimensions",
-			OperationID:      "",
-			Body:             request,
-			Params: middleware.Parameters{
-				{
-					Name: "projectId",
-					In:   "path",
-				}: params.ProjectId,
-			},
-			Raw: r,
-		}
-
-		type (
-			Request  = []HTCComputeEnvironment
-			Params   = HtcProjectsProjectIdDimensionsPutParams
-			Response = HtcProjectsProjectIdDimensionsPutRes
-		)
-		response, err = middleware.HookMiddleware[
-			Request,
-			Params,
-			Response,
-		](
-			m,
-			mreq,
-			unpackHtcProjectsProjectIdDimensionsPutParams,
-			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.HtcProjectsProjectIdDimensionsPut(ctx, request, params)
-				return response, err
-			},
-		)
-	} else {
-		response, err = s.h.HtcProjectsProjectIdDimensionsPut(ctx, request, params)
-	}
-	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	if err := encodeHtcProjectsProjectIdDimensionsPutResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)

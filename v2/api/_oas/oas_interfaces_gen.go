@@ -9,6 +9,10 @@ type CancelJobsRes interface {
 	cancelJobsRes()
 }
 
+type CreateProjectDimensionsRes interface {
+	createProjectDimensionsRes()
+}
+
 type CreateProjectLimitRes interface {
 	createProjectLimitRes()
 }
@@ -103,10 +107,6 @@ type GetWorkspaceLimitsRes interface {
 
 type GetWorkspaceTaskRetentionPolicyRes interface {
 	getWorkspaceTaskRetentionPolicyRes()
-}
-
-type HtcProjectsProjectIdDimensionsPutRes interface {
-	htcProjectsProjectIdDimensionsPutRes()
 }
 
 type HtcProjectsProjectIdLimitsDeleteRes interface {

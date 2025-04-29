@@ -128,6 +128,19 @@ local patches = {
           },
         },
       },
+      put+: {
+        'x-ogen-operation-group': 'Project',
+        operationId: 'createProjectDimensions',
+        responses+: {
+          '201'+: {
+            content+: {
+              'application/json'+: {
+                schema: { '$ref': '#/components/schemas/HTCProjectDimensions' },
+              },
+            },
+          },
+        },
+      }
     },
     '/htc/projects/{projectId}/limits'+: {
       get+: {

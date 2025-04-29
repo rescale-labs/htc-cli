@@ -30,23 +30,6 @@ type Invoker interface {
 	//
 	// GET /auth/token/whoami
 	AuthTokenWhoamiGet(ctx context.Context) (AuthTokenWhoamiGetRes, error)
-	// HtcProjectsProjectIdDimensionsPut invokes PUT /htc/projects/{projectId}/dimensions operation.
-	//
-	// This endpoint allows _workspace_, _organization_, and _Rescale administrators_ to _create_,
-	// _update_, or _delete_ the dimension combinations for a project. It accepts a list of dimension
-	// combinations, each specifying a unique set of computing environment attributes to tailor the
-	// computing environment(s) of a project to match specific job requirements.
-	// For example, a project’s dimensions can be configured to require jobs to run on a particular
-	// type of processor architecture, within a certain region, and with or without hyperthreading.
-	// It's important to note that the dimensions set through this endpoint must align with the available
-	// dimensions at the workspace level.
-	// **In the event that a project's dimension requirements need to be reset to allow for a broader
-	// range of job types, sending an empty list to this endpoint will remove all existing dimension
-	// restrictions, returning the project to a state where it can accommodate any dimension available in
-	// the workspace.**.
-	//
-	// PUT /htc/projects/{projectId}/dimensions
-	HtcProjectsProjectIdDimensionsPut(ctx context.Context, request []HTCComputeEnvironment, params HtcProjectsProjectIdDimensionsPutParams) (HtcProjectsProjectIdDimensionsPutRes, error)
 	// HtcProjectsProjectIdLimitsDelete invokes DELETE /htc/projects/{projectId}/limits operation.
 	//
 	// This endpoint will remove all resource limits associated with this project.
@@ -348,6 +331,23 @@ type ProjectInvoker interface {
 	//
 	// POST /htc/projects
 	CreateProject(ctx context.Context, request OptHTCProject) (CreateProjectRes, error)
+	// CreateProjectDimensions invokes createProjectDimensions operation.
+	//
+	// This endpoint allows _workspace_, _organization_, and _Rescale administrators_ to _create_,
+	// _update_, or _delete_ the dimension combinations for a project. It accepts a list of dimension
+	// combinations, each specifying a unique set of computing environment attributes to tailor the
+	// computing environment(s) of a project to match specific job requirements.
+	// For example, a project’s dimensions can be configured to require jobs to run on a particular
+	// type of processor architecture, within a certain region, and with or without hyperthreading.
+	// It's important to note that the dimensions set through this endpoint must align with the available
+	// dimensions at the workspace level.
+	// **In the event that a project's dimension requirements need to be reset to allow for a broader
+	// range of job types, sending an empty list to this endpoint will remove all existing dimension
+	// restrictions, returning the project to a state where it can accommodate any dimension available in
+	// the workspace.**.
+	//
+	// PUT /htc/projects/{projectId}/dimensions
+	CreateProjectDimensions(ctx context.Context, request []HTCComputeEnvironment, params CreateProjectDimensionsParams) (CreateProjectDimensionsRes, error)
 	// CreateProjectLimit invokes createProjectLimit operation.
 	//
 	// This endpoint will add a new limit to this project or overwrite an existing limit if one already
@@ -845,6 +845,108 @@ func (c *Client) sendCreateProject(ctx context.Context, request OptHTCProject) (
 	defer resp.Body.Close()
 
 	result, err := decodeCreateProjectResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CreateProjectDimensions invokes createProjectDimensions operation.
+//
+// This endpoint allows _workspace_, _organization_, and _Rescale administrators_ to _create_,
+// _update_, or _delete_ the dimension combinations for a project. It accepts a list of dimension
+// combinations, each specifying a unique set of computing environment attributes to tailor the
+// computing environment(s) of a project to match specific job requirements.
+// For example, a project’s dimensions can be configured to require jobs to run on a particular
+// type of processor architecture, within a certain region, and with or without hyperthreading.
+// It's important to note that the dimensions set through this endpoint must align with the available
+// dimensions at the workspace level.
+// **In the event that a project's dimension requirements need to be reset to allow for a broader
+// range of job types, sending an empty list to this endpoint will remove all existing dimension
+// restrictions, returning the project to a state where it can accommodate any dimension available in
+// the workspace.**.
+//
+// PUT /htc/projects/{projectId}/dimensions
+func (c *Client) CreateProjectDimensions(ctx context.Context, request []HTCComputeEnvironment, params CreateProjectDimensionsParams) (CreateProjectDimensionsRes, error) {
+	res, err := c.sendCreateProjectDimensions(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendCreateProjectDimensions(ctx context.Context, request []HTCComputeEnvironment, params CreateProjectDimensionsParams) (res CreateProjectDimensionsRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/dimensions"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "PUT", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCreateProjectDimensionsRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "CreateProjectDimensions", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeCreateProjectDimensionsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -3405,108 +3507,6 @@ func (c *Client) sendGetWorkspaceTaskRetentionPolicy(ctx context.Context, params
 	defer resp.Body.Close()
 
 	result, err := decodeGetWorkspaceTaskRetentionPolicyResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcProjectsProjectIdDimensionsPut invokes PUT /htc/projects/{projectId}/dimensions operation.
-//
-// This endpoint allows _workspace_, _organization_, and _Rescale administrators_ to _create_,
-// _update_, or _delete_ the dimension combinations for a project. It accepts a list of dimension
-// combinations, each specifying a unique set of computing environment attributes to tailor the
-// computing environment(s) of a project to match specific job requirements.
-// For example, a project’s dimensions can be configured to require jobs to run on a particular
-// type of processor architecture, within a certain region, and with or without hyperthreading.
-// It's important to note that the dimensions set through this endpoint must align with the available
-// dimensions at the workspace level.
-// **In the event that a project's dimension requirements need to be reset to allow for a broader
-// range of job types, sending an empty list to this endpoint will remove all existing dimension
-// restrictions, returning the project to a state where it can accommodate any dimension available in
-// the workspace.**.
-//
-// PUT /htc/projects/{projectId}/dimensions
-func (c *Client) HtcProjectsProjectIdDimensionsPut(ctx context.Context, request []HTCComputeEnvironment, params HtcProjectsProjectIdDimensionsPutParams) (HtcProjectsProjectIdDimensionsPutRes, error) {
-	res, err := c.sendHtcProjectsProjectIdDimensionsPut(ctx, request, params)
-	return res, err
-}
-
-func (c *Client) sendHtcProjectsProjectIdDimensionsPut(ctx context.Context, request []HTCComputeEnvironment, params HtcProjectsProjectIdDimensionsPutParams) (res HtcProjectsProjectIdDimensionsPutRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/dimensions"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "PUT", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeHtcProjectsProjectIdDimensionsPutRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcProjectsProjectIdDimensionsPut", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcProjectsProjectIdDimensionsPutResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

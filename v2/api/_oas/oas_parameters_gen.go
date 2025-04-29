@@ -185,6 +185,71 @@ func decodeCancelJobsParams(args [2]string, argsEscaped bool, r *http.Request) (
 	return params, nil
 }
 
+// CreateProjectDimensionsParams is parameters of createProjectDimensions operation.
+type CreateProjectDimensionsParams struct {
+	ProjectId string
+}
+
+func unpackCreateProjectDimensionsParams(packed middleware.Parameters) (params CreateProjectDimensionsParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "projectId",
+			In:   "path",
+		}
+		params.ProjectId = packed[key].(string)
+	}
+	return params
+}
+
+func decodeCreateProjectDimensionsParams(args [1]string, argsEscaped bool, r *http.Request) (params CreateProjectDimensionsParams, _ error) {
+	// Decode path: projectId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "projectId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.ProjectId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "projectId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // CreateProjectLimitParams is parameters of createProjectLimit operation.
 type CreateProjectLimitParams struct {
 	ProjectId string
@@ -3084,71 +3149,6 @@ func decodeGetWorkspaceTaskRetentionPolicyParams(args [1]string, argsEscaped boo
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "workspaceId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
-// HtcProjectsProjectIdDimensionsPutParams is parameters of PUT /htc/projects/{projectId}/dimensions operation.
-type HtcProjectsProjectIdDimensionsPutParams struct {
-	ProjectId string
-}
-
-func unpackHtcProjectsProjectIdDimensionsPutParams(packed middleware.Parameters) (params HtcProjectsProjectIdDimensionsPutParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "projectId",
-			In:   "path",
-		}
-		params.ProjectId = packed[key].(string)
-	}
-	return params
-}
-
-func decodeHtcProjectsProjectIdDimensionsPutParams(args [1]string, argsEscaped bool, r *http.Request) (params HtcProjectsProjectIdDimensionsPutParams, _ error) {
-	// Decode path: projectId.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "projectId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.ProjectId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "projectId",
 			In:   "path",
 			Err:  err,
 		}

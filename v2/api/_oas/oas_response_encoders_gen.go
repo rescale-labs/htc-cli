@@ -117,6 +117,47 @@ func encodeCreateProjectResponse(response CreateProjectRes, w http.ResponseWrite
 	}
 }
 
+func encodeCreateProjectDimensionsResponse(response CreateProjectDimensionsRes, w http.ResponseWriter) error {
+	switch response := response.(type) {
+	case *HTCProjectDimensions:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(201)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *CreateProjectDimensionsUnauthorized:
+		w.WriteHeader(401)
+
+		return nil
+
+	case *CreateProjectDimensionsForbidden:
+		w.WriteHeader(403)
+
+		return nil
+
+	case *OAuth2ErrorResponse:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeCreateProjectLimitResponse(response CreateProjectLimitRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCProjectLimit:
@@ -1018,47 +1059,6 @@ func encodeGetWorkspaceTaskRetentionPolicyResponse(response GetWorkspaceTaskRete
 		return nil
 
 	case *GetWorkspaceTaskRetentionPolicyForbidden:
-		w.WriteHeader(403)
-
-		return nil
-
-	case *OAuth2ErrorResponse:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(404)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeHtcProjectsProjectIdDimensionsPutResponse(response HtcProjectsProjectIdDimensionsPutRes, w http.ResponseWriter) error {
-	switch response := response.(type) {
-	case *HtcProjectsProjectIdDimensionsPutCreatedApplicationJSON:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(201)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *HtcProjectsProjectIdDimensionsPutUnauthorized:
-		w.WriteHeader(401)
-
-		return nil
-
-	case *HtcProjectsProjectIdDimensionsPutForbidden:
 		w.WriteHeader(403)
 
 		return nil

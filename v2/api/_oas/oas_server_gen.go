@@ -21,23 +21,6 @@ type Handler interface {
 	//
 	// GET /auth/token/whoami
 	AuthTokenWhoamiGet(ctx context.Context) (AuthTokenWhoamiGetRes, error)
-	// HtcProjectsProjectIdDimensionsPut implements PUT /htc/projects/{projectId}/dimensions operation.
-	//
-	// This endpoint allows _workspace_, _organization_, and _Rescale administrators_ to _create_,
-	// _update_, or _delete_ the dimension combinations for a project. It accepts a list of dimension
-	// combinations, each specifying a unique set of computing environment attributes to tailor the
-	// computing environment(s) of a project to match specific job requirements.
-	// For example, a project’s dimensions can be configured to require jobs to run on a particular
-	// type of processor architecture, within a certain region, and with or without hyperthreading.
-	// It's important to note that the dimensions set through this endpoint must align with the available
-	// dimensions at the workspace level.
-	// **In the event that a project's dimension requirements need to be reset to allow for a broader
-	// range of job types, sending an empty list to this endpoint will remove all existing dimension
-	// restrictions, returning the project to a state where it can accommodate any dimension available in
-	// the workspace.**.
-	//
-	// PUT /htc/projects/{projectId}/dimensions
-	HtcProjectsProjectIdDimensionsPut(ctx context.Context, req []HTCComputeEnvironment, params HtcProjectsProjectIdDimensionsPutParams) (HtcProjectsProjectIdDimensionsPutRes, error)
 	// HtcProjectsProjectIdLimitsDelete implements DELETE /htc/projects/{projectId}/limits operation.
 	//
 	// This endpoint will remove all resource limits associated with this project.
@@ -339,6 +322,23 @@ type ProjectHandler interface {
 	//
 	// POST /htc/projects
 	CreateProject(ctx context.Context, req OptHTCProject) (CreateProjectRes, error)
+	// CreateProjectDimensions implements createProjectDimensions operation.
+	//
+	// This endpoint allows _workspace_, _organization_, and _Rescale administrators_ to _create_,
+	// _update_, or _delete_ the dimension combinations for a project. It accepts a list of dimension
+	// combinations, each specifying a unique set of computing environment attributes to tailor the
+	// computing environment(s) of a project to match specific job requirements.
+	// For example, a project’s dimensions can be configured to require jobs to run on a particular
+	// type of processor architecture, within a certain region, and with or without hyperthreading.
+	// It's important to note that the dimensions set through this endpoint must align with the available
+	// dimensions at the workspace level.
+	// **In the event that a project's dimension requirements need to be reset to allow for a broader
+	// range of job types, sending an empty list to this endpoint will remove all existing dimension
+	// restrictions, returning the project to a state where it can accommodate any dimension available in
+	// the workspace.**.
+	//
+	// PUT /htc/projects/{projectId}/dimensions
+	CreateProjectDimensions(ctx context.Context, req []HTCComputeEnvironment, params CreateProjectDimensionsParams) (CreateProjectDimensionsRes, error)
 	// CreateProjectLimit implements createProjectLimit operation.
 	//
 	// This endpoint will add a new limit to this project or overwrite an existing limit if one already
