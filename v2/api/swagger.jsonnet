@@ -103,6 +103,15 @@ local patches = {
       get+: {
         'x-ogen-operation-group': 'Image',
         operationId: 'getRegistryToken',
+        responses+: {
+          '404': {
+            content: {
+              'application/json': {
+                schema: { '$ref': '#/components/schemas/OAuth2ErrorResponse'}
+              }
+            }
+          }
+        }
       },
     },
     '/htc/projects/{projectId}/dimensions'+: {

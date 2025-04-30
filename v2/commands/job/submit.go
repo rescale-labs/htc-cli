@@ -102,7 +102,7 @@ func Submit(cmd *cobra.Command, args []string) error {
 		for i := range req.batch {
 			for k, v := range envMap {
 				req.batch[i].HtcJobDefinition.Envs = append(req.batch[i].HtcJobDefinition.Envs,
-					oapi.EnvPair{Name: k, Value: v})
+					oapi.HTCJobDefinitionEnvsItem{Name: k, Value: v})
 			}
 		}
 	}
@@ -173,11 +173,9 @@ func init() {
 			MaxMemory:  oapi.NewOptInt32(128),
 			MaxDiskGiB: oapi.NewOptInt32(1),
 			Commands:   []string{"/bin/sh", "-c", "sleep 5m; echo all done"},
-			Envs: []oapi.EnvPair{
-				oapi.EnvPair{"INPUT_BUCKET", "htc-rescale-bucket"},
-			},
+			Envs: []oapi.HTCJobDefinitionEnvsItem{},
 			ExecTimeoutSeconds: oapi.NewOptInt32(3600),
-			Priority:           oapi.NewOptJobPriority(oapi.JobPriorityONDEMANDPRIORITY),
+			Priority:           oapi.NewOptHTCJobDefinitionPriority(oapi.HTCJobDefinitionPriorityONDEMANDPRIORITY),
 		},
 		BatchSize: oapi.NewOptInt32(1),
 		Regions: []oapi.RescaleRegion{

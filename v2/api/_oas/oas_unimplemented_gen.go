@@ -197,7 +197,7 @@ func (UnimplementedHandler) GetTasks(ctx context.Context, params GetTasksParams)
 // This endpoint will get a JWT token given an API key.
 //
 // GET /auth/token
-func (UnimplementedHandler) GetToken(ctx context.Context) (r GetTokenRes, _ error) {
+func (UnimplementedHandler) GetToken(ctx context.Context, params GetTokenParams) (r GetTokenRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

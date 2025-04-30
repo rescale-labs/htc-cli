@@ -347,7 +347,7 @@ type AuthHandler interface {
 	// This endpoint will get a JWT token given an API key.
 	//
 	// GET /auth/token
-	GetToken(ctx context.Context) (GetTokenRes, error)
+	GetToken(ctx context.Context, params GetTokenParams) (GetTokenRes, error)
 	// WhoAmI implements whoAmI operation.
 	//
 	// This endpoint will get Rescale user information given a Rescale API key.

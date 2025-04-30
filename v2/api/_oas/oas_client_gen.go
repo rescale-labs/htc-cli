@@ -356,7 +356,7 @@ type AuthInvoker interface {
 	// This endpoint will get a JWT token given an API key.
 	//
 	// GET /auth/token
-	GetToken(ctx context.Context) (GetTokenRes, error)
+	GetToken(ctx context.Context, params GetTokenParams) (GetTokenRes, error)
 	// WhoAmI invokes whoAmI operation.
 	//
 	// This endpoint will get Rescale user information given a Rescale API key.
@@ -1882,6 +1882,23 @@ func (c *Client) sendGetLogs(ctx context.Context, params GetLogsParams) (res Get
 			return res, errors.Wrap(err, "encode query")
 		}
 	}
+	{
+		// Encode "sort" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "sort",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Sort.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
 	u.RawQuery = q.Values().Encode()
 
 	r, err := ht.NewRequest(ctx, "GET", u)
@@ -2461,12 +2478,12 @@ func (c *Client) sendGetTasks(ctx context.Context, params GetTasksParams) (res G
 // This endpoint will get a JWT token given an API key.
 //
 // GET /auth/token
-func (c *Client) GetToken(ctx context.Context) (GetTokenRes, error) {
-	res, err := c.sendGetToken(ctx)
+func (c *Client) GetToken(ctx context.Context, params GetTokenParams) (GetTokenRes, error) {
+	res, err := c.sendGetToken(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetToken(ctx context.Context) (res GetTokenRes, err error) {
+func (c *Client) sendGetToken(ctx context.Context, params GetTokenParams) (res GetTokenRes, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
@@ -2476,6 +2493,22 @@ func (c *Client) sendGetToken(ctx context.Context) (res GetTokenRes, err error) 
 	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "X-Rescale-Environment",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.XRescaleEnvironment.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
 	}
 
 	{
