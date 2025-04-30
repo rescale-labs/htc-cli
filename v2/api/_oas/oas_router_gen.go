@@ -421,7 +421,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									// Leaf node.
 									switch r.Method {
 									case "GET":
-										s.handleGetDimensionsRequest([1]string{
+										s.handleGetProjectDimensionsRequest([1]string{
 											args[0],
 										}, elemIsEscaped, w, r)
 									case "PUT":
@@ -451,7 +451,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											args[0],
 										}, elemIsEscaped, w, r)
 									case "GET":
-										s.handleGetLimitsRequest([1]string{
+										s.handleGetProjectLimitsRequest([1]string{
 											args[0],
 										}, elemIsEscaped, w, r)
 									case "POST":
@@ -1330,7 +1330,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								// Leaf node.
 								switch r.Method {
 								case "GET":
-									s.handleHtcWorkspacesWorkspaceIdDimensionsGetRequest([1]string{
+									s.handleGetWorkspaceDimensionsRequest([1]string{
 										args[0],
 									}, elemIsEscaped, w, r)
 								default:
@@ -1353,7 +1353,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								// Leaf node.
 								switch r.Method {
 								case "GET":
-									s.handleHtcWorkspacesWorkspaceIdLimitsGetRequest([1]string{
+									s.handleGetWorkspaceLimitsRequest([1]string{
 										args[0],
 									}, elemIsEscaped, w, r)
 								default:
@@ -1376,11 +1376,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								// Leaf node.
 								switch r.Method {
 								case "GET":
-									s.handleHtcWorkspacesWorkspaceIdTaskRetentionPolicyGetRequest([1]string{
+									s.handleGetTaskRetentionPolicyRequest([1]string{
 										args[0],
 									}, elemIsEscaped, w, r)
 								case "PUT":
-									s.handleHtcWorkspacesWorkspaceIdTaskRetentionPolicyPutRequest([1]string{
+									s.handlePutTaskRetentionPolicyRequest([1]string{
 										args[0],
 									}, elemIsEscaped, w, r)
 								default:
@@ -1920,9 +1920,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									// Leaf node.
 									switch method {
 									case "GET":
-										r.name = "GetDimensions"
+										r.name = "GetProjectDimensions"
 										r.summary = "Get Project Dimensions"
-										r.operationID = "getDimensions"
+										r.operationID = "getProjectDimensions"
 										r.pathPattern = "/htc/projects/{projectId}/dimensions"
 										r.args = args
 										r.count = 1
@@ -1960,9 +1960,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.count = 1
 										return r, true
 									case "GET":
-										r.name = "GetLimits"
+										r.name = "GetProjectLimits"
 										r.summary = "Get Project Limits"
-										r.operationID = "getLimits"
+										r.operationID = "getProjectLimits"
 										r.pathPattern = "/htc/projects/{projectId}/limits"
 										r.args = args
 										r.count = 1
@@ -2904,9 +2904,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								// Leaf node.
 								switch method {
 								case "GET":
-									r.name = "HtcWorkspacesWorkspaceIdDimensionsGet"
+									r.name = "GetWorkspaceDimensions"
 									r.summary = "Get Workspace Dimensions"
-									r.operationID = ""
+									r.operationID = "getWorkspaceDimensions"
 									r.pathPattern = "/htc/workspaces/{workspaceId}/dimensions"
 									r.args = args
 									r.count = 1
@@ -2929,9 +2929,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								// Leaf node.
 								switch method {
 								case "GET":
-									r.name = "HtcWorkspacesWorkspaceIdLimitsGet"
+									r.name = "GetWorkspaceLimits"
 									r.summary = "Get Workspace Limit"
-									r.operationID = ""
+									r.operationID = "getWorkspaceLimits"
 									r.pathPattern = "/htc/workspaces/{workspaceId}/limits"
 									r.args = args
 									r.count = 1
@@ -2954,17 +2954,17 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								// Leaf node.
 								switch method {
 								case "GET":
-									r.name = "HtcWorkspacesWorkspaceIdTaskRetentionPolicyGet"
+									r.name = "GetTaskRetentionPolicy"
 									r.summary = "Get Workspace Task Retention Policy"
-									r.operationID = ""
+									r.operationID = "getTaskRetentionPolicy"
 									r.pathPattern = "/htc/workspaces/{workspaceId}/task-retention-policy"
 									r.args = args
 									r.count = 1
 									return r, true
 								case "PUT":
-									r.name = "HtcWorkspacesWorkspaceIdTaskRetentionPolicyPut"
+									r.name = "PutTaskRetentionPolicy"
 									r.summary = "Modify Workspace Task Retention Policy"
-									r.operationID = ""
+									r.operationID = "putTaskRetentionPolicy"
 									r.pathPattern = "/htc/workspaces/{workspaceId}/task-retention-policy"
 									r.args = args
 									r.count = 1

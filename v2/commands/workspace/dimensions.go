@@ -1,4 +1,4 @@
-package project
+package workspace
 
 import (
 	"context"
@@ -19,54 +19,39 @@ func DimensionsGet(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	p := common.IDParams{RequireProjectId: true}
+	p := common.IDParams{RequireWorkspaceId: true}
 	if err := runner.GetIds(&p); err != nil {
 		return err
 	}
 
 	ctx := context.Background()
-	res, err := runner.Client.GetProjectDimensions(ctx,
-		oapi.GetProjectDimensionsParams{ProjectId: p.ProjectId})
+	res, err := runner.Client.GetWorkspaceDimensions(ctx,
+		oapi.GetWorkspaceDimensionsParams{WorkspaceId: p.WorkspaceId})
 	if err != nil {
 		return err
 	}
 
 	switch res := res.(type) {
-	case *oapi.HTCProjectDimensions:
+	case *oapi.HTCWorkspaceDimensions:
 		return runner.PrintResult((*tabler.ComputeEnvs)(res), os.Stdout)
-	case *oapi.GetProjectDimensionsForbidden,
-		*oapi.GetProjectDimensionsUnauthorized:
+	case *oapi.GetWorkspaceDimensionsForbidden,
+		*oapi.GetWorkspaceDimensionsUnauthorized:
 		return fmt.Errorf("forbidden: %s", res)
 	}
-
 	return fmt.Errorf("Unknown response type: %s", res)
 }
 
 var DimensionsCmd = &cobra.Command{
 	Use:   "dimensions",
-	Short: "Commands for project dimensions",
+	Short: "Commands for workspace dimensions",
 }
 
 var DimensionsGetCmd = &cobra.Command{
 	Use:   "get",
-	Short: "Returns dimensions for an HTC project",
+	Short: "Returns dimensions for an HTC workspace",
 	Run:   common.WrapRunE(DimensionsGet),
 	Args:  cobra.ExactArgs(0),
 }
-
-// var DimensionsApplyCmd = &cobra.Command{
-// 	Use:   "apply",
-// 	Short: "Sets dimensions for an HTC project",
-// 	Run:   common.WrapRunE(DimensionsGet),
-// 	Args:  cobra.ExactArgs(0),
-// }
-//
-// var DimensionsDeleteCmd = &cobra.Command{
-// 	Use:   "delete",
-// 	Short: "Deletes dimensions for an HTC project",
-// 	Run:   common.WrapRunE(DimensionsGet),
-// 	Args:  cobra.ExactArgs(0),
-// }
 
 func init() {
 	DimensionsCmd.AddCommand(DimensionsGetCmd)

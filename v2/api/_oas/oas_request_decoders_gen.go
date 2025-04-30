@@ -671,7 +671,7 @@ func (s *Server) decodeHtcProjectsProjectIdTasksTaskIdPatchRequest(r *http.Reque
 	}
 }
 
-func (s *Server) decodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyPutRequest(r *http.Request) (
+func (s *Server) decodePutTaskRetentionPolicyRequest(r *http.Request) (
 	req OptWorkspaceTaskRetentionPolicy,
 	close func() error,
 	rerr error,

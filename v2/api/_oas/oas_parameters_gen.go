@@ -385,71 +385,6 @@ func decodeCreateTaskParams(args [1]string, argsEscaped bool, r *http.Request) (
 	return params, nil
 }
 
-// GetDimensionsParams is parameters of getDimensions operation.
-type GetDimensionsParams struct {
-	ProjectId string
-}
-
-func unpackGetDimensionsParams(packed middleware.Parameters) (params GetDimensionsParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "projectId",
-			In:   "path",
-		}
-		params.ProjectId = packed[key].(string)
-	}
-	return params
-}
-
-func decodeGetDimensionsParams(args [1]string, argsEscaped bool, r *http.Request) (params GetDimensionsParams, _ error) {
-	// Decode path: projectId.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "projectId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.ProjectId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "projectId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
 // GetEventsParams is parameters of getEvents operation.
 type GetEventsParams struct {
 	JobId     string
@@ -1610,71 +1545,6 @@ func decodeGetJobsParams(args [2]string, argsEscaped bool, r *http.Request) (par
 	return params, nil
 }
 
-// GetLimitsParams is parameters of getLimits operation.
-type GetLimitsParams struct {
-	ProjectId string
-}
-
-func unpackGetLimitsParams(packed middleware.Parameters) (params GetLimitsParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "projectId",
-			In:   "path",
-		}
-		params.ProjectId = packed[key].(string)
-	}
-	return params
-}
-
-func decodeGetLimitsParams(args [1]string, argsEscaped bool, r *http.Request) (params GetLimitsParams, _ error) {
-	// Decode path: projectId.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "projectId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.ProjectId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "projectId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
 // GetLogsParams is parameters of getLogs operation.
 type GetLogsParams struct {
 	JobId     string
@@ -2172,6 +2042,136 @@ func decodeGetProjectParams(args [1]string, argsEscaped bool, r *http.Request) (
 	return params, nil
 }
 
+// GetProjectDimensionsParams is parameters of getProjectDimensions operation.
+type GetProjectDimensionsParams struct {
+	ProjectId string
+}
+
+func unpackGetProjectDimensionsParams(packed middleware.Parameters) (params GetProjectDimensionsParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "projectId",
+			In:   "path",
+		}
+		params.ProjectId = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetProjectDimensionsParams(args [1]string, argsEscaped bool, r *http.Request) (params GetProjectDimensionsParams, _ error) {
+	// Decode path: projectId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "projectId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.ProjectId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "projectId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// GetProjectLimitsParams is parameters of getProjectLimits operation.
+type GetProjectLimitsParams struct {
+	ProjectId string
+}
+
+func unpackGetProjectLimitsParams(packed middleware.Parameters) (params GetProjectLimitsParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "projectId",
+			In:   "path",
+		}
+		params.ProjectId = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetProjectLimitsParams(args [1]string, argsEscaped bool, r *http.Request) (params GetProjectLimitsParams, _ error) {
+	// Decode path: projectId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "projectId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.ProjectId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "projectId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // GetProjectsParams is parameters of getProjects operation.
 type GetProjectsParams struct {
 	OnlyMyProjects OptBool
@@ -2401,6 +2401,71 @@ func decodeGetRegistryTokenParams(args [1]string, argsEscaped bool, r *http.Requ
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "projectId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// GetTaskRetentionPolicyParams is parameters of getTaskRetentionPolicy operation.
+type GetTaskRetentionPolicyParams struct {
+	WorkspaceId string
+}
+
+func unpackGetTaskRetentionPolicyParams(packed middleware.Parameters) (params GetTaskRetentionPolicyParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "workspaceId",
+			In:   "path",
+		}
+		params.WorkspaceId = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetTaskRetentionPolicyParams(args [1]string, argsEscaped bool, r *http.Request) (params GetTaskRetentionPolicyParams, _ error) {
+	// Decode path: workspaceId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "workspaceId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.WorkspaceId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "workspaceId",
 			In:   "path",
 			Err:  err,
 		}
@@ -2760,6 +2825,136 @@ func decodeGetTokenParams(args [0]string, argsEscaped bool, r *http.Request) (pa
 		return params, &ogenerrors.DecodeParamError{
 			Name: "X-Rescale-Environment",
 			In:   "header",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// GetWorkspaceDimensionsParams is parameters of getWorkspaceDimensions operation.
+type GetWorkspaceDimensionsParams struct {
+	WorkspaceId string
+}
+
+func unpackGetWorkspaceDimensionsParams(packed middleware.Parameters) (params GetWorkspaceDimensionsParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "workspaceId",
+			In:   "path",
+		}
+		params.WorkspaceId = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetWorkspaceDimensionsParams(args [1]string, argsEscaped bool, r *http.Request) (params GetWorkspaceDimensionsParams, _ error) {
+	// Decode path: workspaceId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "workspaceId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.WorkspaceId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "workspaceId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// GetWorkspaceLimitsParams is parameters of getWorkspaceLimits operation.
+type GetWorkspaceLimitsParams struct {
+	WorkspaceId string
+}
+
+func unpackGetWorkspaceLimitsParams(packed middleware.Parameters) (params GetWorkspaceLimitsParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "workspaceId",
+			In:   "path",
+		}
+		params.WorkspaceId = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetWorkspaceLimitsParams(args [1]string, argsEscaped bool, r *http.Request) (params GetWorkspaceLimitsParams, _ error) {
+	// Decode path: workspaceId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "workspaceId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.WorkspaceId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "workspaceId",
+			In:   "path",
 			Err:  err,
 		}
 	}
@@ -5804,12 +5999,12 @@ func decodeHtcStorageRegionRegionGetParams(args [1]string, argsEscaped bool, r *
 	return params, nil
 }
 
-// HtcWorkspacesWorkspaceIdDimensionsGetParams is parameters of GET /htc/workspaces/{workspaceId}/dimensions operation.
-type HtcWorkspacesWorkspaceIdDimensionsGetParams struct {
+// PutTaskRetentionPolicyParams is parameters of putTaskRetentionPolicy operation.
+type PutTaskRetentionPolicyParams struct {
 	WorkspaceId string
 }
 
-func unpackHtcWorkspacesWorkspaceIdDimensionsGetParams(packed middleware.Parameters) (params HtcWorkspacesWorkspaceIdDimensionsGetParams) {
+func unpackPutTaskRetentionPolicyParams(packed middleware.Parameters) (params PutTaskRetentionPolicyParams) {
 	{
 		key := middleware.ParameterKey{
 			Name: "workspaceId",
@@ -5820,202 +6015,7 @@ func unpackHtcWorkspacesWorkspaceIdDimensionsGetParams(packed middleware.Paramet
 	return params
 }
 
-func decodeHtcWorkspacesWorkspaceIdDimensionsGetParams(args [1]string, argsEscaped bool, r *http.Request) (params HtcWorkspacesWorkspaceIdDimensionsGetParams, _ error) {
-	// Decode path: workspaceId.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "workspaceId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.WorkspaceId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "workspaceId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
-// HtcWorkspacesWorkspaceIdLimitsGetParams is parameters of GET /htc/workspaces/{workspaceId}/limits operation.
-type HtcWorkspacesWorkspaceIdLimitsGetParams struct {
-	WorkspaceId string
-}
-
-func unpackHtcWorkspacesWorkspaceIdLimitsGetParams(packed middleware.Parameters) (params HtcWorkspacesWorkspaceIdLimitsGetParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "workspaceId",
-			In:   "path",
-		}
-		params.WorkspaceId = packed[key].(string)
-	}
-	return params
-}
-
-func decodeHtcWorkspacesWorkspaceIdLimitsGetParams(args [1]string, argsEscaped bool, r *http.Request) (params HtcWorkspacesWorkspaceIdLimitsGetParams, _ error) {
-	// Decode path: workspaceId.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "workspaceId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.WorkspaceId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "workspaceId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
-// HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetParams is parameters of GET /htc/workspaces/{workspaceId}/task-retention-policy operation.
-type HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetParams struct {
-	WorkspaceId string
-}
-
-func unpackHtcWorkspacesWorkspaceIdTaskRetentionPolicyGetParams(packed middleware.Parameters) (params HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "workspaceId",
-			In:   "path",
-		}
-		params.WorkspaceId = packed[key].(string)
-	}
-	return params
-}
-
-func decodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyGetParams(args [1]string, argsEscaped bool, r *http.Request) (params HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetParams, _ error) {
-	// Decode path: workspaceId.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "workspaceId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.WorkspaceId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "workspaceId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
-// HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutParams is parameters of PUT /htc/workspaces/{workspaceId}/task-retention-policy operation.
-type HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutParams struct {
-	WorkspaceId string
-}
-
-func unpackHtcWorkspacesWorkspaceIdTaskRetentionPolicyPutParams(packed middleware.Parameters) (params HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "workspaceId",
-			In:   "path",
-		}
-		params.WorkspaceId = packed[key].(string)
-	}
-	return params
-}
-
-func decodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyPutParams(args [1]string, argsEscaped bool, r *http.Request) (params HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutParams, _ error) {
+func decodePutTaskRetentionPolicyParams(args [1]string, argsEscaped bool, r *http.Request) (params PutTaskRetentionPolicyParams, _ error) {
 	// Decode path: workspaceId.
 	if err := func() error {
 		param := args[0]

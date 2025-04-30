@@ -39,23 +39,6 @@ local patches = {
         security: securityScheme,
       },
     },
-    '/htc/gcp/clusters/{workspaceId}'+: {
-      get+: {
-        'x-ogen-operation-group': 'Workspace',
-        operationId: 'getGCPClusters',
-        responses+: {
-          '200'+: {
-            content+: {
-              'application/json'+: {
-                schema: { '$ref':
-                  '#/components/schemas/HTCClusterStatusResponse' },
-
-              },
-            },
-          },
-        },
-      },
-    },
     '/htc/metrics'+: {
       get+: {
         'x-ogen-operation-group': 'Metrics',
@@ -134,7 +117,7 @@ local patches = {
     '/htc/projects/{projectId}/dimensions'+: {
       get+: {
         'x-ogen-operation-group': 'Project',
-        operationId: 'getDimensions',
+        operationId: 'getProjectDimensions',
         responses+: {
           '200'+: {
             content+: {
@@ -149,7 +132,7 @@ local patches = {
     '/htc/projects/{projectId}/limits'+: {
       get+: {
         'x-ogen-operation-group': 'Project',
-        operationId: 'getLimits',
+        operationId: 'getProjectLimits',
         responses+: {
           '200'+: {
             content+: {
@@ -182,12 +165,12 @@ local patches = {
         operationId: 'createTask',
       },
     },
-  '/htc/projects/{projectId}/tasks/{taskId}/summary-statistics'+: {
-    get+: {
-      'x-ogen-operation-group': 'Task',
-      operationId: 'GetTaskStats',
-    }
-  },
+    '/htc/projects/{projectId}/tasks/{taskId}/summary-statistics'+: {
+      get+: {
+        'x-ogen-operation-group': 'Task',
+        operationId: 'GetTaskStats',
+      }
+    },
     '/htc/projects/{projectId}/tasks/{taskId}/jobs'+: {
       get+: {
         'x-ogen-operation-group': 'Job',
@@ -300,7 +283,60 @@ local patches = {
           },
         }
       }
-    }
+    },
+    '/htc/workspaces/{workspaceId}/dimensions'+: {
+      get+: {
+        'x-ogen-operation-group': 'Workspace',
+        operationId: 'getWorkspaceDimensions',
+        responses+: {
+          '200'+: {
+            content+: {
+              'application/json'+: {
+                schema: { '$ref': '#/components/schemas/HTCWorkspaceDimensions' },
+              },
+            },
+          },
+        },
+      },
+    },
+    '/htc/workspaces/{workspaceId}/limits'+: {
+      get+: {
+        'x-ogen-operation-group': 'Workspace',
+        operationId: 'getWorkspaceLimits',
+      },
+    },
+    '/htc/workspaces/{workspaceId}/task-retention-policy'+: {
+      get+: {
+        'x-ogen-operation-group': 'Workspace',
+        operationId: 'getTaskRetentionPolicy',
+      },
+      put+: {
+        'x-ogen-operation-group': 'Workspace',
+        operationId: 'putTaskRetentionPolicy',
+        responses+: {
+          '405'+: {
+            description: "Not Allowed"
+          },
+        },
+      },
+    },
+    '/htc/gcp/clusters/{workspaceId}'+: {
+      get+: {
+        'x-ogen-operation-group': 'Workspace',
+        operationId: 'getGCPClusters',
+        responses+: {
+          '200'+: {
+            content+: {
+              'application/json'+: {
+                schema: { '$ref':
+                  '#/components/schemas/HTCClusterStatusResponse' },
+
+              },
+            },
+          },
+        },
+      },
+    },
   },
   components+: {
     schemas+: {
@@ -484,6 +520,12 @@ local patches = {
             type: 'string',
             example: 'https://page2.com',
           },
+        },
+      },
+      HTCWorkspaceDimensions: {
+        type: 'array',
+        items: {
+          '$ref': '#/components/schemas/HTCComputeEnvironment',
         },
       },
       HTCTokenPayload: { type: 'string' },

@@ -413,16 +413,6 @@ func (s *FeatureFlagsResult) SetResults(val []RescaleFlag) {
 	s.Results = val
 }
 
-// GetDimensionsForbidden is response for GetDimensions operation.
-type GetDimensionsForbidden struct{}
-
-func (*GetDimensionsForbidden) getDimensionsRes() {}
-
-// GetDimensionsUnauthorized is response for GetDimensions operation.
-type GetDimensionsUnauthorized struct{}
-
-func (*GetDimensionsUnauthorized) getDimensionsRes() {}
-
 // GetEventsForbidden is response for GetEvents operation.
 type GetEventsForbidden struct{}
 
@@ -510,16 +500,6 @@ type GetJobsUnauthorized struct{}
 
 func (*GetJobsUnauthorized) getJobsRes() {}
 
-// GetLimitsForbidden is response for GetLimits operation.
-type GetLimitsForbidden struct{}
-
-func (*GetLimitsForbidden) getLimitsRes() {}
-
-// GetLimitsUnauthorized is response for GetLimits operation.
-type GetLimitsUnauthorized struct{}
-
-func (*GetLimitsUnauthorized) getLimitsRes() {}
-
 // GetLogsForbidden is response for GetLogs operation.
 type GetLogsForbidden struct{}
 
@@ -597,10 +577,30 @@ type GetMetricsUnauthorized struct{}
 
 func (*GetMetricsUnauthorized) getMetricsRes() {}
 
+// GetProjectDimensionsForbidden is response for GetProjectDimensions operation.
+type GetProjectDimensionsForbidden struct{}
+
+func (*GetProjectDimensionsForbidden) getProjectDimensionsRes() {}
+
+// GetProjectDimensionsUnauthorized is response for GetProjectDimensions operation.
+type GetProjectDimensionsUnauthorized struct{}
+
+func (*GetProjectDimensionsUnauthorized) getProjectDimensionsRes() {}
+
 // GetProjectForbidden is response for GetProject operation.
 type GetProjectForbidden struct{}
 
 func (*GetProjectForbidden) getProjectRes() {}
+
+// GetProjectLimitsForbidden is response for GetProjectLimits operation.
+type GetProjectLimitsForbidden struct{}
+
+func (*GetProjectLimitsForbidden) getProjectLimitsRes() {}
+
+// GetProjectLimitsUnauthorized is response for GetProjectLimits operation.
+type GetProjectLimitsUnauthorized struct{}
+
+func (*GetProjectLimitsUnauthorized) getProjectLimitsRes() {}
 
 // GetProjectUnauthorized is response for GetProject operation.
 type GetProjectUnauthorized struct{}
@@ -669,6 +669,16 @@ type GetRegistryTokenUnauthorized struct{}
 
 func (*GetRegistryTokenUnauthorized) getRegistryTokenRes() {}
 
+// GetTaskRetentionPolicyForbidden is response for GetTaskRetentionPolicy operation.
+type GetTaskRetentionPolicyForbidden struct{}
+
+func (*GetTaskRetentionPolicyForbidden) getTaskRetentionPolicyRes() {}
+
+// GetTaskRetentionPolicyUnauthorized is response for GetTaskRetentionPolicy operation.
+type GetTaskRetentionPolicyUnauthorized struct{}
+
+func (*GetTaskRetentionPolicyUnauthorized) getTaskRetentionPolicyRes() {}
+
 // GetTaskStatsForbidden is response for GetTaskStats operation.
 type GetTaskStatsForbidden struct{}
 
@@ -688,6 +698,26 @@ func (*GetTasksForbidden) getTasksRes() {}
 type GetTasksUnauthorized struct{}
 
 func (*GetTasksUnauthorized) getTasksRes() {}
+
+// GetWorkspaceDimensionsForbidden is response for GetWorkspaceDimensions operation.
+type GetWorkspaceDimensionsForbidden struct{}
+
+func (*GetWorkspaceDimensionsForbidden) getWorkspaceDimensionsRes() {}
+
+// GetWorkspaceDimensionsUnauthorized is response for GetWorkspaceDimensions operation.
+type GetWorkspaceDimensionsUnauthorized struct{}
+
+func (*GetWorkspaceDimensionsUnauthorized) getWorkspaceDimensionsRes() {}
+
+// GetWorkspaceLimitsForbidden is response for GetWorkspaceLimits operation.
+type GetWorkspaceLimitsForbidden struct{}
+
+func (*GetWorkspaceLimitsForbidden) getWorkspaceLimitsRes() {}
+
+// GetWorkspaceLimitsUnauthorized is response for GetWorkspaceLimits operation.
+type GetWorkspaceLimitsUnauthorized struct{}
+
+func (*GetWorkspaceLimitsUnauthorized) getWorkspaceLimitsRes() {}
 
 // Ref: #/components/schemas/HTCCluster
 type HTCCluster struct {
@@ -2629,7 +2659,7 @@ func (*HTCProject) htcProjectsProjectIdPatchRes() {}
 
 type HTCProjectDimensions []HTCComputeEnvironment
 
-func (*HTCProjectDimensions) getDimensionsRes() {}
+func (*HTCProjectDimensions) getProjectDimensionsRes() {}
 
 // Ref: #/components/schemas/HTCProjectLimit
 type HTCProjectLimit struct {
@@ -2782,7 +2812,7 @@ func (s *HTCProjectLimitModifierRole) UnmarshalText(data []byte) error {
 
 type HTCProjectLimits []HTCProjectLimit
 
-func (*HTCProjectLimits) getLimitsRes() {}
+func (*HTCProjectLimits) getProjectLimitsRes() {}
 
 // Ref: #/components/schemas/HTCProjectUpdate
 type HTCProjectUpdate struct {
@@ -3654,6 +3684,10 @@ type HTCTokenPayload string
 
 func (*HTCTokenPayload) authTokenWhoamiGetRes() {}
 
+type HTCWorkspaceDimensions []HTCComputeEnvironment
+
+func (*HTCWorkspaceDimensions) getWorkspaceDimensionsRes() {}
+
 // Ref: #/components/schemas/HTCWorkspaceLimit
 type HTCWorkspaceLimit struct {
 	CreatedAt   OptDateTime `json:"createdAt"`
@@ -3724,7 +3758,7 @@ func (s *HTCWorkspaceLimit) SetWorkspaceId(val OptString) {
 	s.WorkspaceId = val
 }
 
-func (*HTCWorkspaceLimit) htcWorkspacesWorkspaceIdLimitsGetRes() {}
+func (*HTCWorkspaceLimit) getWorkspaceLimitsRes() {}
 
 type HtcProjectsProjectIdDimensionsPutCreatedApplicationJSON []HTCComputeEnvironment
 
@@ -4251,56 +4285,6 @@ type HtcStorageRegionRegionGetUnauthorized struct{}
 
 func (*HtcStorageRegionRegionGetUnauthorized) htcStorageRegionRegionGetRes() {}
 
-// HtcWorkspacesWorkspaceIdDimensionsGetForbidden is response for HtcWorkspacesWorkspaceIdDimensionsGet operation.
-type HtcWorkspacesWorkspaceIdDimensionsGetForbidden struct{}
-
-func (*HtcWorkspacesWorkspaceIdDimensionsGetForbidden) htcWorkspacesWorkspaceIdDimensionsGetRes() {}
-
-type HtcWorkspacesWorkspaceIdDimensionsGetOKApplicationJSON []HTCComputeEnvironment
-
-func (*HtcWorkspacesWorkspaceIdDimensionsGetOKApplicationJSON) htcWorkspacesWorkspaceIdDimensionsGetRes() {
-}
-
-// HtcWorkspacesWorkspaceIdDimensionsGetUnauthorized is response for HtcWorkspacesWorkspaceIdDimensionsGet operation.
-type HtcWorkspacesWorkspaceIdDimensionsGetUnauthorized struct{}
-
-func (*HtcWorkspacesWorkspaceIdDimensionsGetUnauthorized) htcWorkspacesWorkspaceIdDimensionsGetRes() {
-}
-
-// HtcWorkspacesWorkspaceIdLimitsGetForbidden is response for HtcWorkspacesWorkspaceIdLimitsGet operation.
-type HtcWorkspacesWorkspaceIdLimitsGetForbidden struct{}
-
-func (*HtcWorkspacesWorkspaceIdLimitsGetForbidden) htcWorkspacesWorkspaceIdLimitsGetRes() {}
-
-// HtcWorkspacesWorkspaceIdLimitsGetUnauthorized is response for HtcWorkspacesWorkspaceIdLimitsGet operation.
-type HtcWorkspacesWorkspaceIdLimitsGetUnauthorized struct{}
-
-func (*HtcWorkspacesWorkspaceIdLimitsGetUnauthorized) htcWorkspacesWorkspaceIdLimitsGetRes() {}
-
-// HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetForbidden is response for HtcWorkspacesWorkspaceIdTaskRetentionPolicyGet operation.
-type HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetForbidden struct{}
-
-func (*HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetForbidden) htcWorkspacesWorkspaceIdTaskRetentionPolicyGetRes() {
-}
-
-// HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetUnauthorized is response for HtcWorkspacesWorkspaceIdTaskRetentionPolicyGet operation.
-type HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetUnauthorized struct{}
-
-func (*HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetUnauthorized) htcWorkspacesWorkspaceIdTaskRetentionPolicyGetRes() {
-}
-
-// HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutForbidden is response for HtcWorkspacesWorkspaceIdTaskRetentionPolicyPut operation.
-type HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutForbidden struct{}
-
-func (*HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutForbidden) htcWorkspacesWorkspaceIdTaskRetentionPolicyPutRes() {
-}
-
-// HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutUnauthorized is response for HtcWorkspacesWorkspaceIdTaskRetentionPolicyPut operation.
-type HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutUnauthorized struct{}
-
-func (*HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutUnauthorized) htcWorkspacesWorkspaceIdTaskRetentionPolicyPutRes() {
-}
-
 // Ref: #/components/schemas/InstanceLabels
 type InstanceLabels struct {
 	AccountId            OptString `json:"accountId"`
@@ -4761,15 +4745,18 @@ func (s *OAuth2ErrorResponse) SetErrorDescription(val OptString) {
 func (*OAuth2ErrorResponse) authTokenWhoamiGetRes()                                       {}
 func (*OAuth2ErrorResponse) createRepoRes()                                               {}
 func (*OAuth2ErrorResponse) createTaskRes()                                               {}
-func (*OAuth2ErrorResponse) getDimensionsRes()                                            {}
 func (*OAuth2ErrorResponse) getGCPClustersRes()                                           {}
 func (*OAuth2ErrorResponse) getImagesRes()                                                {}
-func (*OAuth2ErrorResponse) getLimitsRes()                                                {}
+func (*OAuth2ErrorResponse) getProjectDimensionsRes()                                     {}
+func (*OAuth2ErrorResponse) getProjectLimitsRes()                                         {}
 func (*OAuth2ErrorResponse) getProjectRes()                                               {}
 func (*OAuth2ErrorResponse) getRegistryTokenRes()                                         {}
+func (*OAuth2ErrorResponse) getTaskRetentionPolicyRes()                                   {}
 func (*OAuth2ErrorResponse) getTaskStatsRes()                                             {}
 func (*OAuth2ErrorResponse) getTasksRes()                                                 {}
 func (*OAuth2ErrorResponse) getTokenRes()                                                 {}
+func (*OAuth2ErrorResponse) getWorkspaceDimensionsRes()                                   {}
+func (*OAuth2ErrorResponse) getWorkspaceLimitsRes()                                       {}
 func (*OAuth2ErrorResponse) htcProjectsProjectIdDimensionsPutRes()                        {}
 func (*OAuth2ErrorResponse) htcProjectsProjectIdLimitsDeleteRes()                         {}
 func (*OAuth2ErrorResponse) htcProjectsProjectIdLimitsIDDeleteRes()                       {}
@@ -4797,11 +4784,8 @@ func (*OAuth2ErrorResponse) htcProjectsProjectIdTasksTaskIdStorageTokensGetRes()
 func (*OAuth2ErrorResponse) htcRegionsGetRes()                                            {}
 func (*OAuth2ErrorResponse) htcRegionsRegionGetRes()                                      {}
 func (*OAuth2ErrorResponse) htcStorageRegionRegionGetRes()                                {}
-func (*OAuth2ErrorResponse) htcWorkspacesWorkspaceIdDimensionsGetRes()                    {}
-func (*OAuth2ErrorResponse) htcWorkspacesWorkspaceIdLimitsGetRes()                        {}
-func (*OAuth2ErrorResponse) htcWorkspacesWorkspaceIdTaskRetentionPolicyGetRes()           {}
-func (*OAuth2ErrorResponse) htcWorkspacesWorkspaceIdTaskRetentionPolicyPutRes()           {}
 func (*OAuth2ErrorResponse) oAuth2TokenPostRes()                                          {}
+func (*OAuth2ErrorResponse) putTaskRetentionPolicyRes()                                   {}
 func (*OAuth2ErrorResponse) submitJobsRes()                                               {}
 func (*OAuth2ErrorResponse) wellKnownJwksJSONGetRes()                                     {}
 func (*OAuth2ErrorResponse) whoAmIRes()                                                   {}
@@ -7733,6 +7717,21 @@ func (s *PublicKey) SetFormat(val OptString) {
 	s.Format = val
 }
 
+// PutTaskRetentionPolicyForbidden is response for PutTaskRetentionPolicy operation.
+type PutTaskRetentionPolicyForbidden struct{}
+
+func (*PutTaskRetentionPolicyForbidden) putTaskRetentionPolicyRes() {}
+
+// PutTaskRetentionPolicyMethodNotAllowed is response for PutTaskRetentionPolicy operation.
+type PutTaskRetentionPolicyMethodNotAllowed struct{}
+
+func (*PutTaskRetentionPolicyMethodNotAllowed) putTaskRetentionPolicyRes() {}
+
+// PutTaskRetentionPolicyUnauthorized is response for PutTaskRetentionPolicy operation.
+type PutTaskRetentionPolicyUnauthorized struct{}
+
+func (*PutTaskRetentionPolicyUnauthorized) putTaskRetentionPolicyRes() {}
+
 // Ref: #/components/schemas/RegionStorageOption
 type RegionStorageOption struct {
 	Provider    OptCloudProvider `json:"provider"`
@@ -9161,5 +9160,5 @@ func (s *WorkspaceTaskRetentionPolicy) SetWorkspaceId(val OptString) {
 	s.WorkspaceId = val
 }
 
-func (*WorkspaceTaskRetentionPolicy) htcWorkspacesWorkspaceIdTaskRetentionPolicyGetRes() {}
-func (*WorkspaceTaskRetentionPolicy) htcWorkspacesWorkspaceIdTaskRetentionPolicyPutRes() {}
+func (*WorkspaceTaskRetentionPolicy) getTaskRetentionPolicyRes() {}
+func (*WorkspaceTaskRetentionPolicy) putTaskRetentionPolicyRes() {}

@@ -263,64 +263,6 @@ type Invoker interface {
 	//
 	// GET /htc/storage/region/{region}
 	HtcStorageRegionRegionGet(ctx context.Context, params HtcStorageRegionRegionGetParams) (HtcStorageRegionRegionGetRes, error)
-	// HtcWorkspacesWorkspaceIdDimensionsGet invokes GET /htc/workspaces/{workspaceId}/dimensions operation.
-	//
-	// This endpoint provides a comprehensive view of the various hardware configurations and
-	// environments available within a specific workspace. This read-only API is primarily designed for
-	// users who need to understand the different "dimensions" or attributes that describe the hardware
-	// and other aspects of job runs within their workspace. By offering insights into available
-	// environments, it aids users in selecting the most suitable configuration for their jobs,
-	// especially when performance testing across different hardware setups.
-	// Normal users can access this endpoint for the workspace they belong to
-	// Rescale personnel are required in order to modify any of these dimensions.
-	//
-	// GET /htc/workspaces/{workspaceId}/dimensions
-	HtcWorkspacesWorkspaceIdDimensionsGet(ctx context.Context, params HtcWorkspacesWorkspaceIdDimensionsGetParams) (HtcWorkspacesWorkspaceIdDimensionsGetRes, error)
-	// HtcWorkspacesWorkspaceIdLimitsGet invokes GET /htc/workspaces/{workspaceId}/limits operation.
-	//
-	// This endpoint will get the resource limit applied to this workspace.
-	//
-	// GET /htc/workspaces/{workspaceId}/limits
-	HtcWorkspacesWorkspaceIdLimitsGet(ctx context.Context, params HtcWorkspacesWorkspaceIdLimitsGetParams) (HtcWorkspacesWorkspaceIdLimitsGetRes, error)
-	// HtcWorkspacesWorkspaceIdTaskRetentionPolicyGet invokes GET /htc/workspaces/{workspaceId}/task-retention-policy operation.
-	//
-	// This endpoint is used to retrieve the current task retention policy of a specific Workspace. The
-	// task retention policy is necessary in managing the lifecycle of tasks within a Workspace. The task
-	// retention policy includes two key aspects:
-	// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
-	// which an archived task is automatically deleted. Archived tasks can be unarchived during this
-	// period, protecting users from prematurely deleting task resources.
-	// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
-	// of inactivity after which an active task is automatically archived. This feature helps in keeping
-	// the project organized by archiving active tasks, ensuring that storage resources are freed
-	// optimistically.
-	// Setting either value to `0` will result in disabling of that feature. For example, a project's
-	// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
-	// auto-deleting.
-	//
-	// GET /htc/workspaces/{workspaceId}/task-retention-policy
-	HtcWorkspacesWorkspaceIdTaskRetentionPolicyGet(ctx context.Context, params HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetParams) (HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetRes, error)
-	// HtcWorkspacesWorkspaceIdTaskRetentionPolicyPut invokes PUT /htc/workspaces/{workspaceId}/task-retention-policy operation.
-	//
-	// This endpoint enables Workspace administrators to define or update the task retention policy for a
-	// specific workspace. The task retention policy includes two key aspects:
-	// * **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in
-	// hours) after which an archived task is automatically deleted. This control allows for flexibility
-	// in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before
-	// being permanently deleted. Archived tasks can be unarchived during this period, protecting users
-	// from prematurely deleting task resources
-	// * **Auto-Archive After Inactivity**: The `archiveAfter` field allows administrators to specify the
-	// duration (in hours) of inactivity after which an active task is automatically archived. This
-	// feature helps in keeping the project organized by archiving active tasks, ensuring that storage
-	// resources are freed optimistically.
-	// Setting either value to `0` will result in disabling of that feature. For example, a workspace's
-	// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
-	// auto-deleting. The policy applies to all projects within the workspace that do not have their own
-	// project-level policy defined. If a project within the workspace has its own retention policy
-	// defined, the project-level policy takes precedence over the workspace-level policy.
-	//
-	// PUT /htc/workspaces/{workspaceId}/task-retention-policy
-	HtcWorkspacesWorkspaceIdTaskRetentionPolicyPut(ctx context.Context, request OptWorkspaceTaskRetentionPolicy, params HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutParams) (HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutRes, error)
 	// OAuth2TokenPost invokes POST /oauth2/token operation.
 	//
 	// This endpoint will get an OAuth access token.
@@ -459,7 +401,13 @@ type ProjectInvoker interface {
 	//
 	// POST /htc/projects
 	CreateProject(ctx context.Context, request OptHTCProject) (CreateProjectRes, error)
-	// GetDimensions invokes getDimensions operation.
+	// GetProject invokes getProject operation.
+	//
+	// This endpoint will get a project by id.
+	//
+	// GET /htc/projects/{projectId}
+	GetProject(ctx context.Context, params GetProjectParams) (GetProjectRes, error)
+	// GetProjectDimensions invokes getProjectDimensions operation.
 	//
 	// This endpoint is designed to retrieve the current set of dimension combinations configured for a
 	// specific project so that users can understand the existing computing environment constraints of a
@@ -472,21 +420,15 @@ type ProjectInvoker interface {
 	// currently configured `machineType`.
 	//
 	// GET /htc/projects/{projectId}/dimensions
-	GetDimensions(ctx context.Context, params GetDimensionsParams) (GetDimensionsRes, error)
-	// GetLimits invokes getLimits operation.
+	GetProjectDimensions(ctx context.Context, params GetProjectDimensionsParams) (GetProjectDimensionsRes, error)
+	// GetProjectLimits invokes getProjectLimits operation.
 	//
 	// This endpoint will list all resource limitations associated with this project.
 	// A job running in this project will be subject to all resulting limits as well as any associated
 	// with the workspace (see `/htc/workspaces/{workspaceId}/limits`).
 	//
 	// GET /htc/projects/{projectId}/limits
-	GetLimits(ctx context.Context, params GetLimitsParams) (GetLimitsRes, error)
-	// GetProject invokes getProject operation.
-	//
-	// This endpoint will get a project by id.
-	//
-	// GET /htc/projects/{projectId}
-	GetProject(ctx context.Context, params GetProjectParams) (GetProjectRes, error)
+	GetProjectLimits(ctx context.Context, params GetProjectLimitsParams) (GetProjectLimitsRes, error)
 	// GetProjects invokes getProjects operation.
 	//
 	// This endpoint will get all projects.
@@ -530,6 +472,64 @@ type WorkspaceInvoker interface {
 	//
 	// GET /htc/gcp/clusters/{workspaceId}
 	GetGCPClusters(ctx context.Context, params GetGCPClustersParams) (GetGCPClustersRes, error)
+	// GetTaskRetentionPolicy invokes getTaskRetentionPolicy operation.
+	//
+	// This endpoint is used to retrieve the current task retention policy of a specific Workspace. The
+	// task retention policy is necessary in managing the lifecycle of tasks within a Workspace. The task
+	// retention policy includes two key aspects:
+	// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
+	// which an archived task is automatically deleted. Archived tasks can be unarchived during this
+	// period, protecting users from prematurely deleting task resources.
+	// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
+	// of inactivity after which an active task is automatically archived. This feature helps in keeping
+	// the project organized by archiving active tasks, ensuring that storage resources are freed
+	// optimistically.
+	// Setting either value to `0` will result in disabling of that feature. For example, a project's
+	// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
+	// auto-deleting.
+	//
+	// GET /htc/workspaces/{workspaceId}/task-retention-policy
+	GetTaskRetentionPolicy(ctx context.Context, params GetTaskRetentionPolicyParams) (GetTaskRetentionPolicyRes, error)
+	// GetWorkspaceDimensions invokes getWorkspaceDimensions operation.
+	//
+	// This endpoint provides a comprehensive view of the various hardware configurations and
+	// environments available within a specific workspace. This read-only API is primarily designed for
+	// users who need to understand the different "dimensions" or attributes that describe the hardware
+	// and other aspects of job runs within their workspace. By offering insights into available
+	// environments, it aids users in selecting the most suitable configuration for their jobs,
+	// especially when performance testing across different hardware setups.
+	// Normal users can access this endpoint for the workspace they belong to
+	// Rescale personnel are required in order to modify any of these dimensions.
+	//
+	// GET /htc/workspaces/{workspaceId}/dimensions
+	GetWorkspaceDimensions(ctx context.Context, params GetWorkspaceDimensionsParams) (GetWorkspaceDimensionsRes, error)
+	// GetWorkspaceLimits invokes getWorkspaceLimits operation.
+	//
+	// This endpoint will get the resource limit applied to this workspace.
+	//
+	// GET /htc/workspaces/{workspaceId}/limits
+	GetWorkspaceLimits(ctx context.Context, params GetWorkspaceLimitsParams) (GetWorkspaceLimitsRes, error)
+	// PutTaskRetentionPolicy invokes putTaskRetentionPolicy operation.
+	//
+	// This endpoint enables Workspace administrators to define or update the task retention policy for a
+	// specific workspace. The task retention policy includes two key aspects:
+	// * **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in
+	// hours) after which an archived task is automatically deleted. This control allows for flexibility
+	// in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before
+	// being permanently deleted. Archived tasks can be unarchived during this period, protecting users
+	// from prematurely deleting task resources
+	// * **Auto-Archive After Inactivity**: The `archiveAfter` field allows administrators to specify the
+	// duration (in hours) of inactivity after which an active task is automatically archived. This
+	// feature helps in keeping the project organized by archiving active tasks, ensuring that storage
+	// resources are freed optimistically.
+	// Setting either value to `0` will result in disabling of that feature. For example, a workspace's
+	// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
+	// auto-deleting. The policy applies to all projects within the workspace that do not have their own
+	// project-level policy defined. If a project within the workspace has its own retention policy
+	// defined, the project-level policy takes precedence over the workspace-level policy.
+	//
+	// PUT /htc/workspaces/{workspaceId}/task-retention-policy
+	PutTaskRetentionPolicy(ctx context.Context, request OptWorkspaceTaskRetentionPolicy, params PutTaskRetentionPolicyParams) (PutTaskRetentionPolicyRes, error)
 }
 
 // Client implements OAS client.
@@ -1048,104 +1048,6 @@ func (c *Client) sendCreateTask(ctx context.Context, request OptHTCTask, params 
 	defer resp.Body.Close()
 
 	result, err := decodeCreateTaskResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// GetDimensions invokes getDimensions operation.
-//
-// This endpoint is designed to retrieve the current set of dimension combinations configured for a
-// specific project so that users can understand the existing computing environment constraints of a
-// project. It returns a list of dimension combinations such as pricing priority, geographical region,
-//
-//	compute scaling policy, and hyperthreading options.
-//
-// Any user who _belongs to the workspace this project belongs to_ can use this endpoint to verify or
-// audit the current configuration of a project. This can be helpful in ensuring that the project's
-// settings align with expectations.
-// The payload also includes a read-only set of `derived` dimensions which help describe the
-// currently configured `machineType`.
-//
-// GET /htc/projects/{projectId}/dimensions
-func (c *Client) GetDimensions(ctx context.Context, params GetDimensionsParams) (GetDimensionsRes, error) {
-	res, err := c.sendGetDimensions(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendGetDimensions(ctx context.Context, params GetDimensionsParams) (res GetDimensionsRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/dimensions"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "GetDimensions", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeGetDimensionsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -1947,96 +1849,6 @@ func (c *Client) sendGetJobs(ctx context.Context, params GetJobsParams) (res Get
 	return result, nil
 }
 
-// GetLimits invokes getLimits operation.
-//
-// This endpoint will list all resource limitations associated with this project.
-// A job running in this project will be subject to all resulting limits as well as any associated
-// with the workspace (see `/htc/workspaces/{workspaceId}/limits`).
-//
-// GET /htc/projects/{projectId}/limits
-func (c *Client) GetLimits(ctx context.Context, params GetLimitsParams) (GetLimitsRes, error) {
-	res, err := c.sendGetLimits(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendGetLimits(ctx context.Context, params GetLimitsParams) (res GetLimitsRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/htc/projects/"
-	{
-		// Encode "projectId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "projectId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ProjectId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/limits"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "GetLimits", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeGetLimitsResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
 // GetLogs invokes getLogs operation.
 //
 // This endpoint will get job logs.
@@ -2398,6 +2210,194 @@ func (c *Client) sendGetProject(ctx context.Context, params GetProjectParams) (r
 	return result, nil
 }
 
+// GetProjectDimensions invokes getProjectDimensions operation.
+//
+// This endpoint is designed to retrieve the current set of dimension combinations configured for a
+// specific project so that users can understand the existing computing environment constraints of a
+// project. It returns a list of dimension combinations such as pricing priority, geographical region,
+//
+//	compute scaling policy, and hyperthreading options.
+//
+// Any user who _belongs to the workspace this project belongs to_ can use this endpoint to verify or
+// audit the current configuration of a project. This can be helpful in ensuring that the project's
+// settings align with expectations.
+// The payload also includes a read-only set of `derived` dimensions which help describe the
+// currently configured `machineType`.
+//
+// GET /htc/projects/{projectId}/dimensions
+func (c *Client) GetProjectDimensions(ctx context.Context, params GetProjectDimensionsParams) (GetProjectDimensionsRes, error) {
+	res, err := c.sendGetProjectDimensions(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetProjectDimensions(ctx context.Context, params GetProjectDimensionsParams) (res GetProjectDimensionsRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/dimensions"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetProjectDimensions", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetProjectDimensionsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetProjectLimits invokes getProjectLimits operation.
+//
+// This endpoint will list all resource limitations associated with this project.
+// A job running in this project will be subject to all resulting limits as well as any associated
+// with the workspace (see `/htc/workspaces/{workspaceId}/limits`).
+//
+// GET /htc/projects/{projectId}/limits
+func (c *Client) GetProjectLimits(ctx context.Context, params GetProjectLimitsParams) (GetProjectLimitsRes, error) {
+	res, err := c.sendGetProjectLimits(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetProjectLimits(ctx context.Context, params GetProjectLimitsParams) (res GetProjectLimitsRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/htc/projects/"
+	{
+		// Encode "projectId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "projectId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ProjectId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/limits"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetProjectLimits", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetProjectLimitsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // GetProjects invokes getProjects operation.
 //
 // This endpoint will get all projects.
@@ -2605,6 +2605,106 @@ func (c *Client) sendGetRegistryToken(ctx context.Context, params GetRegistryTok
 	defer resp.Body.Close()
 
 	result, err := decodeGetRegistryTokenResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetTaskRetentionPolicy invokes getTaskRetentionPolicy operation.
+//
+// This endpoint is used to retrieve the current task retention policy of a specific Workspace. The
+// task retention policy is necessary in managing the lifecycle of tasks within a Workspace. The task
+// retention policy includes two key aspects:
+// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
+// which an archived task is automatically deleted. Archived tasks can be unarchived during this
+// period, protecting users from prematurely deleting task resources.
+// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
+// of inactivity after which an active task is automatically archived. This feature helps in keeping
+// the project organized by archiving active tasks, ensuring that storage resources are freed
+// optimistically.
+// Setting either value to `0` will result in disabling of that feature. For example, a project's
+// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
+// auto-deleting.
+//
+// GET /htc/workspaces/{workspaceId}/task-retention-policy
+func (c *Client) GetTaskRetentionPolicy(ctx context.Context, params GetTaskRetentionPolicyParams) (GetTaskRetentionPolicyRes, error) {
+	res, err := c.sendGetTaskRetentionPolicy(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetTaskRetentionPolicy(ctx context.Context, params GetTaskRetentionPolicyParams) (res GetTaskRetentionPolicyRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/htc/workspaces/"
+	{
+		// Encode "workspaceId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "workspaceId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.WorkspaceId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/task-retention-policy"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetTaskRetentionPolicy", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetTaskRetentionPolicyResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -2922,6 +3022,189 @@ func (c *Client) sendGetToken(ctx context.Context, params GetTokenParams) (res G
 	defer resp.Body.Close()
 
 	result, err := decodeGetTokenResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetWorkspaceDimensions invokes getWorkspaceDimensions operation.
+//
+// This endpoint provides a comprehensive view of the various hardware configurations and
+// environments available within a specific workspace. This read-only API is primarily designed for
+// users who need to understand the different "dimensions" or attributes that describe the hardware
+// and other aspects of job runs within their workspace. By offering insights into available
+// environments, it aids users in selecting the most suitable configuration for their jobs,
+// especially when performance testing across different hardware setups.
+// Normal users can access this endpoint for the workspace they belong to
+// Rescale personnel are required in order to modify any of these dimensions.
+//
+// GET /htc/workspaces/{workspaceId}/dimensions
+func (c *Client) GetWorkspaceDimensions(ctx context.Context, params GetWorkspaceDimensionsParams) (GetWorkspaceDimensionsRes, error) {
+	res, err := c.sendGetWorkspaceDimensions(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetWorkspaceDimensions(ctx context.Context, params GetWorkspaceDimensionsParams) (res GetWorkspaceDimensionsRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/htc/workspaces/"
+	{
+		// Encode "workspaceId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "workspaceId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.WorkspaceId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/dimensions"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetWorkspaceDimensions", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetWorkspaceDimensionsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetWorkspaceLimits invokes getWorkspaceLimits operation.
+//
+// This endpoint will get the resource limit applied to this workspace.
+//
+// GET /htc/workspaces/{workspaceId}/limits
+func (c *Client) GetWorkspaceLimits(ctx context.Context, params GetWorkspaceLimitsParams) (GetWorkspaceLimitsRes, error) {
+	res, err := c.sendGetWorkspaceLimits(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetWorkspaceLimits(ctx context.Context, params GetWorkspaceLimitsParams) (res GetWorkspaceLimitsRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/htc/workspaces/"
+	{
+		// Encode "workspaceId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "workspaceId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.WorkspaceId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/limits"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "GetWorkspaceLimits", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGetWorkspaceLimitsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -5886,395 +6169,6 @@ func (c *Client) sendHtcStorageRegionRegionGet(ctx context.Context, params HtcSt
 	return result, nil
 }
 
-// HtcWorkspacesWorkspaceIdDimensionsGet invokes GET /htc/workspaces/{workspaceId}/dimensions operation.
-//
-// This endpoint provides a comprehensive view of the various hardware configurations and
-// environments available within a specific workspace. This read-only API is primarily designed for
-// users who need to understand the different "dimensions" or attributes that describe the hardware
-// and other aspects of job runs within their workspace. By offering insights into available
-// environments, it aids users in selecting the most suitable configuration for their jobs,
-// especially when performance testing across different hardware setups.
-// Normal users can access this endpoint for the workspace they belong to
-// Rescale personnel are required in order to modify any of these dimensions.
-//
-// GET /htc/workspaces/{workspaceId}/dimensions
-func (c *Client) HtcWorkspacesWorkspaceIdDimensionsGet(ctx context.Context, params HtcWorkspacesWorkspaceIdDimensionsGetParams) (HtcWorkspacesWorkspaceIdDimensionsGetRes, error) {
-	res, err := c.sendHtcWorkspacesWorkspaceIdDimensionsGet(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendHtcWorkspacesWorkspaceIdDimensionsGet(ctx context.Context, params HtcWorkspacesWorkspaceIdDimensionsGetParams) (res HtcWorkspacesWorkspaceIdDimensionsGetRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/htc/workspaces/"
-	{
-		// Encode "workspaceId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "workspaceId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.WorkspaceId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/dimensions"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcWorkspacesWorkspaceIdDimensionsGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcWorkspacesWorkspaceIdDimensionsGetResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcWorkspacesWorkspaceIdLimitsGet invokes GET /htc/workspaces/{workspaceId}/limits operation.
-//
-// This endpoint will get the resource limit applied to this workspace.
-//
-// GET /htc/workspaces/{workspaceId}/limits
-func (c *Client) HtcWorkspacesWorkspaceIdLimitsGet(ctx context.Context, params HtcWorkspacesWorkspaceIdLimitsGetParams) (HtcWorkspacesWorkspaceIdLimitsGetRes, error) {
-	res, err := c.sendHtcWorkspacesWorkspaceIdLimitsGet(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendHtcWorkspacesWorkspaceIdLimitsGet(ctx context.Context, params HtcWorkspacesWorkspaceIdLimitsGetParams) (res HtcWorkspacesWorkspaceIdLimitsGetRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/htc/workspaces/"
-	{
-		// Encode "workspaceId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "workspaceId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.WorkspaceId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/limits"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcWorkspacesWorkspaceIdLimitsGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcWorkspacesWorkspaceIdLimitsGetResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcWorkspacesWorkspaceIdTaskRetentionPolicyGet invokes GET /htc/workspaces/{workspaceId}/task-retention-policy operation.
-//
-// This endpoint is used to retrieve the current task retention policy of a specific Workspace. The
-// task retention policy is necessary in managing the lifecycle of tasks within a Workspace. The task
-// retention policy includes two key aspects:
-// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
-// which an archived task is automatically deleted. Archived tasks can be unarchived during this
-// period, protecting users from prematurely deleting task resources.
-// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
-// of inactivity after which an active task is automatically archived. This feature helps in keeping
-// the project organized by archiving active tasks, ensuring that storage resources are freed
-// optimistically.
-// Setting either value to `0` will result in disabling of that feature. For example, a project's
-// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
-// auto-deleting.
-//
-// GET /htc/workspaces/{workspaceId}/task-retention-policy
-func (c *Client) HtcWorkspacesWorkspaceIdTaskRetentionPolicyGet(ctx context.Context, params HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetParams) (HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetRes, error) {
-	res, err := c.sendHtcWorkspacesWorkspaceIdTaskRetentionPolicyGet(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendHtcWorkspacesWorkspaceIdTaskRetentionPolicyGet(ctx context.Context, params HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetParams) (res HtcWorkspacesWorkspaceIdTaskRetentionPolicyGetRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/htc/workspaces/"
-	{
-		// Encode "workspaceId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "workspaceId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.WorkspaceId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/task-retention-policy"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcWorkspacesWorkspaceIdTaskRetentionPolicyGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyGetResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// HtcWorkspacesWorkspaceIdTaskRetentionPolicyPut invokes PUT /htc/workspaces/{workspaceId}/task-retention-policy operation.
-//
-// This endpoint enables Workspace administrators to define or update the task retention policy for a
-// specific workspace. The task retention policy includes two key aspects:
-// * **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in
-// hours) after which an archived task is automatically deleted. This control allows for flexibility
-// in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before
-// being permanently deleted. Archived tasks can be unarchived during this period, protecting users
-// from prematurely deleting task resources
-// * **Auto-Archive After Inactivity**: The `archiveAfter` field allows administrators to specify the
-// duration (in hours) of inactivity after which an active task is automatically archived. This
-// feature helps in keeping the project organized by archiving active tasks, ensuring that storage
-// resources are freed optimistically.
-// Setting either value to `0` will result in disabling of that feature. For example, a workspace's
-// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
-// auto-deleting. The policy applies to all projects within the workspace that do not have their own
-// project-level policy defined. If a project within the workspace has its own retention policy
-// defined, the project-level policy takes precedence over the workspace-level policy.
-//
-// PUT /htc/workspaces/{workspaceId}/task-retention-policy
-func (c *Client) HtcWorkspacesWorkspaceIdTaskRetentionPolicyPut(ctx context.Context, request OptWorkspaceTaskRetentionPolicy, params HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutParams) (HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutRes, error) {
-	res, err := c.sendHtcWorkspacesWorkspaceIdTaskRetentionPolicyPut(ctx, request, params)
-	return res, err
-}
-
-func (c *Client) sendHtcWorkspacesWorkspaceIdTaskRetentionPolicyPut(ctx context.Context, request OptWorkspaceTaskRetentionPolicy, params HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutParams) (res HtcWorkspacesWorkspaceIdTaskRetentionPolicyPutRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/htc/workspaces/"
-	{
-		// Encode "workspaceId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "workspaceId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.WorkspaceId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/task-retention-policy"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "PUT", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyPutRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securitySecurityScheme(ctx, "HtcWorkspacesWorkspaceIdTaskRetentionPolicyPut", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"SecurityScheme\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeHtcWorkspacesWorkspaceIdTaskRetentionPolicyPutResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
 // OAuth2TokenPost invokes POST /oauth2/token operation.
 //
 // This endpoint will get an OAuth access token.
@@ -6304,6 +6198,112 @@ func (c *Client) sendOAuth2TokenPost(ctx context.Context) (res OAuth2TokenPostRe
 	defer resp.Body.Close()
 
 	result, err := decodeOAuth2TokenPostResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// PutTaskRetentionPolicy invokes putTaskRetentionPolicy operation.
+//
+// This endpoint enables Workspace administrators to define or update the task retention policy for a
+// specific workspace. The task retention policy includes two key aspects:
+// * **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in
+// hours) after which an archived task is automatically deleted. This control allows for flexibility
+// in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before
+// being permanently deleted. Archived tasks can be unarchived during this period, protecting users
+// from prematurely deleting task resources
+// * **Auto-Archive After Inactivity**: The `archiveAfter` field allows administrators to specify the
+// duration (in hours) of inactivity after which an active task is automatically archived. This
+// feature helps in keeping the project organized by archiving active tasks, ensuring that storage
+// resources are freed optimistically.
+// Setting either value to `0` will result in disabling of that feature. For example, a workspace's
+// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
+// auto-deleting. The policy applies to all projects within the workspace that do not have their own
+// project-level policy defined. If a project within the workspace has its own retention policy
+// defined, the project-level policy takes precedence over the workspace-level policy.
+//
+// PUT /htc/workspaces/{workspaceId}/task-retention-policy
+func (c *Client) PutTaskRetentionPolicy(ctx context.Context, request OptWorkspaceTaskRetentionPolicy, params PutTaskRetentionPolicyParams) (PutTaskRetentionPolicyRes, error) {
+	res, err := c.sendPutTaskRetentionPolicy(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendPutTaskRetentionPolicy(ctx context.Context, request OptWorkspaceTaskRetentionPolicy, params PutTaskRetentionPolicyParams) (res PutTaskRetentionPolicyRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/htc/workspaces/"
+	{
+		// Encode "workspaceId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "workspaceId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.WorkspaceId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/task-retention-policy"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "PUT", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodePutTaskRetentionPolicyRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securitySecurityScheme(ctx, "PutTaskRetentionPolicy", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SecurityScheme\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodePutTaskRetentionPolicyResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

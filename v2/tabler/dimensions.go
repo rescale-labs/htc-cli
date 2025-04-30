@@ -15,7 +15,7 @@ func (c *ComputeEnvs) Fields() []Field {
 		Field{"Machine Type", "%-20s", "%-20.20s"},
 		Field{"Priority", "%-8s", "%-8.8s"},
 		Field{"HT", "%-2s", " %1.1s"},
-		Field{"Arch", "%-5s", "%-5s"},
+		Field{"Arch", "%-10s", "%-10s"},
 		Field{"vCPU", "%-4s", "%4d"},
 		Field{"Mem", "%-3s", "%-3.0f"},
 		Field{"Swap", "%-4s", "%4s"},
