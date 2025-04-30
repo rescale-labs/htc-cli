@@ -2,11 +2,9 @@ package task
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
-	"sort"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -55,30 +53,16 @@ func Stats(cmd *cobra.Command, args []string) error {
 }
 
 func writeSummary(summary oapi.JobStatusSummary, w io.Writer) error {
-	if _, err := fmt.Fprintf(w, "%-38s %19s\n", "JOB STATUS", "TOTAL COUNT"); err != nil {
+	if _, err := fmt.Fprintf(w, "%-21s %15s\n", "JOB STATUS", "TOTAL COUNT"); err != nil {
 		return err
 	}
 	
-	// marshal/unmarshal so we can reflect on the struct field names (JobStatusSummaryJobStatuses)
-	var asJson map[string]any
-	statuses, err := json.Marshal(summary.JobStatuses.Value)
-	if err != nil {
-		return err
-	}
-	json.Unmarshal(statuses, &asJson)
-	// unordered map, so sort keys for consistent output
-	var keys []string
-	for key := range asJson {
-		keys = append(keys, key)
-	}
-	sort.Strings(keys)
-
-	for _, status := range keys {
-		count := asJson[status]
-		if _, err := fmt.Fprintf(w, "%-38s %19d\n", status, int(count.(float64))); err != nil {
+	for status, count := range summary.JobStatuses.Value {
+		if _, err := fmt.Fprintf(w, "%-21s %15d\n", status, count); err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
 
