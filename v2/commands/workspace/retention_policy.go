@@ -13,7 +13,7 @@ import (
 	"github.com/rescale-labs/htc-cli/v2/common"
 )
 
-func TaskRetentionPolicyGet(cmd *cobra.Command, args []string) error {
+func getTaskRetentionPolicy(cmd *cobra.Command, args []string) error {
 	runner, err := common.NewRunnerWithToken(cmd, time.Now())
 	if err != nil {
 		return err
@@ -25,7 +25,7 @@ func TaskRetentionPolicyGet(cmd *cobra.Command, args []string) error {
 	}
 
 	ctx := context.Background()
-	res, err := runner.Client.GetTaskRetentionPolicy(ctx, oapi.GetTaskRetentionPolicyParams{
+	res, err := runner.Client.GetWorkspaceTaskRetentionPolicy(ctx, oapi.GetWorkspaceTaskRetentionPolicyParams{
 		WorkspaceId: p.WorkspaceId,
 	})
 	if err != nil {
@@ -35,14 +35,14 @@ func TaskRetentionPolicyGet(cmd *cobra.Command, args []string) error {
 	switch res := res.(type) {
 	case *oapi.WorkspaceTaskRetentionPolicy:
 		return runner.PrintResult(res, os.Stdout)
-	case *oapi.GetTaskRetentionPolicyForbidden,
-		*oapi.GetTaskRetentionPolicyUnauthorized:
+	case *oapi.GetWorkspaceTaskRetentionPolicyForbidden,
+		*oapi.GetWorkspaceTaskRetentionPolicyUnauthorized:
 		return fmt.Errorf("forbidden: %s", res)
 	}
 	return fmt.Errorf("Unknown response type: %s", res)
 }
 
-func TaskRetentionPolicyPut(cmd *cobra.Command, args []string) error {
+func putTaskRetentionPolicy(cmd *cobra.Command, args []string) error {
 	runner, err := common.NewRunnerWithToken(cmd, time.Now())
 	if err != nil {
 		return err
@@ -53,23 +53,15 @@ func TaskRetentionPolicyPut(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	f, err := common.OpenArg(args[0])
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	dec := json.NewDecoder(f)
 	var policy oapi.WorkspaceTaskRetentionPolicy
-	if err := dec.Decode(&policy); err != nil {
+	if err := common.DecodeFile(&policy, args[0]); err != nil {
 		return err
 	}
-
 
 	ctx := context.Background()
-	res, err := runner.Client.PutTaskRetentionPolicy(ctx,
+	res, err := runner.Client.PutWorkspaceTaskRetentionPolicy(ctx,
 		oapi.NewOptWorkspaceTaskRetentionPolicy(policy),
-		oapi.PutTaskRetentionPolicyParams{
+		oapi.PutWorkspaceTaskRetentionPolicyParams{
 			WorkspaceId: p.WorkspaceId,
 		},
 	)
@@ -80,9 +72,9 @@ func TaskRetentionPolicyPut(cmd *cobra.Command, args []string) error {
 	switch res := res.(type) {
 	case *oapi.WorkspaceTaskRetentionPolicy:
 		return runner.PrintResult(res, os.Stdout)
-	case *oapi.PutTaskRetentionPolicyMethodNotAllowed:
+	case *oapi.PutWorkspaceTaskRetentionPolicyMethodNotAllowed:
 		return fmt.Errorf("not allowed: %s", res)
-	case *oapi.PutTaskRetentionPolicyUnauthorized, *oapi.PutTaskRetentionPolicyForbidden:
+	case *oapi.PutWorkspaceTaskRetentionPolicyUnauthorized, *oapi.PutWorkspaceTaskRetentionPolicyForbidden:
 		return fmt.Errorf("forbidden: %s", res)
 	}
 	return nil
@@ -96,18 +88,20 @@ var RetentionPolicyCmd = &cobra.Command{
 var RetentionPolicyGetCmd = &cobra.Command{
 	Use: 	"get",
 	Short: 	"Returns task retention policy to a workspace.",
-	Run:	common.WrapRunE(TaskRetentionPolicyGet),
+	Run:	common.WrapRunE(getTaskRetentionPolicy),
 	Args: 	cobra.ExactArgs(0),
 }
 
 var RetentionPolicyApplyCmd = &cobra.Command{
 	Use:	"apply JSON_FILE",
 	Short: 	"Apply task retention policy to a workspace.",
-	Run:	common.WrapRunE(TaskRetentionPolicyPut),
+	Run:	common.WrapRunE(putTaskRetentionPolicy),
 	Args:	cobra.ExactArgs(1),
 }
 
 func init() {
+	RetentionPolicyCmd.AddCommand(RetentionPolicyGetCmd)
+
 	// example retention policy JSON payload
 	policy := oapi.WorkspaceTaskRetentionPolicy{
 		ArchiveAfter: 24, // hours
@@ -124,6 +118,5 @@ htc workspace retention-policy apply - <<'EOF'
   %s
 EOF`, string(b))
 
-	RetentionPolicyCmd.AddCommand(RetentionPolicyGetCmd)
 	RetentionPolicyCmd.AddCommand(RetentionPolicyApplyCmd)
 }

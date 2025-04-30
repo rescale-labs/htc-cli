@@ -379,6 +379,298 @@ func (s *Server) handleCreateProjectRequest(args [0]string, argsEscaped bool, w 
 	}
 }
 
+// handleCreateProjectDimensionsRequest handles createProjectDimensions operation.
+//
+// This endpoint allows _workspace_, _organization_, and _Rescale administrators_ to _create_,
+// _update_, or _delete_ the dimension combinations for a project. It accepts a list of dimension
+// combinations, each specifying a unique set of computing environment attributes to tailor the
+// computing environment(s) of a project to match specific job requirements.
+// For example, a project’s dimensions can be configured to require jobs to run on a particular
+// type of processor architecture, within a certain region, and with or without hyperthreading.
+// It's important to note that the dimensions set through this endpoint must align with the available
+// dimensions at the workspace level.
+// **In the event that a project's dimension requirements need to be reset to allow for a broader
+// range of job types, sending an empty list to this endpoint will remove all existing dimension
+// restrictions, returning the project to a state where it can accommodate any dimension available in
+// the workspace.**.
+//
+// PUT /htc/projects/{projectId}/dimensions
+func (s *Server) handleCreateProjectDimensionsRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var (
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "CreateProjectDimensions",
+			ID:   "createProjectDimensions",
+		}
+	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securitySecurityScheme(ctx, "CreateProjectDimensions", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "SecurityScheme",
+					Err:              err,
+				}
+				defer recordError("Security:SecurityScheme", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+	params, err := decodeCreateProjectDimensionsParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	request, close, err := s.decodeCreateProjectDimensionsRequest(r)
+	if err != nil {
+		err = &ogenerrors.DecodeRequestError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeRequest", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
+
+	var response CreateProjectDimensionsRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:          ctx,
+			OperationName:    "CreateProjectDimensions",
+			OperationSummary: "Modify Project Dimensions",
+			OperationID:      "createProjectDimensions",
+			Body:             request,
+			Params: middleware.Parameters{
+				{
+					Name: "projectId",
+					In:   "path",
+				}: params.ProjectId,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = []HTCComputeEnvironment
+			Params   = CreateProjectDimensionsParams
+			Response = CreateProjectDimensionsRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackCreateProjectDimensionsParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.CreateProjectDimensions(ctx, request, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.CreateProjectDimensions(ctx, request, params)
+	}
+	if err != nil {
+		defer recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeCreateProjectDimensionsResponse(response, w); err != nil {
+		defer recordError("EncodeResponse", err)
+		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+		}
+		return
+	}
+}
+
+// handleCreateProjectLimitRequest handles createProjectLimit operation.
+//
+// This endpoint will add a new limit to this project or overwrite an existing limit if one already
+// exists with the provided `modifierRole`.
+// Jobs submitted to this project will only run when the active resource count falls below the
+// minimum of all limits associated with this project.
+// Any user who belongs the project's workspace can modify the `PROJECT_ADMIN` limit. Higher
+// permissions are required to modify the `WORKSPACE_ADMIN` limit.
+//
+// POST /htc/projects/{projectId}/limits
+func (s *Server) handleCreateProjectLimitRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var (
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "CreateProjectLimit",
+			ID:   "createProjectLimit",
+		}
+	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securitySecurityScheme(ctx, "CreateProjectLimit", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "SecurityScheme",
+					Err:              err,
+				}
+				defer recordError("Security:SecurityScheme", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+	params, err := decodeCreateProjectLimitParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	request, close, err := s.decodeCreateProjectLimitRequest(r)
+	if err != nil {
+		err = &ogenerrors.DecodeRequestError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeRequest", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
+
+	var response CreateProjectLimitRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:          ctx,
+			OperationName:    "CreateProjectLimit",
+			OperationSummary: "Create a Project Limit",
+			OperationID:      "createProjectLimit",
+			Body:             request,
+			Params: middleware.Parameters{
+				{
+					Name: "projectId",
+					In:   "path",
+				}: params.ProjectId,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = OptHTCLimitCreate
+			Params   = CreateProjectLimitParams
+			Response = CreateProjectLimitRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackCreateProjectLimitParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.CreateProjectLimit(ctx, request, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.CreateProjectLimit(ctx, request, params)
+	}
+	if err != nil {
+		defer recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeCreateProjectLimitResponse(response, w); err != nil {
+		defer recordError("EncodeResponse", err)
+		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+		}
+		return
+	}
+}
+
 // handleCreateRepoRequest handles createRepo operation.
 //
 // This endpoint will create a private container repository belonging to this project
@@ -2095,6 +2387,145 @@ func (s *Server) handleGetProjectLimitsRequest(args [1]string, argsEscaped bool,
 	}
 }
 
+// handleGetProjectTaskRetentionPolicyRequest handles getProjectTaskRetentionPolicy operation.
+//
+// This endpoint is used to retrieve the current task retention policy of a specific project. The
+// task retention policy is necessary in managing the lifecycle of tasks within a project. The task
+// retention policy includes two key aspects:
+// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
+// which an archived task is automatically deleted. Archived tasks can be unarchived during this
+// period, protecting users from prematurely deleting task resources.
+// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
+// of inactivity after which an active task is automatically archived. This feature helps in keeping
+// the project organized by archiving active tasks, ensuring that storage resources are freed
+// optimistically.
+// Setting either value to `0` will result in disabling of that feature. For example, a project's
+// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
+// auto-deleting.
+// If no policy is set at the project level (i.e., the response is a 404), the policy at the
+// workspace level will apply. If the policy has archiveAfter or deleteAfter set to 0, it means that
+// auto-archival or auto-deletion is disabled at the project level and any workspace level policy is
+// ignored.
+//
+// GET /htc/projects/{projectId}/task-retention-policy
+func (s *Server) handleGetProjectTaskRetentionPolicyRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var (
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "GetProjectTaskRetentionPolicy",
+			ID:   "getProjectTaskRetentionPolicy",
+		}
+	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securitySecurityScheme(ctx, "GetProjectTaskRetentionPolicy", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "SecurityScheme",
+					Err:              err,
+				}
+				defer recordError("Security:SecurityScheme", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+	params, err := decodeGetProjectTaskRetentionPolicyParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	var response GetProjectTaskRetentionPolicyRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:          ctx,
+			OperationName:    "GetProjectTaskRetentionPolicy",
+			OperationSummary: "Get Project Task Retention Policy",
+			OperationID:      "getProjectTaskRetentionPolicy",
+			Body:             nil,
+			Params: middleware.Parameters{
+				{
+					Name: "projectId",
+					In:   "path",
+				}: params.ProjectId,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = GetProjectTaskRetentionPolicyParams
+			Response = GetProjectTaskRetentionPolicyRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackGetProjectTaskRetentionPolicyParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.GetProjectTaskRetentionPolicy(ctx, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.GetProjectTaskRetentionPolicy(ctx, params)
+	}
+	if err != nil {
+		defer recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeGetProjectTaskRetentionPolicyResponse(response, w); err != nil {
+		defer recordError("EncodeResponse", err)
+		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+		}
+		return
+	}
+}
+
 // handleGetProjectsRequest handles getProjects operation.
 //
 // This endpoint will get all projects.
@@ -2344,141 +2775,6 @@ func (s *Server) handleGetRegistryTokenRequest(args [1]string, argsEscaped bool,
 	}
 
 	if err := encodeGetRegistryTokenResponse(response, w); err != nil {
-		defer recordError("EncodeResponse", err)
-		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
-			s.cfg.ErrorHandler(ctx, w, r, err)
-		}
-		return
-	}
-}
-
-// handleGetTaskRetentionPolicyRequest handles getTaskRetentionPolicy operation.
-//
-// This endpoint is used to retrieve the current task retention policy of a specific Workspace. The
-// task retention policy is necessary in managing the lifecycle of tasks within a Workspace. The task
-// retention policy includes two key aspects:
-// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
-// which an archived task is automatically deleted. Archived tasks can be unarchived during this
-// period, protecting users from prematurely deleting task resources.
-// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
-// of inactivity after which an active task is automatically archived. This feature helps in keeping
-// the project organized by archiving active tasks, ensuring that storage resources are freed
-// optimistically.
-// Setting either value to `0` will result in disabling of that feature. For example, a project's
-// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
-// auto-deleting.
-//
-// GET /htc/workspaces/{workspaceId}/task-retention-policy
-func (s *Server) handleGetTaskRetentionPolicyRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var (
-		err          error
-		opErrContext = ogenerrors.OperationContext{
-			Name: "GetTaskRetentionPolicy",
-			ID:   "getTaskRetentionPolicy",
-		}
-	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securitySecurityScheme(ctx, "GetTaskRetentionPolicy", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "SecurityScheme",
-					Err:              err,
-				}
-				defer recordError("Security:SecurityScheme", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
-	params, err := decodeGetTaskRetentionPolicyParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	var response GetTaskRetentionPolicyRes
-	if m := s.cfg.Middleware; m != nil {
-		mreq := middleware.Request{
-			Context:          ctx,
-			OperationName:    "GetTaskRetentionPolicy",
-			OperationSummary: "Get Workspace Task Retention Policy",
-			OperationID:      "getTaskRetentionPolicy",
-			Body:             nil,
-			Params: middleware.Parameters{
-				{
-					Name: "workspaceId",
-					In:   "path",
-				}: params.WorkspaceId,
-			},
-			Raw: r,
-		}
-
-		type (
-			Request  = struct{}
-			Params   = GetTaskRetentionPolicyParams
-			Response = GetTaskRetentionPolicyRes
-		)
-		response, err = middleware.HookMiddleware[
-			Request,
-			Params,
-			Response,
-		](
-			m,
-			mreq,
-			unpackGetTaskRetentionPolicyParams,
-			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.GetTaskRetentionPolicy(ctx, params)
-				return response, err
-			},
-		)
-	} else {
-		response, err = s.h.GetTaskRetentionPolicy(ctx, params)
-	}
-	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	if err := encodeGetTaskRetentionPolicyResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -3121,37 +3417,38 @@ func (s *Server) handleGetWorkspaceLimitsRequest(args [1]string, argsEscaped boo
 	}
 }
 
-// handleHtcProjectsProjectIdDimensionsPutRequest handles PUT /htc/projects/{projectId}/dimensions operation.
+// handleGetWorkspaceTaskRetentionPolicyRequest handles getWorkspaceTaskRetentionPolicy operation.
 //
-// This endpoint allows _workspace_, _organization_, and _Rescale administrators_ to _create_,
-// _update_, or _delete_ the dimension combinations for a project. It accepts a list of dimension
-// combinations, each specifying a unique set of computing environment attributes to tailor the
-// computing environment(s) of a project to match specific job requirements.
-// For example, a project’s dimensions can be configured to require jobs to run on a particular
-// type of processor architecture, within a certain region, and with or without hyperthreading.
-// It's important to note that the dimensions set through this endpoint must align with the available
-// dimensions at the workspace level.
-// **In the event that a project's dimension requirements need to be reset to allow for a broader
-// range of job types, sending an empty list to this endpoint will remove all existing dimension
-// restrictions, returning the project to a state where it can accommodate any dimension available in
-// the workspace.**.
+// This endpoint is used to retrieve the current task retention policy of a specific Workspace. The
+// task retention policy is necessary in managing the lifecycle of tasks within a Workspace. The task
+// retention policy includes two key aspects:
+// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
+// which an archived task is automatically deleted. Archived tasks can be unarchived during this
+// period, protecting users from prematurely deleting task resources.
+// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
+// of inactivity after which an active task is automatically archived. This feature helps in keeping
+// the project organized by archiving active tasks, ensuring that storage resources are freed
+// optimistically.
+// Setting either value to `0` will result in disabling of that feature. For example, a project's
+// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
+// auto-deleting.
 //
-// PUT /htc/projects/{projectId}/dimensions
-func (s *Server) handleHtcProjectsProjectIdDimensionsPutRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// GET /htc/workspaces/{workspaceId}/task-retention-policy
+func (s *Server) handleGetWorkspaceTaskRetentionPolicyRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var (
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: "HtcProjectsProjectIdDimensionsPut",
-			ID:   "",
+			Name: "GetWorkspaceTaskRetentionPolicy",
+			ID:   "getWorkspaceTaskRetentionPolicy",
 		}
 	)
 	{
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securitySecurityScheme(ctx, "HtcProjectsProjectIdDimensionsPut", r)
+			sctx, ok, err := s.securitySecurityScheme(ctx, "GetWorkspaceTaskRetentionPolicy", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
@@ -3191,7 +3488,7 @@ func (s *Server) handleHtcProjectsProjectIdDimensionsPutRequest(args [1]string, 
 			return
 		}
 	}
-	params, err := decodeHtcProjectsProjectIdDimensionsPutParams(args, argsEscaped, r)
+	params, err := decodeGetWorkspaceTaskRetentionPolicyParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -3201,43 +3498,28 @@ func (s *Server) handleHtcProjectsProjectIdDimensionsPutRequest(args [1]string, 
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodeHtcProjectsProjectIdDimensionsPutRequest(r)
-	if err != nil {
-		err = &ogenerrors.DecodeRequestError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeRequest", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-	defer func() {
-		if err := close(); err != nil {
-			recordError("CloseRequest", err)
-		}
-	}()
 
-	var response HtcProjectsProjectIdDimensionsPutRes
+	var response GetWorkspaceTaskRetentionPolicyRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    "HtcProjectsProjectIdDimensionsPut",
-			OperationSummary: "Modify Project Dimensions",
-			OperationID:      "",
-			Body:             request,
+			OperationName:    "GetWorkspaceTaskRetentionPolicy",
+			OperationSummary: "Get Workspace Task Retention Policy",
+			OperationID:      "getWorkspaceTaskRetentionPolicy",
+			Body:             nil,
 			Params: middleware.Parameters{
 				{
-					Name: "projectId",
+					Name: "workspaceId",
 					In:   "path",
-				}: params.ProjectId,
+				}: params.WorkspaceId,
 			},
 			Raw: r,
 		}
 
 		type (
-			Request  = []HTCComputeEnvironment
-			Params   = HtcProjectsProjectIdDimensionsPutParams
-			Response = HtcProjectsProjectIdDimensionsPutRes
+			Request  = struct{}
+			Params   = GetWorkspaceTaskRetentionPolicyParams
+			Response = GetWorkspaceTaskRetentionPolicyRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -3246,14 +3528,14 @@ func (s *Server) handleHtcProjectsProjectIdDimensionsPutRequest(args [1]string, 
 		](
 			m,
 			mreq,
-			unpackHtcProjectsProjectIdDimensionsPutParams,
+			unpackGetWorkspaceTaskRetentionPolicyParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.HtcProjectsProjectIdDimensionsPut(ctx, request, params)
+				response, err = s.h.GetWorkspaceTaskRetentionPolicy(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.HtcProjectsProjectIdDimensionsPut(ctx, request, params)
+		response, err = s.h.GetWorkspaceTaskRetentionPolicy(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -3261,7 +3543,7 @@ func (s *Server) handleHtcProjectsProjectIdDimensionsPutRequest(args [1]string, 
 		return
 	}
 
-	if err := encodeHtcProjectsProjectIdDimensionsPutResponse(response, w); err != nil {
+	if err := encodeGetWorkspaceTaskRetentionPolicyResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -3784,149 +4066,6 @@ func (s *Server) handleHtcProjectsProjectIdLimitsIDPatchRequest(args [2]string, 
 	}
 
 	if err := encodeHtcProjectsProjectIdLimitsIDPatchResponse(response, w); err != nil {
-		defer recordError("EncodeResponse", err)
-		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
-			s.cfg.ErrorHandler(ctx, w, r, err)
-		}
-		return
-	}
-}
-
-// handleHtcProjectsProjectIdLimitsPostRequest handles POST /htc/projects/{projectId}/limits operation.
-//
-// This endpoint will add a new limit to this project or overwrite an existing limit if one already
-// exists with the provided `modifierRole`.
-// Jobs submitted to this project will only run when the active resource count falls below the
-// minimum of all limits associated with this project.
-// Any user who belongs the project's workspace can modify the `PROJECT_ADMIN` limit. Higher
-// permissions are required to modify the `WORKSPACE_ADMIN` limit.
-//
-// POST /htc/projects/{projectId}/limits
-func (s *Server) handleHtcProjectsProjectIdLimitsPostRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var (
-		err          error
-		opErrContext = ogenerrors.OperationContext{
-			Name: "HtcProjectsProjectIdLimitsPost",
-			ID:   "",
-		}
-	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securitySecurityScheme(ctx, "HtcProjectsProjectIdLimitsPost", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "SecurityScheme",
-					Err:              err,
-				}
-				defer recordError("Security:SecurityScheme", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
-	params, err := decodeHtcProjectsProjectIdLimitsPostParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-	request, close, err := s.decodeHtcProjectsProjectIdLimitsPostRequest(r)
-	if err != nil {
-		err = &ogenerrors.DecodeRequestError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeRequest", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-	defer func() {
-		if err := close(); err != nil {
-			recordError("CloseRequest", err)
-		}
-	}()
-
-	var response HtcProjectsProjectIdLimitsPostRes
-	if m := s.cfg.Middleware; m != nil {
-		mreq := middleware.Request{
-			Context:          ctx,
-			OperationName:    "HtcProjectsProjectIdLimitsPost",
-			OperationSummary: "Create a Project Limit",
-			OperationID:      "",
-			Body:             request,
-			Params: middleware.Parameters{
-				{
-					Name: "projectId",
-					In:   "path",
-				}: params.ProjectId,
-			},
-			Raw: r,
-		}
-
-		type (
-			Request  = OptHTCLimitCreate
-			Params   = HtcProjectsProjectIdLimitsPostParams
-			Response = HtcProjectsProjectIdLimitsPostRes
-		)
-		response, err = middleware.HookMiddleware[
-			Request,
-			Params,
-			Response,
-		](
-			m,
-			mreq,
-			unpackHtcProjectsProjectIdLimitsPostParams,
-			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.HtcProjectsProjectIdLimitsPost(ctx, request, params)
-				return response, err
-			},
-		)
-	} else {
-		response, err = s.h.HtcProjectsProjectIdLimitsPost(ctx, request, params)
-	}
-	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	if err := encodeHtcProjectsProjectIdLimitsPostResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -4692,297 +4831,6 @@ func (s *Server) handleHtcProjectsProjectIdTaskRetentionPolicyDeleteRequest(args
 	}
 
 	if err := encodeHtcProjectsProjectIdTaskRetentionPolicyDeleteResponse(response, w); err != nil {
-		defer recordError("EncodeResponse", err)
-		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
-			s.cfg.ErrorHandler(ctx, w, r, err)
-		}
-		return
-	}
-}
-
-// handleHtcProjectsProjectIdTaskRetentionPolicyGetRequest handles GET /htc/projects/{projectId}/task-retention-policy operation.
-//
-// This endpoint is used to retrieve the current task retention policy of a specific project. The
-// task retention policy is necessary in managing the lifecycle of tasks within a project. The task
-// retention policy includes two key aspects:
-// * **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after
-// which an archived task is automatically deleted. Archived tasks can be unarchived during this
-// period, protecting users from prematurely deleting task resources.
-// * **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours)
-// of inactivity after which an active task is automatically archived. This feature helps in keeping
-// the project organized by archiving active tasks, ensuring that storage resources are freed
-// optimistically.
-// Setting either value to `0` will result in disabling of that feature. For example, a project's
-// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
-// auto-deleting.
-// If no policy is set at the project level (i.e., the response is a 404), the policy at the
-// workspace level will apply. If the policy has archiveAfter or deleteAfter set to 0, it means that
-// auto-archival or auto-deletion is disabled at the project level and any workspace level policy is
-// ignored.
-//
-// GET /htc/projects/{projectId}/task-retention-policy
-func (s *Server) handleHtcProjectsProjectIdTaskRetentionPolicyGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var (
-		err          error
-		opErrContext = ogenerrors.OperationContext{
-			Name: "HtcProjectsProjectIdTaskRetentionPolicyGet",
-			ID:   "",
-		}
-	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securitySecurityScheme(ctx, "HtcProjectsProjectIdTaskRetentionPolicyGet", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "SecurityScheme",
-					Err:              err,
-				}
-				defer recordError("Security:SecurityScheme", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
-	params, err := decodeHtcProjectsProjectIdTaskRetentionPolicyGetParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	var response HtcProjectsProjectIdTaskRetentionPolicyGetRes
-	if m := s.cfg.Middleware; m != nil {
-		mreq := middleware.Request{
-			Context:          ctx,
-			OperationName:    "HtcProjectsProjectIdTaskRetentionPolicyGet",
-			OperationSummary: "Get Project Task Retention Policy",
-			OperationID:      "",
-			Body:             nil,
-			Params: middleware.Parameters{
-				{
-					Name: "projectId",
-					In:   "path",
-				}: params.ProjectId,
-			},
-			Raw: r,
-		}
-
-		type (
-			Request  = struct{}
-			Params   = HtcProjectsProjectIdTaskRetentionPolicyGetParams
-			Response = HtcProjectsProjectIdTaskRetentionPolicyGetRes
-		)
-		response, err = middleware.HookMiddleware[
-			Request,
-			Params,
-			Response,
-		](
-			m,
-			mreq,
-			unpackHtcProjectsProjectIdTaskRetentionPolicyGetParams,
-			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.HtcProjectsProjectIdTaskRetentionPolicyGet(ctx, params)
-				return response, err
-			},
-		)
-	} else {
-		response, err = s.h.HtcProjectsProjectIdTaskRetentionPolicyGet(ctx, params)
-	}
-	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	if err := encodeHtcProjectsProjectIdTaskRetentionPolicyGetResponse(response, w); err != nil {
-		defer recordError("EncodeResponse", err)
-		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
-			s.cfg.ErrorHandler(ctx, w, r, err)
-		}
-		return
-	}
-}
-
-// handleHtcProjectsProjectIdTaskRetentionPolicyPutRequest handles PUT /htc/projects/{projectId}/task-retention-policy operation.
-//
-// This endpoint enables project administrators to define or update the task retention policy for a
-// specific project. The task retention policy includes two key aspects:
-// * **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in
-// hours) after which an archived task is automatically deleted. This control allows for flexibility
-// in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before
-// being permanently deleted. Archived tasks can be unarchived during this period, protecting users
-// from prematurely deleting task resources
-// * **Auto-Archive After Inactivity**: The `archiveAfter` field allows administrators to specify the
-// duration (in hours) of inactivity after which an active task is automatically archived. This
-// feature helps in keeping the project organized by archiving active tasks, ensuring that storage
-// resources are freed optimistically.
-// Setting either value to `0` will result in disabling of that feature. For example, a project's
-// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
-// auto-deleting.If no policy is set at the project level, the workspace-level policy (if any) will
-// be applied to the project.
-//
-// PUT /htc/projects/{projectId}/task-retention-policy
-func (s *Server) handleHtcProjectsProjectIdTaskRetentionPolicyPutRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var (
-		err          error
-		opErrContext = ogenerrors.OperationContext{
-			Name: "HtcProjectsProjectIdTaskRetentionPolicyPut",
-			ID:   "",
-		}
-	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securitySecurityScheme(ctx, "HtcProjectsProjectIdTaskRetentionPolicyPut", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "SecurityScheme",
-					Err:              err,
-				}
-				defer recordError("Security:SecurityScheme", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
-	params, err := decodeHtcProjectsProjectIdTaskRetentionPolicyPutParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-	request, close, err := s.decodeHtcProjectsProjectIdTaskRetentionPolicyPutRequest(r)
-	if err != nil {
-		err = &ogenerrors.DecodeRequestError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeRequest", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-	defer func() {
-		if err := close(); err != nil {
-			recordError("CloseRequest", err)
-		}
-	}()
-
-	var response HtcProjectsProjectIdTaskRetentionPolicyPutRes
-	if m := s.cfg.Middleware; m != nil {
-		mreq := middleware.Request{
-			Context:          ctx,
-			OperationName:    "HtcProjectsProjectIdTaskRetentionPolicyPut",
-			OperationSummary: "Modify Project Task Retention Policy",
-			OperationID:      "",
-			Body:             request,
-			Params: middleware.Parameters{
-				{
-					Name: "projectId",
-					In:   "path",
-				}: params.ProjectId,
-			},
-			Raw: r,
-		}
-
-		type (
-			Request  = OptTaskRetentionPolicy
-			Params   = HtcProjectsProjectIdTaskRetentionPolicyPutParams
-			Response = HtcProjectsProjectIdTaskRetentionPolicyPutRes
-		)
-		response, err = middleware.HookMiddleware[
-			Request,
-			Params,
-			Response,
-		](
-			m,
-			mreq,
-			unpackHtcProjectsProjectIdTaskRetentionPolicyPutParams,
-			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.HtcProjectsProjectIdTaskRetentionPolicyPut(ctx, request, params)
-				return response, err
-			},
-		)
-	} else {
-		response, err = s.h.HtcProjectsProjectIdTaskRetentionPolicyPut(ctx, request, params)
-	}
-	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	if err := encodeHtcProjectsProjectIdTaskRetentionPolicyPutResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -6860,10 +6708,10 @@ func (s *Server) handleOAuth2TokenPostRequest(args [0]string, argsEscaped bool, 
 	}
 }
 
-// handlePutTaskRetentionPolicyRequest handles putTaskRetentionPolicy operation.
+// handlePutProjectTaskRetentionPolicyRequest handles putProjectTaskRetentionPolicy operation.
 //
-// This endpoint enables Workspace administrators to define or update the task retention policy for a
-// specific workspace. The task retention policy includes two key aspects:
+// This endpoint enables project administrators to define or update the task retention policy for a
+// specific project. The task retention policy includes two key aspects:
 // * **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in
 // hours) after which an archived task is automatically deleted. This control allows for flexibility
 // in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before
@@ -6873,28 +6721,27 @@ func (s *Server) handleOAuth2TokenPostRequest(args [0]string, argsEscaped bool, 
 // duration (in hours) of inactivity after which an active task is automatically archived. This
 // feature helps in keeping the project organized by archiving active tasks, ensuring that storage
 // resources are freed optimistically.
-// Setting either value to `0` will result in disabling of that feature. For example, a workspace's
+// Setting either value to `0` will result in disabling of that feature. For example, a project's
 // task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
-// auto-deleting. The policy applies to all projects within the workspace that do not have their own
-// project-level policy defined. If a project within the workspace has its own retention policy
-// defined, the project-level policy takes precedence over the workspace-level policy.
+// auto-deleting.If no policy is set at the project level, the workspace-level policy (if any) will
+// be applied to the project.
 //
-// PUT /htc/workspaces/{workspaceId}/task-retention-policy
-func (s *Server) handlePutTaskRetentionPolicyRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// PUT /htc/projects/{projectId}/task-retention-policy
+func (s *Server) handlePutProjectTaskRetentionPolicyRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var (
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: "PutTaskRetentionPolicy",
-			ID:   "putTaskRetentionPolicy",
+			Name: "PutProjectTaskRetentionPolicy",
+			ID:   "putProjectTaskRetentionPolicy",
 		}
 	)
 	{
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securitySecurityScheme(ctx, "PutTaskRetentionPolicy", r)
+			sctx, ok, err := s.securitySecurityScheme(ctx, "PutProjectTaskRetentionPolicy", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
@@ -6934,7 +6781,7 @@ func (s *Server) handlePutTaskRetentionPolicyRequest(args [1]string, argsEscaped
 			return
 		}
 	}
-	params, err := decodePutTaskRetentionPolicyParams(args, argsEscaped, r)
+	params, err := decodePutProjectTaskRetentionPolicyParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -6944,7 +6791,7 @@ func (s *Server) handlePutTaskRetentionPolicyRequest(args [1]string, argsEscaped
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodePutTaskRetentionPolicyRequest(r)
+	request, close, err := s.decodePutProjectTaskRetentionPolicyRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -6960,13 +6807,166 @@ func (s *Server) handlePutTaskRetentionPolicyRequest(args [1]string, argsEscaped
 		}
 	}()
 
-	var response PutTaskRetentionPolicyRes
+	var response PutProjectTaskRetentionPolicyRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    "PutTaskRetentionPolicy",
+			OperationName:    "PutProjectTaskRetentionPolicy",
+			OperationSummary: "Modify Project Task Retention Policy",
+			OperationID:      "putProjectTaskRetentionPolicy",
+			Body:             request,
+			Params: middleware.Parameters{
+				{
+					Name: "projectId",
+					In:   "path",
+				}: params.ProjectId,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = OptTaskRetentionPolicy
+			Params   = PutProjectTaskRetentionPolicyParams
+			Response = PutProjectTaskRetentionPolicyRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackPutProjectTaskRetentionPolicyParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.PutProjectTaskRetentionPolicy(ctx, request, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.PutProjectTaskRetentionPolicy(ctx, request, params)
+	}
+	if err != nil {
+		defer recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodePutProjectTaskRetentionPolicyResponse(response, w); err != nil {
+		defer recordError("EncodeResponse", err)
+		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+		}
+		return
+	}
+}
+
+// handlePutWorkspaceTaskRetentionPolicyRequest handles putWorkspaceTaskRetentionPolicy operation.
+//
+// This endpoint enables Workspace administrators to define or update the task retention policy for a
+// specific workspace. The task retention policy includes two key aspects:
+// * **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in
+// hours) after which an archived task is automatically deleted. This control allows for flexibility
+// in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before
+// being permanently deleted. Archived tasks can be unarchived during this period, protecting users
+// from prematurely deleting task resources
+// * **Auto-Archive After Inactivity**: The `archiveAfter` field allows administrators to specify the
+// duration (in hours) of inactivity after which an active task is automatically archived. This
+// feature helps in keeping the project organized by archiving active tasks, ensuring that storage
+// resources are freed optimistically.
+// Setting either value to `0` will result in disabling of that feature. For example, a workspace's
+// task retention policy with `deleteAfter` set to `0` will result in tasks within that project never
+// auto-deleting. The policy applies to all projects within the workspace that do not have their own
+// project-level policy defined. If a project within the workspace has its own retention policy
+// defined, the project-level policy takes precedence over the workspace-level policy.
+//
+// PUT /htc/workspaces/{workspaceId}/task-retention-policy
+func (s *Server) handlePutWorkspaceTaskRetentionPolicyRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var (
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "PutWorkspaceTaskRetentionPolicy",
+			ID:   "putWorkspaceTaskRetentionPolicy",
+		}
+	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securitySecurityScheme(ctx, "PutWorkspaceTaskRetentionPolicy", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "SecurityScheme",
+					Err:              err,
+				}
+				defer recordError("Security:SecurityScheme", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+	params, err := decodePutWorkspaceTaskRetentionPolicyParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	request, close, err := s.decodePutWorkspaceTaskRetentionPolicyRequest(r)
+	if err != nil {
+		err = &ogenerrors.DecodeRequestError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeRequest", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
+
+	var response PutWorkspaceTaskRetentionPolicyRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:          ctx,
+			OperationName:    "PutWorkspaceTaskRetentionPolicy",
 			OperationSummary: "Modify Workspace Task Retention Policy",
-			OperationID:      "putTaskRetentionPolicy",
+			OperationID:      "putWorkspaceTaskRetentionPolicy",
 			Body:             request,
 			Params: middleware.Parameters{
 				{
@@ -6979,8 +6979,8 @@ func (s *Server) handlePutTaskRetentionPolicyRequest(args [1]string, argsEscaped
 
 		type (
 			Request  = OptWorkspaceTaskRetentionPolicy
-			Params   = PutTaskRetentionPolicyParams
-			Response = PutTaskRetentionPolicyRes
+			Params   = PutWorkspaceTaskRetentionPolicyParams
+			Response = PutWorkspaceTaskRetentionPolicyRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -6989,14 +6989,14 @@ func (s *Server) handlePutTaskRetentionPolicyRequest(args [1]string, argsEscaped
 		](
 			m,
 			mreq,
-			unpackPutTaskRetentionPolicyParams,
+			unpackPutWorkspaceTaskRetentionPolicyParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.PutTaskRetentionPolicy(ctx, request, params)
+				response, err = s.h.PutWorkspaceTaskRetentionPolicy(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.PutTaskRetentionPolicy(ctx, request, params)
+		response, err = s.h.PutWorkspaceTaskRetentionPolicy(ctx, request, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -7004,7 +7004,7 @@ func (s *Server) handlePutTaskRetentionPolicyRequest(args [1]string, argsEscaped
 		return
 	}
 
-	if err := encodePutTaskRetentionPolicyResponse(response, w); err != nil {
+	if err := encodePutWorkspaceTaskRetentionPolicyResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)

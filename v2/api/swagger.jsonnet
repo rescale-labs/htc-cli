@@ -128,6 +128,19 @@ local patches = {
           },
         },
       },
+      put+: {
+        'x-ogen-operation-group': 'Project',
+        operationId: 'createProjectDimensions',
+        responses+: {
+          '201'+: {
+            content+: {
+              'application/json'+: {
+                schema: { '$ref': '#/components/schemas/HTCProjectDimensions' },
+              },
+            },
+          },
+        },
+      }
     },
     '/htc/projects/{projectId}/limits'+: {
       get+: {
@@ -142,6 +155,20 @@ local patches = {
             },
           },
         },
+      },
+      post+: {
+        'x-ogen-operation-group': 'Project',
+        operationId: 'createProjectLimit',
+      }
+    },
+    '/htc/projects/{projectId}/task-retention-policy'+: {
+      get+: {
+        'x-ogen-operation-group': 'Project',
+        operationId: 'getProjectTaskRetentionPolicy',
+      },
+      put+: {
+        'x-ogen-operation-group': 'Project',
+        operationId: 'putProjectTaskRetentionPolicy',
       },
     },
     '/htc/projects/{projectId}/tasks'+: {
@@ -308,11 +335,11 @@ local patches = {
     '/htc/workspaces/{workspaceId}/task-retention-policy'+: {
       get+: {
         'x-ogen-operation-group': 'Workspace',
-        operationId: 'getTaskRetentionPolicy',
+        operationId: 'getWorkspaceTaskRetentionPolicy',
       },
       put+: {
         'x-ogen-operation-group': 'Workspace',
-        operationId: 'putTaskRetentionPolicy',
+        operationId: 'putWorkspaceTaskRetentionPolicy',
         responses+: {
           '405'+: {
             description: "Not Allowed"

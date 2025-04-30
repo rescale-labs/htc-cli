@@ -9,6 +9,14 @@ type CancelJobsRes interface {
 	cancelJobsRes()
 }
 
+type CreateProjectDimensionsRes interface {
+	createProjectDimensionsRes()
+}
+
+type CreateProjectLimitRes interface {
+	createProjectLimitRes()
+}
+
 type CreateProjectRes interface {
 	createProjectRes()
 }
@@ -65,16 +73,16 @@ type GetProjectRes interface {
 	getProjectRes()
 }
 
+type GetProjectTaskRetentionPolicyRes interface {
+	getProjectTaskRetentionPolicyRes()
+}
+
 type GetProjectsRes interface {
 	getProjectsRes()
 }
 
 type GetRegistryTokenRes interface {
 	getRegistryTokenRes()
-}
-
-type GetTaskRetentionPolicyRes interface {
-	getTaskRetentionPolicyRes()
 }
 
 type GetTaskStatsRes interface {
@@ -97,8 +105,8 @@ type GetWorkspaceLimitsRes interface {
 	getWorkspaceLimitsRes()
 }
 
-type HtcProjectsProjectIdDimensionsPutRes interface {
-	htcProjectsProjectIdDimensionsPutRes()
+type GetWorkspaceTaskRetentionPolicyRes interface {
+	getWorkspaceTaskRetentionPolicyRes()
 }
 
 type HtcProjectsProjectIdLimitsDeleteRes interface {
@@ -115,10 +123,6 @@ type HtcProjectsProjectIdLimitsIDGetRes interface {
 
 type HtcProjectsProjectIdLimitsIDPatchRes interface {
 	htcProjectsProjectIdLimitsIDPatchRes()
-}
-
-type HtcProjectsProjectIdLimitsPostRes interface {
-	htcProjectsProjectIdLimitsPostRes()
 }
 
 type HtcProjectsProjectIdPatchRes interface {
@@ -143,14 +147,6 @@ type HtcProjectsProjectIdStorageTokensGetRes interface {
 
 type HtcProjectsProjectIdTaskRetentionPolicyDeleteRes interface {
 	htcProjectsProjectIdTaskRetentionPolicyDeleteRes()
-}
-
-type HtcProjectsProjectIdTaskRetentionPolicyGetRes interface {
-	htcProjectsProjectIdTaskRetentionPolicyGetRes()
-}
-
-type HtcProjectsProjectIdTaskRetentionPolicyPutRes interface {
-	htcProjectsProjectIdTaskRetentionPolicyPutRes()
 }
 
 type HtcProjectsProjectIdTasksTaskIdDeleteRes interface {
@@ -213,8 +209,12 @@ type OAuth2TokenPostRes interface {
 	oAuth2TokenPostRes()
 }
 
-type PutTaskRetentionPolicyRes interface {
-	putTaskRetentionPolicyRes()
+type PutProjectTaskRetentionPolicyRes interface {
+	putProjectTaskRetentionPolicyRes()
+}
+
+type PutWorkspaceTaskRetentionPolicyRes interface {
+	putWorkspaceTaskRetentionPolicyRes()
 }
 
 type SubmitJobsRes interface {

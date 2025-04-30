@@ -2793,6 +2793,7 @@
          },
          "put": {
             "description": "This endpoint allows _workspace_, _organization_, and _Rescale administrators_ to _create_, _update_, or _delete_ the dimension combinations for a project. It accepts a list of dimension combinations, each specifying a unique set of computing environment attributes to tailor the computing environment(s) of a project to match specific job requirements.\n\nFor example, a project’s dimensions can be configured to require jobs to run on a particular type of processor architecture, within a certain region, and with or without hyperthreading.\n\nIt's important to note that the dimensions set through this endpoint must align with the available dimensions at the workspace level.\n\n**In the event that a project's dimension requirements need to be reset to allow for a broader range of job types, sending an empty list to this endpoint will remove all existing dimension restrictions, returning the project to a state where it can accommodate any dimension available in the workspace.**",
+            "operationId": "createProjectDimensions",
             "parameters": [
                {
                   "in": "path",
@@ -2820,10 +2821,7 @@
                   "content": {
                      "application/json": {
                         "schema": {
-                           "items": {
-                              "$ref": "#/components/schemas/HTCComputeEnvironment"
-                           },
-                           "type": "array"
+                           "$ref": "#/components/schemas/HTCProjectDimensions"
                         }
                      }
                   },
@@ -2854,7 +2852,8 @@
             "summary": "Modify Project Dimensions",
             "tags": [
                "Project Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Project"
          }
       },
       "/htc/projects/{projectId}/limits": {
@@ -2955,6 +2954,7 @@
          },
          "post": {
             "description": "This endpoint will add a new limit to this project or overwrite an existing limit if one already exists with the provided `modifierRole`.\n\nJobs submitted to this project will only run when the active resource count falls below the minimum of all limits associated with this project.\n\nAny user who belongs the project's workspace can modify the `PROJECT_ADMIN` limit. Higher permissions are required to modify the `WORKSPACE_ADMIN` limit",
+            "operationId": "createProjectLimit",
             "parameters": [
                {
                   "in": "path",
@@ -3010,7 +3010,8 @@
             "summary": "Create a Project Limit",
             "tags": [
                "Project Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Project"
          }
       },
       "/htc/projects/{projectId}/limits/{id}": {
@@ -3465,6 +3466,7 @@
          },
          "get": {
             "description": "This endpoint is used to retrieve the current task retention policy of a specific project. The task retention policy is necessary in managing the lifecycle of tasks within a project. The task retention policy includes two key aspects:\n\n* **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after which an archived task is automatically deleted. Archived tasks can be unarchived during this period, protecting users from prematurely deleting task resources.\n\n* **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours) of inactivity after which an active task is automatically archived. This feature helps in keeping the project organized by archiving active tasks, ensuring that storage resources are freed optimistically.\n\nSetting either value to `0` will result in disabling of that feature. For example, a project's task retention policy with `deleteAfter` set to `0` will result in tasks within that project never auto-deleting. \n\nIf no policy is set at the project level (i.e., the response is a 404), the policy at the workspace level will apply. If the policy has archiveAfter or deleteAfter set to 0, it means that auto-archival or auto-deletion is disabled at the project level and any workspace level policy is ignored",
+            "operationId": "getProjectTaskRetentionPolicy",
             "parameters": [
                {
                   "in": "path",
@@ -3511,10 +3513,12 @@
             "summary": "Get Project Task Retention Policy",
             "tags": [
                "Project Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Project"
          },
          "put": {
             "description": "This endpoint enables project administrators to define or update the task retention policy for a specific project. The task retention policy includes two key aspects:\n\n* **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in hours) after which an archived task is automatically deleted. This control allows for flexibility in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before being permanently deleted. Archived tasks can be unarchived during this period, protecting users from prematurely deleting task resources\n\n* **Auto-Archive After Inactivity**: The `archiveAfter` field allows administrators to specify the duration (in hours) of inactivity after which an active task is automatically archived. This feature helps in keeping the project organized by archiving active tasks, ensuring that storage resources are freed optimistically.\n\nSetting either value to `0` will result in disabling of that feature. For example, a project's task retention policy with `deleteAfter` set to `0` will result in tasks within that project never auto-deleting.If no policy is set at the project level, the workspace-level policy (if any) will be applied to the project.",
+            "operationId": "putProjectTaskRetentionPolicy",
             "parameters": [
                {
                   "in": "path",
@@ -3570,7 +3574,8 @@
             "summary": "Modify Project Task Retention Policy",
             "tags": [
                "Project Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Project"
          }
       },
       "/htc/projects/{projectId}/tasks": {
@@ -5362,7 +5367,7 @@
       "/htc/workspaces/{workspaceId}/task-retention-policy": {
          "get": {
             "description": "This endpoint is used to retrieve the current task retention policy of a specific Workspace. The task retention policy is necessary in managing the lifecycle of tasks within a Workspace. The task retention policy includes two key aspects:\n\n* **Deletion Grace Period**: The `deleteAfter` field represents the duration (in hours) after which an archived task is automatically deleted. Archived tasks can be unarchived during this period, protecting users from prematurely deleting task resources.\n\n* **Auto-Archive After Inactivity**: The `archiveAfter` field represents the duration (in hours) of inactivity after which an active task is automatically archived. This feature helps in keeping the project organized by archiving active tasks, ensuring that storage resources are freed optimistically.\n\nSetting either value to `0` will result in disabling of that feature. For example, a project's task retention policy with `deleteAfter` set to `0` will result in tasks within that project never auto-deleting.",
-            "operationId": "getTaskRetentionPolicy",
+            "operationId": "getWorkspaceTaskRetentionPolicy",
             "parameters": [
                {
                   "in": "path",
@@ -5414,7 +5419,7 @@
          },
          "put": {
             "description": "This endpoint enables Workspace administrators to define or update the task retention policy for a specific workspace. The task retention policy includes two key aspects:\n\n* **Deletion Grace Period**: The `deleteAfter` field allows administrators to set the duration (in hours) after which an archived task is automatically deleted. This control allows for flexibility in managing the lifecycle of tasks, ensuring that data is retained for an adequate period before being permanently deleted. Archived tasks can be unarchived during this period, protecting users from prematurely deleting task resources\n\n* **Auto-Archive After Inactivity**: The `archiveAfter` field allows administrators to specify the duration (in hours) of inactivity after which an active task is automatically archived. This feature helps in keeping the project organized by archiving active tasks, ensuring that storage resources are freed optimistically.\n\nSetting either value to `0` will result in disabling of that feature. For example, a workspace's task retention policy with `deleteAfter` set to `0` will result in tasks within that project never auto-deleting. The policy applies to all projects within the workspace that do not have their own project-level policy defined. If a project within the workspace has its own retention policy defined, the project-level policy takes precedence over the workspace-level policy.",
-            "operationId": "putTaskRetentionPolicy",
+            "operationId": "putWorkspaceTaskRetentionPolicy",
             "parameters": [
                {
                   "in": "path",
