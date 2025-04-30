@@ -55,10 +55,17 @@ func (s HTCJobs) WriteRows(rowFmt string, w io.Writer) error {
 	return nil
 }
 
-
-var htcJobStatusEventFields = []Field {
+var htcJobStatusEventFields = []Field{
 	Field{"Time", "%19s", "%19s"},
 	Field{"Status", "%21s", "%21s"},
+	Field{"Status Reason", "%19s", "%19s"},
+	Field{"Container Exit Code", "%19s", "%19d"},
+	Field{"Container Exit Reason", "%24s", "%24s"},
+	Field{"Instance Type", "%20s", "%20s"},
+	Field{"CSP", "%5s", "%5s"},
+	Field{"Region", "%15s", "%15s"},
+	Field{"Priority", "%10s", "%10s"},
+	Field{"Instance ID", "%20s", "%20s"},
 }
 
 type HTCJobStatusEvent oapi.RescaleJobStatusEvent
@@ -68,14 +75,23 @@ func (e *HTCJobStatusEvent) Fields() []Field {
 }
 
 func (e *HTCJobStatusEvent) WriteRows(rowFmt string, w io.Writer) error {
+	container := e.Container.Value
+	instanceLabels := e.InstanceLabels.Value
 	_, err := fmt.Fprintf(
 		w, rowFmt,
 		formatDateTime(e.DateTime),
 		e.Status.Value,
+		e.StatusReason.Value,
+		int(container.ExitCode.Value),
+		container.Reason.Value,
+		instanceLabels.InstanceType.Value,
+		instanceLabels.Csp.Value,
+		instanceLabels.Region.Value,
+		instanceLabels.Priority.Value,
+		e.InstanceId.Value,
 	)
 	return err
 }
-
 
 type HTCJobStatusEvents []oapi.RescaleJobStatusEvent
 
