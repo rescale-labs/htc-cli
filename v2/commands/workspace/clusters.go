@@ -35,6 +35,9 @@ func Clusters(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	if runner.Config.OutputFormat != "text" {
+		return fmt.Errorf("Only default text format is supported for this command\n")
+	}
 
 	p := common.IDParams{RequireWorkspaceId: true}
 	if err := runner.GetIds(&p); err != nil {
@@ -46,6 +49,7 @@ func Clusters(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+
 	return writeRows(res, os.Stdout)
 }
 
@@ -93,9 +97,10 @@ func writeRows(clusters *oapi.HTCClusterStatusResponse, w io.Writer) error {
 }
 
 var ClustersCmd = &cobra.Command{
-	Use: "clusters",
-	Short: "Get information about cluster status.",
-	Run: common.WrapRunE(Clusters),
+	Use: 	"clusters",
+	Short: 	"Get information about cluster status.",
+	Run: 	common.WrapRunE(Clusters),
+	Args: 	cobra.ExactArgs(0),
 }
 
 func init() {
