@@ -187,12 +187,6 @@ type Handler interface {
 	//
 	// GET /htc/projects/{projectId}/tasks/{taskId}/groups
 	HtcProjectsProjectIdTasksTaskIdGroupsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdGroupsGetParams) (HtcProjectsProjectIdTasksTaskIdGroupsGetRes, error)
-	// HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet implements GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events operation.
-	//
-	// This endpoint will get events for a job.
-	//
-	// GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events
-	HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGet(ctx context.Context, params HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetParams) (HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes, error)
 	// HtcProjectsProjectIdTasksTaskIdPatch implements PATCH /htc/projects/{projectId}/tasks/{taskId} operation.
 	//
 	// This endpoint allows for managing the lifecycle of tasks. Users may set the `LifecycleStatus` of
@@ -407,6 +401,12 @@ type JobHandler interface {
 	//
 	// POST /htc/projects/{projectId}/tasks/{taskId}/jobs/cancel
 	CancelJobs(ctx context.Context, params CancelJobsParams) (CancelJobsRes, error)
+	// GetEvents implements getEvents operation.
+	//
+	// This endpoint will get events for a job.
+	//
+	// GET /htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events
+	GetEvents(ctx context.Context, params GetEventsParams) (GetEventsRes, error)
 	// GetJob implements getJob operation.
 	//
 	// This endpoint will get a job by id.

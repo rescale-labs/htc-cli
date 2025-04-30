@@ -254,10 +254,36 @@ local patches = {
           },
         },
       }
+    },
+    '/htc/projects/{projectId}/tasks/{taskId}/jobs/{jobId}/events'+: {
+      get+: {
+        'x-ogen-operation-group': 'Job',
+        operationId: 'getEvents',
+        responses+: {
+          '200'+: {
+            content+: {
+              'application/json'+: {
+                schema: { '$ref':
+                  '#/components/schemas/HTCJobStatusEvents' },
+              }
+            }
+          },
+          '404': {
+            content: {
+              'application/json': {
+                schema: { '$ref': '#/components/schemas/HTCRequestError' },
+              },
+            },
+          },
+        }
+      }
     }
   },
   components+: {
     schemas+: {
+      ContainerDetails+: {
+        nullable: true,
+      },
       HTCJob+: {
         properties+: {
           completedAt: {
@@ -294,6 +320,22 @@ local patches = {
         properties+: {
           statusReason+: {
             nullable: true,
+          },
+        },
+      },
+      HTCJobStatusEvents+: {
+        type: 'object',
+        properties+: {
+          items: {
+            items: {
+              '$ref': '#/components/schemas/RescaleJobStatusEvent',
+            },
+            type: 'array',
+          },
+          next: {
+            example: 'https://page2.com',
+            format: 'uri',
+            type: 'string',
           },
         },
       },
@@ -415,7 +457,19 @@ local patches = {
         type: 'string',
         nullable: true,
       },
-
+      InstanceLabels+: {
+        nullable: true,
+      },
+      RescaleJobStatusEvent+: {
+        properties+: {
+          statusReason+: {
+            nullable: true,
+          },
+          instanceId+: {
+            nullable: true,
+          }
+        }
+      },
     },
   },
 };

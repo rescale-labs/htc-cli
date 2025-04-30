@@ -25,6 +25,10 @@ type GetDimensionsRes interface {
 	getDimensionsRes()
 }
 
+type GetEventsRes interface {
+	getEventsRes()
+}
+
 type GetImageRes interface {
 	getImageRes()
 }
@@ -147,10 +151,6 @@ type HtcProjectsProjectIdTasksTaskIdGroupSummaryStatisticsGetRes interface {
 
 type HtcProjectsProjectIdTasksTaskIdGroupsGetRes interface {
 	htcProjectsProjectIdTasksTaskIdGroupsGetRes()
-}
-
-type HtcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes interface {
-	htcProjectsProjectIdTasksTaskIdJobsJobIdEventsGetRes()
 }
 
 type HtcProjectsProjectIdTasksTaskIdPatchRes interface {
