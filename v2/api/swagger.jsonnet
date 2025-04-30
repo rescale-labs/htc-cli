@@ -39,6 +39,23 @@ local patches = {
         security: securityScheme,
       },
     },
+    '/htc/gcp/clusters/{workspaceId}'+: {
+      get+: {
+        'x-ogen-operation-group': 'Workspace',
+        operationId: 'getGCPClusters',
+        responses+: {
+          '200'+: {
+            content+: {
+              'application/json'+: {
+                schema: { '$ref':
+                  '#/components/schemas/HTCClusterStatusResponse' },
+
+              },
+            },
+          },
+        },
+      },
+    },
     '/htc/metrics'+: {
       get+: {
         'x-ogen-operation-group': 'Metrics',

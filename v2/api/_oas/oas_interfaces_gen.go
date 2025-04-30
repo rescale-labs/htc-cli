@@ -29,6 +29,10 @@ type GetEventsRes interface {
 	getEventsRes()
 }
 
+type GetGCPClustersRes interface {
+	getGCPClustersRes()
+}
+
 type GetImageRes interface {
 	getImageRes()
 }
@@ -79,10 +83,6 @@ type GetTasksRes interface {
 
 type GetTokenRes interface {
 	getTokenRes()
-}
-
-type HtcGcpClustersWorkspaceIdGetRes interface {
-	htcGcpClustersWorkspaceIdGetRes()
 }
 
 type HtcProjectsProjectIdDimensionsPutRes interface {

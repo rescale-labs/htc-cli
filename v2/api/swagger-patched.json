@@ -2166,6 +2166,7 @@
       "/htc/gcp/clusters/{workspaceId}": {
          "get": {
             "description": "This endpoint returns details about all GCP clusters that can run jobs for the specified HTC workspace",
+            "operationId": "getGCPClusters",
             "parameters": [
                {
                   "in": "path",
@@ -2212,7 +2213,8 @@
             "summary": "Get Status of GCP Cluster",
             "tags": [
                "Provider Resource"
-            ]
+            ],
+            "x-ogen-operation-group": "Workspace"
          }
       },
       "/htc/metrics": {

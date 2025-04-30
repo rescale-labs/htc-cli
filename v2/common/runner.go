@@ -166,10 +166,12 @@ type IDParams struct {
 	ProjectId string
 	TaskId    string
 	JobId     string
+	WorkspaceId string
 
 	RequireProjectId bool
 	RequireTaskId    bool
 	RequireJobId     bool
+	RequireWorkspaceId bool
 }
 
 func (r *Runner) GetIds(p *IDParams) error {
@@ -192,6 +194,15 @@ func (r *Runner) GetIds(p *IDParams) error {
 		}
 	}
 
+	if p.RequireWorkspaceId {
+		if r.Config.Credentials.Identity.WorkspaceId == "" {
+			errors = append(errors,
+				config.UsageErrorf("Error: missing workspace ID."))
+		} else {
+			p.WorkspaceId = r.Config.Credentials.Identity.WorkspaceId
+		}
+	}
+
 	if len(errors) == 1 {
 		return errors[0]
 	} else if len(errors) > 0 {
@@ -207,6 +218,7 @@ func (r *Runner) GetIds(p *IDParams) error {
 
 	return nil
 }
+
 
 func (r *Runner) PrintResult(res any, w io.Writer) error {
 	// Text output is the default and happy path. Use it when we can.
