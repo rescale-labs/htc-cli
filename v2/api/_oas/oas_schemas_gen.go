@@ -659,6 +659,16 @@ type GetRegistryTokenUnauthorized struct{}
 
 func (*GetRegistryTokenUnauthorized) getRegistryTokenRes() {}
 
+// GetTaskStatsForbidden is response for GetTaskStats operation.
+type GetTaskStatsForbidden struct{}
+
+func (*GetTaskStatsForbidden) getTaskStatsRes() {}
+
+// GetTaskStatsUnauthorized is response for GetTaskStats operation.
+type GetTaskStatsUnauthorized struct{}
+
+func (*GetTaskStatsUnauthorized) getTaskStatsRes() {}
+
 // GetTasksForbidden is response for GetTasks operation.
 type GetTasksForbidden struct{}
 
@@ -4400,6 +4410,45 @@ func (s *JobExecutionEnvironment) SetInstanceType(val OptString) {
 	s.InstanceType = val
 }
 
+// Ref: #/components/schemas/JobStatusSummary
+type JobStatusSummary struct {
+	Group       OptNilString                   `json:"group"`
+	JobStatuses OptJobStatusSummaryJobStatuses `json:"jobStatuses"`
+}
+
+// GetGroup returns the value of Group.
+func (s *JobStatusSummary) GetGroup() OptNilString {
+	return s.Group
+}
+
+// GetJobStatuses returns the value of JobStatuses.
+func (s *JobStatusSummary) GetJobStatuses() OptJobStatusSummaryJobStatuses {
+	return s.JobStatuses
+}
+
+// SetGroup sets the value of Group.
+func (s *JobStatusSummary) SetGroup(val OptNilString) {
+	s.Group = val
+}
+
+// SetJobStatuses sets the value of JobStatuses.
+func (s *JobStatusSummary) SetJobStatuses(val OptJobStatusSummaryJobStatuses) {
+	s.JobStatuses = val
+}
+
+func (*JobStatusSummary) getTaskStatsRes() {}
+
+type JobStatusSummaryJobStatuses map[string]int
+
+func (s *JobStatusSummaryJobStatuses) init() JobStatusSummaryJobStatuses {
+	m := *s
+	if m == nil {
+		m = map[string]int{}
+		*s = m
+	}
+	return m
+}
+
 // Ref: #/components/schemas/JsonWebKey
 type JsonWebKey struct {
 	Algorithm       OptString                    `json:"algorithm"`
@@ -4717,6 +4766,7 @@ func (*OAuth2ErrorResponse) getImagesRes()                                      
 func (*OAuth2ErrorResponse) getLimitsRes()                                                {}
 func (*OAuth2ErrorResponse) getProjectRes()                                               {}
 func (*OAuth2ErrorResponse) getRegistryTokenRes()                                         {}
+func (*OAuth2ErrorResponse) getTaskStatsRes()                                             {}
 func (*OAuth2ErrorResponse) getTasksRes()                                                 {}
 func (*OAuth2ErrorResponse) getTokenRes()                                                 {}
 func (*OAuth2ErrorResponse) htcGcpClustersWorkspaceIdGetRes()                             {}
@@ -6261,6 +6311,52 @@ func (o OptJobExecutionEnvironment) Get() (v JobExecutionEnvironment, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptJobExecutionEnvironment) Or(d JobExecutionEnvironment) JobExecutionEnvironment {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptJobStatusSummaryJobStatuses returns new OptJobStatusSummaryJobStatuses with value set to v.
+func NewOptJobStatusSummaryJobStatuses(v JobStatusSummaryJobStatuses) OptJobStatusSummaryJobStatuses {
+	return OptJobStatusSummaryJobStatuses{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptJobStatusSummaryJobStatuses is optional JobStatusSummaryJobStatuses.
+type OptJobStatusSummaryJobStatuses struct {
+	Value JobStatusSummaryJobStatuses
+	Set   bool
+}
+
+// IsSet returns true if OptJobStatusSummaryJobStatuses was set.
+func (o OptJobStatusSummaryJobStatuses) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptJobStatusSummaryJobStatuses) Reset() {
+	var v JobStatusSummaryJobStatuses
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptJobStatusSummaryJobStatuses) SetTo(v JobStatusSummaryJobStatuses) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptJobStatusSummaryJobStatuses) Get() (v JobStatusSummaryJobStatuses, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptJobStatusSummaryJobStatuses) Or(d JobStatusSummaryJobStatuses) JobStatusSummaryJobStatuses {
 	if v, ok := o.Get(); ok {
 		return v
 	}

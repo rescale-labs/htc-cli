@@ -165,6 +165,12 @@ local patches = {
         operationId: 'createTask',
       },
     },
+  '/htc/projects/{projectId}/tasks/{taskId}/summary-statistics'+: {
+    get+: {
+      'x-ogen-operation-group': 'Task',
+      operationId: 'GetTaskStats',
+    }
+  },
     '/htc/projects/{projectId}/tasks/{taskId}/jobs'+: {
       get+: {
         'x-ogen-operation-group': 'Job',
@@ -283,6 +289,19 @@ local patches = {
     schemas+: {
       ContainerDetails+: {
         nullable: true,
+      },
+      JobStatusSummary+: {
+        properties+: {
+          group+:{
+            nullable: true,
+          },
+          jobStatuses: {
+            type: 'object',
+            additionalProperties: {
+              type: 'integer',
+            },
+          }
+        }
       },
       HTCJob+: {
         properties+: {

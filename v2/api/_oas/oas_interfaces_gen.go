@@ -69,6 +69,10 @@ type GetRegistryTokenRes interface {
 	getRegistryTokenRes()
 }
 
+type GetTaskStatsRes interface {
+	getTaskStatsRes()
+}
+
 type GetTasksRes interface {
 	getTasksRes()
 }

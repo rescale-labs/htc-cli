@@ -192,6 +192,15 @@ func (UnimplementedHandler) GetRegistryToken(ctx context.Context, params GetRegi
 	return r, ht.ErrNotImplemented
 }
 
+// GetTaskStats implements GetTaskStats operation.
+//
+// This endpoint will get task summary statistics.
+//
+// GET /htc/projects/{projectId}/tasks/{taskId}/summary-statistics
+func (UnimplementedHandler) GetTaskStats(ctx context.Context, params GetTaskStatsParams) (r GetTaskStatsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetTasks implements getTasks operation.
 //
 // This endpoint will get all tasks in a project.

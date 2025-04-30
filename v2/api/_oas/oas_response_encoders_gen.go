@@ -680,6 +680,47 @@ func encodeGetRegistryTokenResponse(response GetRegistryTokenRes, w http.Respons
 	}
 }
 
+func encodeGetTaskStatsResponse(response GetTaskStatsRes, w http.ResponseWriter) error {
+	switch response := response.(type) {
+	case *JobStatusSummary:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetTaskStatsUnauthorized:
+		w.WriteHeader(401)
+
+		return nil
+
+	case *GetTaskStatsForbidden:
+		w.WriteHeader(403)
+
+		return nil
+
+	case *OAuth2ErrorResponse:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeGetTasksResponse(response GetTasksRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *HTCTasksResponse:
