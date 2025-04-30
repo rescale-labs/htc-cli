@@ -1337,35 +1337,8 @@
                   "type": "string"
                },
                "jobStatuses": {
-                  "properties": {
-                     "FAILED": {
-                        "example": 5,
-                        "type": "integer"
-                     },
-                     "RUNNABLE": {
-                        "example": 5,
-                        "type": "integer"
-                     },
-                     "RUNNING": {
-                        "example": 5,
-                        "type": "integer"
-                     },
-                     "STARTING": {
-                        "example": 5,
-                        "type": "integer"
-                     },
-                     "SUBMITTED_TO_PROVIDER": {
-                        "example": 5,
-                        "type": "integer"
-                     },
-                     "SUBMITTED_TO_RESCALE": {
-                        "example": 5,
-                        "type": "integer"
-                     },
-                     "SUCCEEDED": {
-                        "example": 5,
-                        "type": "integer"
-                     }
+                  "additionalProperties": {
+                     "type": "integer"
                   },
                   "type": "object"
                }

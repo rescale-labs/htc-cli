@@ -4438,84 +4438,15 @@ func (s *JobStatusSummary) SetJobStatuses(val OptJobStatusSummaryJobStatuses) {
 
 func (*JobStatusSummary) getTaskStatsRes() {}
 
-type JobStatusSummaryJobStatuses struct {
-	FAILED              OptInt `json:"FAILED"`
-	RUNNABLE            OptInt `json:"RUNNABLE"`
-	RUNNING             OptInt `json:"RUNNING"`
-	STARTING            OptInt `json:"STARTING"`
-	SUBMITTEDTOPROVIDER OptInt `json:"SUBMITTED_TO_PROVIDER"`
-	SUBMITTEDTORESCALE  OptInt `json:"SUBMITTED_TO_RESCALE"`
-	SUCCEEDED           OptInt `json:"SUCCEEDED"`
-}
+type JobStatusSummaryJobStatuses map[string]int
 
-// GetFAILED returns the value of FAILED.
-func (s *JobStatusSummaryJobStatuses) GetFAILED() OptInt {
-	return s.FAILED
-}
-
-// GetRUNNABLE returns the value of RUNNABLE.
-func (s *JobStatusSummaryJobStatuses) GetRUNNABLE() OptInt {
-	return s.RUNNABLE
-}
-
-// GetRUNNING returns the value of RUNNING.
-func (s *JobStatusSummaryJobStatuses) GetRUNNING() OptInt {
-	return s.RUNNING
-}
-
-// GetSTARTING returns the value of STARTING.
-func (s *JobStatusSummaryJobStatuses) GetSTARTING() OptInt {
-	return s.STARTING
-}
-
-// GetSUBMITTEDTOPROVIDER returns the value of SUBMITTEDTOPROVIDER.
-func (s *JobStatusSummaryJobStatuses) GetSUBMITTEDTOPROVIDER() OptInt {
-	return s.SUBMITTEDTOPROVIDER
-}
-
-// GetSUBMITTEDTORESCALE returns the value of SUBMITTEDTORESCALE.
-func (s *JobStatusSummaryJobStatuses) GetSUBMITTEDTORESCALE() OptInt {
-	return s.SUBMITTEDTORESCALE
-}
-
-// GetSUCCEEDED returns the value of SUCCEEDED.
-func (s *JobStatusSummaryJobStatuses) GetSUCCEEDED() OptInt {
-	return s.SUCCEEDED
-}
-
-// SetFAILED sets the value of FAILED.
-func (s *JobStatusSummaryJobStatuses) SetFAILED(val OptInt) {
-	s.FAILED = val
-}
-
-// SetRUNNABLE sets the value of RUNNABLE.
-func (s *JobStatusSummaryJobStatuses) SetRUNNABLE(val OptInt) {
-	s.RUNNABLE = val
-}
-
-// SetRUNNING sets the value of RUNNING.
-func (s *JobStatusSummaryJobStatuses) SetRUNNING(val OptInt) {
-	s.RUNNING = val
-}
-
-// SetSTARTING sets the value of STARTING.
-func (s *JobStatusSummaryJobStatuses) SetSTARTING(val OptInt) {
-	s.STARTING = val
-}
-
-// SetSUBMITTEDTOPROVIDER sets the value of SUBMITTEDTOPROVIDER.
-func (s *JobStatusSummaryJobStatuses) SetSUBMITTEDTOPROVIDER(val OptInt) {
-	s.SUBMITTEDTOPROVIDER = val
-}
-
-// SetSUBMITTEDTORESCALE sets the value of SUBMITTEDTORESCALE.
-func (s *JobStatusSummaryJobStatuses) SetSUBMITTEDTORESCALE(val OptInt) {
-	s.SUBMITTEDTORESCALE = val
-}
-
-// SetSUCCEEDED sets the value of SUCCEEDED.
-func (s *JobStatusSummaryJobStatuses) SetSUCCEEDED(val OptInt) {
-	s.SUCCEEDED = val
+func (s *JobStatusSummaryJobStatuses) init() JobStatusSummaryJobStatuses {
+	m := *s
+	if m == nil {
+		m = map[string]int{}
+		*s = m
+	}
+	return m
 }
 
 // Ref: #/components/schemas/JsonWebKey
@@ -6242,52 +6173,6 @@ func (o OptInstant) Get() (v Instant, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptInstant) Or(d Instant) Instant {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptInt returns new OptInt with value set to v.
-func NewOptInt(v int) OptInt {
-	return OptInt{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptInt is optional int.
-type OptInt struct {
-	Value int
-	Set   bool
-}
-
-// IsSet returns true if OptInt was set.
-func (o OptInt) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptInt) Reset() {
-	var v int
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptInt) SetTo(v int) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptInt) Get() (v int, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptInt) Or(d int) int {
 	if v, ok := o.Get(); ok {
 		return v
 	}

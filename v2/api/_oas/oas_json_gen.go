@@ -7537,66 +7537,19 @@ func (s *JobStatusSummary) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
-func (s *JobStatusSummaryJobStatuses) Encode(e *jx.Encoder) {
+func (s JobStatusSummaryJobStatuses) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
-// encodeFields encodes fields.
-func (s *JobStatusSummaryJobStatuses) encodeFields(e *jx.Encoder) {
-	{
-		if s.FAILED.Set {
-			e.FieldStart("FAILED")
-			s.FAILED.Encode(e)
-		}
-	}
-	{
-		if s.RUNNABLE.Set {
-			e.FieldStart("RUNNABLE")
-			s.RUNNABLE.Encode(e)
-		}
-	}
-	{
-		if s.RUNNING.Set {
-			e.FieldStart("RUNNING")
-			s.RUNNING.Encode(e)
-		}
-	}
-	{
-		if s.STARTING.Set {
-			e.FieldStart("STARTING")
-			s.STARTING.Encode(e)
-		}
-	}
-	{
-		if s.SUBMITTEDTOPROVIDER.Set {
-			e.FieldStart("SUBMITTED_TO_PROVIDER")
-			s.SUBMITTEDTOPROVIDER.Encode(e)
-		}
-	}
-	{
-		if s.SUBMITTEDTORESCALE.Set {
-			e.FieldStart("SUBMITTED_TO_RESCALE")
-			s.SUBMITTEDTORESCALE.Encode(e)
-		}
-	}
-	{
-		if s.SUCCEEDED.Set {
-			e.FieldStart("SUCCEEDED")
-			s.SUCCEEDED.Encode(e)
-		}
-	}
-}
+// encodeFields implements json.Marshaler.
+func (s JobStatusSummaryJobStatuses) encodeFields(e *jx.Encoder) {
+	for k, elem := range s {
+		e.FieldStart(k)
 
-var jsonFieldsNameOfJobStatusSummaryJobStatuses = [7]string{
-	0: "FAILED",
-	1: "RUNNABLE",
-	2: "RUNNING",
-	3: "STARTING",
-	4: "SUBMITTED_TO_PROVIDER",
-	5: "SUBMITTED_TO_RESCALE",
-	6: "SUCCEEDED",
+		e.Int(elem)
+	}
 }
 
 // Decode decodes JobStatusSummaryJobStatuses from json.
@@ -7604,82 +7557,20 @@ func (s *JobStatusSummaryJobStatuses) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode JobStatusSummaryJobStatuses to nil")
 	}
-
+	m := s.init()
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "FAILED":
-			if err := func() error {
-				s.FAILED.Reset()
-				if err := s.FAILED.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"FAILED\"")
+		var elem int
+		if err := func() error {
+			v, err := d.Int()
+			elem = int(v)
+			if err != nil {
+				return err
 			}
-		case "RUNNABLE":
-			if err := func() error {
-				s.RUNNABLE.Reset()
-				if err := s.RUNNABLE.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RUNNABLE\"")
-			}
-		case "RUNNING":
-			if err := func() error {
-				s.RUNNING.Reset()
-				if err := s.RUNNING.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RUNNING\"")
-			}
-		case "STARTING":
-			if err := func() error {
-				s.STARTING.Reset()
-				if err := s.STARTING.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"STARTING\"")
-			}
-		case "SUBMITTED_TO_PROVIDER":
-			if err := func() error {
-				s.SUBMITTEDTOPROVIDER.Reset()
-				if err := s.SUBMITTEDTOPROVIDER.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"SUBMITTED_TO_PROVIDER\"")
-			}
-		case "SUBMITTED_TO_RESCALE":
-			if err := func() error {
-				s.SUBMITTEDTORESCALE.Reset()
-				if err := s.SUBMITTEDTORESCALE.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"SUBMITTED_TO_RESCALE\"")
-			}
-		case "SUCCEEDED":
-			if err := func() error {
-				s.SUCCEEDED.Reset()
-				if err := s.SUCCEEDED.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"SUCCEEDED\"")
-			}
-		default:
-			return d.Skip()
+			return nil
+		}(); err != nil {
+			return errors.Wrapf(err, "decode field %q", k)
 		}
+		m[string(k)] = elem
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode JobStatusSummaryJobStatuses")
@@ -7689,7 +7580,7 @@ func (s *JobStatusSummaryJobStatuses) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *JobStatusSummaryJobStatuses) MarshalJSON() ([]byte, error) {
+func (s JobStatusSummaryJobStatuses) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
@@ -9498,41 +9389,6 @@ func (s *OptInstant) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes int as json.
-func (o OptInt) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Int(int(o.Value))
-}
-
-// Decode decodes int from json.
-func (o *OptInt) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptInt to nil")
-	}
-	o.Set = true
-	v, err := d.Int()
-	if err != nil {
-		return err
-	}
-	o.Value = int(v)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptInt) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptInt) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes int32 as json.
 func (o OptInt32) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -9650,6 +9506,7 @@ func (o *OptJobStatusSummaryJobStatuses) Decode(d *jx.Decoder) error {
 		return errors.New("invalid: unable to decode OptJobStatusSummaryJobStatuses to nil")
 	}
 	o.Set = true
+	o.Value = make(JobStatusSummaryJobStatuses)
 	if err := o.Value.Decode(d); err != nil {
 		return err
 	}
