@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.0.10
+* Add `job logs -f [JOB_UUID]` flag to live tail job logs.
+* Add `job events [JOB_UUID]` to view job lifecycle events.
+
+* Add `task stats` to get task summary statistics.
+
+* Add `workspace clusters` to view details about all GCP clusters that can run jobs for the specified HTC workspace.
+* Add `workspace retention-policy get` to view current task retention policy of a specific Workspace
+* Add `workspace retention-policy apply` (admin) to define or update task retention policy for the HTC workspace
+* Add `workspace dimensions get` to view the various hardware configurations and environments available within a specific workspace.
+
+* Add `project retention-policy get` to view the current task retention policy of a specific project.
+* Add `project retention-policy apply` (admin) to define or update the task retention policy for a specific project.
+* Add `project limits get` to view all resource limitations associated with this project.
+* Add `project limits apply` to add a new limit to this project or overwrite an existing limit if one already exists with the provided `modifierRole`
+* Add `project dimensions get` to view the current set of dimension combinations configured for a specific project
+* Add `project dimensions apply` to create/update/delete the dimension combinations for a project
+
+
 ## v0.0.9
 
 * Add `job logs [JOB_UUID]` to support viewing job logs
