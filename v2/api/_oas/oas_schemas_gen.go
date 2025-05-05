@@ -1478,14 +1478,14 @@ type HTCJob struct {
 	FailureCode             *NilHTCJobFailureCode      `json:"failureCode"`
 	Group                   OptString                  `json:"group"`
 	ImageName               OptString                  `json:"imageName"`
-	InstanceId              OptString                  `json:"instanceId"`
+	InstanceId              OptNilString               `json:"instanceId"`
 	InstanceLabels          OptNilInstanceLabels       `json:"instanceLabels"`
 	JobExecutionEnvironment OptJobExecutionEnvironment `json:"jobExecutionEnvironment"`
 	JobUUID                 OptString                  `json:"jobUUID"`
 	MaxDiskGiB              OptInt32                   `json:"maxDiskGiB"`
-	MaxGpus                 OptInt32                   `json:"maxGpus"`
+	MaxGpus                 OptNilInt32                `json:"maxGpus"`
 	MaxMemory               OptInt32                   `json:"maxMemory"`
-	MaxSwap                 OptInt32                   `json:"maxSwap"`
+	MaxSwap                 OptNilInt32                `json:"maxSwap"`
 	MaxVCpus                OptInt32                   `json:"maxVCpus"`
 	MinVCpus                OptInt32                   `json:"minVCpus"`
 	ProjectId               OptString                  `json:"projectId"`
@@ -1556,7 +1556,7 @@ func (s *HTCJob) GetImageName() OptString {
 }
 
 // GetInstanceId returns the value of InstanceId.
-func (s *HTCJob) GetInstanceId() OptString {
+func (s *HTCJob) GetInstanceId() OptNilString {
 	return s.InstanceId
 }
 
@@ -1581,7 +1581,7 @@ func (s *HTCJob) GetMaxDiskGiB() OptInt32 {
 }
 
 // GetMaxGpus returns the value of MaxGpus.
-func (s *HTCJob) GetMaxGpus() OptInt32 {
+func (s *HTCJob) GetMaxGpus() OptNilInt32 {
 	return s.MaxGpus
 }
 
@@ -1591,7 +1591,7 @@ func (s *HTCJob) GetMaxMemory() OptInt32 {
 }
 
 // GetMaxSwap returns the value of MaxSwap.
-func (s *HTCJob) GetMaxSwap() OptInt32 {
+func (s *HTCJob) GetMaxSwap() OptNilInt32 {
 	return s.MaxSwap
 }
 
@@ -1711,7 +1711,7 @@ func (s *HTCJob) SetImageName(val OptString) {
 }
 
 // SetInstanceId sets the value of InstanceId.
-func (s *HTCJob) SetInstanceId(val OptString) {
+func (s *HTCJob) SetInstanceId(val OptNilString) {
 	s.InstanceId = val
 }
 
@@ -1736,7 +1736,7 @@ func (s *HTCJob) SetMaxDiskGiB(val OptInt32) {
 }
 
 // SetMaxGpus sets the value of MaxGpus.
-func (s *HTCJob) SetMaxGpus(val OptInt32) {
+func (s *HTCJob) SetMaxGpus(val OptNilInt32) {
 	s.MaxGpus = val
 }
 
@@ -1746,7 +1746,7 @@ func (s *HTCJob) SetMaxMemory(val OptInt32) {
 }
 
 // SetMaxSwap sets the value of MaxSwap.
-func (s *HTCJob) SetMaxSwap(val OptInt32) {
+func (s *HTCJob) SetMaxSwap(val OptNilInt32) {
 	s.MaxSwap = val
 }
 
@@ -6604,6 +6604,69 @@ func (o OptNilInstanceLabels) Get() (v InstanceLabels, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilInstanceLabels) Or(d InstanceLabels) InstanceLabels {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilInt32 returns new OptNilInt32 with value set to v.
+func NewOptNilInt32(v int32) OptNilInt32 {
+	return OptNilInt32{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilInt32 is optional nullable int32.
+type OptNilInt32 struct {
+	Value int32
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilInt32 was set.
+func (o OptNilInt32) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilInt32) Reset() {
+	var v int32
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilInt32) SetTo(v int32) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilInt32) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilInt32) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v int32
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilInt32) Get() (v int32, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilInt32) Or(d int32) int32 {
 	if v, ok := o.Get(); ok {
 		return v
 	}

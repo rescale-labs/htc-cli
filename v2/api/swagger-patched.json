@@ -332,6 +332,7 @@
                   "type": "string"
                },
                "instanceId": {
+                  "nullable": true,
                   "type": "string"
                },
                "instanceLabels": {
@@ -350,6 +351,7 @@
                },
                "maxGpus": {
                   "format": "int32",
+                  "nullable": true,
                   "type": "integer"
                },
                "maxMemory": {
@@ -358,6 +360,7 @@
                },
                "maxSwap": {
                   "format": "int32",
+                  "nullable": true,
                   "type": "integer"
                },
                "maxVCpus": {
