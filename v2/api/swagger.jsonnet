@@ -388,6 +388,15 @@ local patches = {
           completedAt: {
             '$ref': '#/components/schemas/NullableInstant',
           },
+          instanceId+: {
+            nullable: true,
+          },
+          maxGpus+: {
+            nullable: true,
+          },
+          maxSwap+: {
+            nullable: true,
+          },
           statusReason+: {
             nullable: true,
           },
