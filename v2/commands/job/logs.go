@@ -95,6 +95,10 @@ func Logs(cmd *cobra.Command, args []string) error {
 				currentPage = limit - total
 			}
 
+			if currentPage == 0 {
+				break
+			}
+
 			// only write up to the current page limit
 			if limit > 0 {
 				err = writeRows(res.Items[:currentPage], os.Stdout, time.Time{})
