@@ -60,6 +60,6 @@ Steps are pretty simple:
    git push --tags
    ```
 1. Create a new release at
-   https://github.com/rescale/htc-storage-cli/releases/new
+   https://github.com/rescale-labs/htc-cli/releases/new
    1. Copy in the text from `CHANGES.md`.
    1. Upload the dist archives you built in `build/dist`.
