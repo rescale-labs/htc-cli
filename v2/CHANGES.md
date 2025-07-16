@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.0.11
+* Fix panic error when calling `htc job logs` command on jobs with no/empty logs.
+
 ## v0.0.10
 * Add `job logs -f [JOB_UUID]` flag to live tail job logs.
 * Add `job events [JOB_UUID]` to view job lifecycle events.
